@@ -1,11 +1,15 @@
 """Configurações globais do jogo: dimensões, cores, física."""
 
-TITLE = "Escola dos Bugs - A Vingança dos Professores"
+TITLE = "IFVania"
 
 SCREEN_WIDTH = 960
 SCREEN_HEIGHT = 540
 FPS = 60
 TILE_SIZE = 32
+
+# Contrato corporal comum a protagonistas, NPCs, bugs e bosses.
+CHARACTER_SIZE = (40, 40)
+CHARACTER_VISUAL_SCALE = 1.10  # Apenas protagonista e bosses, durante toda a partida.
 
 # Física
 GRAVITY = 0.65

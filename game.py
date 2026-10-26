@@ -5,17 +5,24 @@ import settings
 from entities.player import Player
 from world.level import Level
 from world.levels_data import build_levels, STORY_INTRO
+from world.school import SchoolLevel
+from world.school_data import ENCOUNTER_DIALOGUE, MOUSE_DISCOVERY
+from world.boss_transition import BossTransition
 from ui.dialogue import DialogueBox
 from ui.hud import HUD
+from ui.frontend import Frontend
 
 STATE_MENU = "menu"
-STATE_STORY = "story"
+STATE_CHARACTER_SELECT = "character_select"
 STATE_PLAYING = "playing"
 STATE_DIALOGUE = "dialogue"
 STATE_LEVEL_CARD = "level_card"
 STATE_PAUSE = "pause"
 STATE_GAME_OVER = "game_over"
-STATE_VICTORY = "victory"
+STATE_CONTENT_END = "content_end"
+STATE_ABDUCTION = "abduction"
+STATE_INFECTION = "infection"
+STATE_BOSS_TRANSFORMATION = 'boss_transformation'
 
 
 class Game:
@@ -28,30 +35,36 @@ class Game:
 
         self.hud = HUD()
         self.dialogue_box = DialogueBox()
-        self.font_title = pygame.font.SysFont(settings.FONT_NAME, 46, bold=True)
-        self.font_menu = pygame.font.SysFont(settings.FONT_NAME, 22)
+        self.frontend = Frontend()
+        self.menu_index = 0
+        self.character_index = 0
+        self.selected_character = "boy"
 
         self.level_defs = build_levels()
         self.level_index = 0
         self.level = None
         self.player = None
+        self.in_story_intro = False
 
         self.state = STATE_MENU
         self.level_card_timer = 0
+        self.abduction_timer = 0
+        self.abduction_duration = 90
+        self.pause_return_state = STATE_PLAYING
+        self.infection_timer = 0
+        self.infection_duration = 60
+        self.boss_transition = None
 
     # ------------------------------------------------------------------
     def run(self):
         while self.running:
             events = pygame.event.get()
-            for event in events:
-                if event.type == pygame.QUIT:
-                    self.running = False
-                self.dialogue_box.handle_event(event)
-                if event.type == pygame.KEYDOWN:
-                    self._handle_keydown(event, events)
+            gameplay_events = self._process_events(events)
+            if not self.running:
+                break
 
             keys = pygame.key.get_pressed()
-            self._update(keys, events)
+            self._update(keys, gameplay_events)
             self._draw()
 
             self.clock.tick(settings.FPS)
@@ -60,20 +73,92 @@ class Game:
         sys.exit()
 
     # ------------------------------------------------------------------
+    def _process_events(self, events):
+        gameplay_events = []
+        for event in events:
+            previous_state = self.state
+            self._handle_event(event)
+            if previous_state == STATE_PLAYING and self.state == STATE_PLAYING:
+                gameplay_events.append(event)
+            if not self.running:
+                break
+        return gameplay_events
+
+    def _handle_event(self, event):
+        if event.type == pygame.QUIT:
+            self.running = False
+            return
+        # Um evento pertence a uma única tela, mesmo se o callback trocar estado.
+        if self.state == STATE_DIALOGUE or (self.state == STATE_BOSS_TRANSFORMATION and self.dialogue_box.active):
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                self.pause_return_state = self.state
+                self.state = STATE_PAUSE
+                return
+            self.dialogue_box.handle_event(event)
+            return
+        if event.type == pygame.KEYDOWN:
+            self._handle_keydown(event, [event])
+        elif event.type == pygame.MOUSEMOTION and self.state == STATE_MENU:
+            for i, rect in enumerate(self.frontend.menu_rects):
+                if rect.collidepoint(event.pos):
+                    self.menu_index = i
+        elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+            if self.state == STATE_MENU:
+                for i, rect in enumerate(self.frontend.menu_rects):
+                    if rect.collidepoint(event.pos):
+                        self.menu_index = i
+                        self._activate_menu()
+                        return
+            elif self.state == STATE_CHARACTER_SELECT:
+                if self.frontend.back_rect.collidepoint(event.pos):
+                    self.state = STATE_MENU
+                elif self.frontend.confirm_rect.collidepoint(event.pos):
+                    self._confirm_character()
+                else:
+                    for i, rect in enumerate(self.frontend.character_rects):
+                        if rect.collidepoint(event.pos):
+                            self.character_index = i
+
+    def _activate_menu(self):
+        if self.menu_index == 0:
+            self.state = STATE_CHARACTER_SELECT
+            self.character_index = self.frontend.characters.index(self.selected_character)
+        else:
+            self.running = False
+
+    def _confirm_character(self):
+        self.selected_character = self.frontend.characters[self.character_index]
+        self._start_story()
+
     def _handle_keydown(self, event, events):
+        if self.state == STATE_MENU:
+            if event.key in (pygame.K_UP, pygame.K_DOWN, pygame.K_w, pygame.K_s, pygame.K_TAB):
+                self.menu_index = 1 - self.menu_index
+            elif event.key in (pygame.K_RETURN, pygame.K_SPACE):
+                self._activate_menu()
+            elif event.key == pygame.K_ESCAPE:
+                self.running = False
+            return
+        if self.state == STATE_CHARACTER_SELECT:
+            if event.key in (pygame.K_LEFT, pygame.K_RIGHT, pygame.K_a, pygame.K_d, pygame.K_TAB):
+                self.character_index = 1 - self.character_index
+            elif event.key in (pygame.K_RETURN, pygame.K_SPACE):
+                self._confirm_character()
+            elif event.key == pygame.K_ESCAPE:
+                self.state = STATE_MENU
+            return
         if event.key == pygame.K_ESCAPE:
-            if self.state == STATE_PLAYING:
+            if self.state in (STATE_PLAYING, STATE_ABDUCTION, STATE_INFECTION, STATE_BOSS_TRANSFORMATION):
+                self.pause_return_state = self.state
                 self.state = STATE_PAUSE
             elif self.state == STATE_PAUSE:
-                self.state = STATE_PLAYING
+                self.state = self.pause_return_state
             else:
                 self.running = False
 
-        if self.state == STATE_MENU and event.key in (pygame.K_RETURN, pygame.K_SPACE):
-            self._start_story()
-
-        elif self.state in (STATE_GAME_OVER, STATE_VICTORY) and event.key in (pygame.K_RETURN, pygame.K_SPACE):
+        if self.state in (STATE_GAME_OVER, STATE_CONTENT_END) and event.key in (pygame.K_RETURN, pygame.K_SPACE):
             self.state = STATE_MENU
+            self.menu_index = 0
             self.level_index = 0
 
         elif self.state == STATE_LEVEL_CARD and event.key in (pygame.K_RETURN, pygame.K_SPACE):
@@ -81,16 +166,51 @@ class Game:
 
     # ------------------------------------------------------------------
     def _start_story(self):
+        self.boss_transition = None
         self.level_index = 0
-        self._load_level(0, fresh_player=True)
+        self._load_school('classroom', fresh_player=True)
+        self.in_story_intro = True
         self.state = STATE_DIALOGUE
-        self.dialogue_box.start(STORY_INTRO, on_finish=self._show_level_card)
+        self.dialogue_box.start(STORY_INTRO, on_finish=self._begin_corridor)
+
+    def _load_school(self, room, fresh_player=False):
+        self.level = SchoolLevel(room)
+        if fresh_player:
+            self.player = Player(*self.level.player_spawn, character=self.selected_character)
+        else:
+            self.player.respawn(*self.level.player_spawn)
+        self.player.whip_unlocked = False
+        self.level.camera.update(self.player.rect)
+
+    def _begin_corridor(self):
+        self._load_school('corridor')
+        self._show_level_card()
+
+    def _start_abduction(self):
+        self.state = STATE_ABDUCTION
+        self.abduction_timer = 0
+        self.player.vel.update(0, 0)
+        self.level.begin_abduction(self.player)
+
+    def _enter_virtual(self):
+        self._load_level(0)
+        self.player.whip_unlocked = False
+        self.state = STATE_DIALOGUE
+        self.dialogue_box.start(MOUSE_DISCOVERY, on_finish=self._grant_mouse)
+
+    def _grant_mouse(self):
+        self.player.whip_unlocked = True
+        self._show_level_card()
+
+    def _start_boss_transformation(self):
+        self.boss_transition = BossTransition(self.level, self.player)
+        self.state = STATE_BOSS_TRANSFORMATION
 
     def _load_level(self, index, fresh_player=False):
         self.level = Level(self.level_defs[index])
         spawn = self.level.player_spawn
         if fresh_player or self.player is None:
-            self.player = Player(*spawn)
+            self.player = Player(*spawn, character=self.selected_character)
         else:
             saved_abilities = self.player.abilities
             saved_health_bonus = self.player.max_health
@@ -98,14 +218,22 @@ class Game:
             self.player.abilities = saved_abilities
             self.player.max_health = saved_health_bonus
             self.player.health = self.player.max_health
+        self.player.whip_unlocked = True
+        self.level.camera.update(self.player.rect)
 
     def _show_level_card(self):
+        self.in_story_intro = False
         self.state = STATE_LEVEL_CARD
         self.level_card_timer = 0
 
     # ------------------------------------------------------------------
     def _update(self, keys, events):
-        if self.state == STATE_PLAYING:
+        if self.state in (STATE_MENU, STATE_CHARACTER_SELECT):
+            self.frontend.update()
+        elif self.state == STATE_PLAYING:
+            if getattr(self.level.boss, 'cinematic_pending', False):
+                self._start_boss_transformation()
+                return
             self.player.handle_input(keys, events)
             self.player.update(self.level.tilemap.solids, self.level.tilemap.hazards)
 
@@ -117,12 +245,47 @@ class Game:
                 self._advance_level()
             elif event_type == "fell":
                 self.player.respawn(*self.level.player_spawn)
+            elif event_type == 'enter_lab':
+                self._load_school('lab')
+            elif event_type == 'school_encounter':
+                self.state = STATE_DIALOGUE
+                self.player.vel.update(0, 0)
+                self.dialogue_box.start(ENCOUNTER_DIALOGUE, on_finish=self._start_abduction)
+            elif event_type == 'boss_transform':
+                self._start_boss_transformation()
 
             if not self.player.alive:
                 self.state = STATE_GAME_OVER
 
         elif self.state == STATE_DIALOGUE:
             self.dialogue_box.update()
+            if self.in_story_intro and self.dialogue_box.index >= 4:
+                self.level.corrupted = True
+
+        elif self.state == STATE_ABDUCTION:
+            self.abduction_timer += 1
+            self.level.update_abduction(self.player, self.abduction_timer)
+            if self.abduction_timer >= self.abduction_duration:
+                self._enter_virtual()
+
+        elif self.state == STATE_INFECTION:
+            self.infection_timer += 1
+            if self.infection_timer >= self.infection_duration//2:
+                self.level.infected = True
+            if self.infection_timer >= self.infection_duration:
+                self.level.finish_boss_dialogue()
+                self.state = STATE_PLAYING
+
+        elif self.state == STATE_BOSS_TRANSFORMATION:
+            if self.dialogue_box.active:
+                self.dialogue_box.update()
+            else:
+                event = self.boss_transition.update()
+                if event == 'speech':
+                    self.dialogue_box.start([('Entidade', 'Ainda não terminou.')],
+                                             on_finish=self.boss_transition.resume)
+                elif event == 'complete':
+                    self.state = STATE_PLAYING
 
         elif self.state == STATE_LEVEL_CARD:
             self.level_card_timer += 1
@@ -131,12 +294,16 @@ class Game:
 
     def _resume_from_dialogue(self):
         if self.state == STATE_DIALOGUE:
-            self.state = STATE_PLAYING
+            if getattr(self.level, 'encounter_pending', False):
+                self.infection_timer = 0
+                self.state = STATE_INFECTION
+            else:
+                self.state = STATE_PLAYING
 
     def _advance_level(self):
         self.level_index += 1
         if self.level_index >= len(self.level_defs):
-            self.state = STATE_VICTORY
+            self.state = STATE_CONTENT_END
         else:
             self._load_level(self.level_index)
             self._show_level_card()
@@ -145,11 +312,30 @@ class Game:
     def _draw(self):
         if self.state == STATE_MENU:
             self._draw_menu()
-        elif self.state in (STATE_PLAYING, STATE_DIALOGUE, STATE_PAUSE):
+        elif self.state == STATE_CHARACTER_SELECT:
+            self.frontend.draw_selection(self.screen, self.character_index)
+        elif self.state == STATE_BOSS_TRANSFORMATION or (self.state == STATE_PAUSE
+                                                        and self.pause_return_state == STATE_BOSS_TRANSFORMATION):
+            self.boss_transition.draw(self.screen)
+            if self.dialogue_box.active:
+                self.dialogue_box.draw(self.screen)
+            if self.state == STATE_PAUSE:
+                self._draw_overlay('PAUSADO', 'ESC para continuar')
+        elif self.state in (STATE_PLAYING, STATE_DIALOGUE, STATE_PAUSE, STATE_ABDUCTION, STATE_INFECTION):
             self.level.draw(self.screen)
             self.player.draw(self.screen, self.level.camera)
-            self.hud.draw(self.screen, self.player, self.level.name, self.level.boss)
-            self.hud.draw_controls_hint(self.screen, self.player)
+            if not self.in_story_intro:
+                self.hud.draw(self.screen, self.player, self.level.name, self.level.boss)
+                if self.state not in (STATE_ABDUCTION, STATE_INFECTION) and not (
+                        self.state == STATE_PAUSE and self.pause_return_state in (STATE_ABDUCTION, STATE_INFECTION)):
+                    self.hud.draw_controls_hint(self.screen, self.player)
+            if self.state == STATE_ABDUCTION or (self.state == STATE_PAUSE
+                                                  and self.pause_return_state == STATE_ABDUCTION):
+                self.level.draw_abduction(self.screen, self.player,
+                                           self.abduction_timer/self.abduction_duration)
+            if self.state == STATE_INFECTION or (self.state == STATE_PAUSE
+                                                 and self.pause_return_state == STATE_INFECTION):
+                self.level.draw_infection(self.screen, self.infection_timer/self.infection_duration)
             if self.state == STATE_DIALOGUE:
                 self.dialogue_box.draw(self.screen)
             if self.state == STATE_PAUSE:
@@ -160,9 +346,13 @@ class Game:
         elif self.state == STATE_GAME_OVER:
             self.screen.fill((25, 10, 15))
             self._draw_overlay("VOCÊ FOI REPROVADO(A)...", "ENTER para voltar ao menu")
-        elif self.state == STATE_VICTORY:
+        elif self.state == STATE_CONTENT_END:
             self.screen.fill((10, 25, 18))
-            self._draw_overlay("PARABÉNS! ESCOLA SALVA!", "ENTER para voltar ao menu")
+            self._draw_overlay("A JORNADA CONTINUA", "Fim do conteúdo disponível. ENTER para voltar ao menu")
+            text = self.hud.font_small.render(
+                'A IFVania segue ativa. A energia da escola ainda precisa ser desligada.',
+                True, settings.TEXT_COLOR)
+            self.screen.blit(text, text.get_rect(center=(settings.SCREEN_WIDTH//2, 340)))
 
         pygame.display.flip()
 
@@ -173,21 +363,4 @@ class Game:
         self.hud.draw_center_text(self.screen, title, sub)
 
     def _draw_menu(self):
-        self.screen.fill(settings.BG_COLOR)
-        title = self.font_title.render(settings.TITLE, True, settings.NAME_COLOR)
-        self.screen.blit(title, title.get_rect(center=(settings.SCREEN_WIDTH // 2, 160)))
-
-        subtitle = self.font_menu.render(
-            "Um metroidvania sobre enfrentar 6 professores de programação corrompidos",
-            True, settings.TEXT_COLOR)
-        self.screen.blit(subtitle, subtitle.get_rect(center=(settings.SCREEN_WIDTH // 2, 220)))
-
-        prompt = self.font_menu.render("Pressione ENTER ou ESPAÇO para começar", True, settings.WHITE)
-        self.screen.blit(prompt, prompt.get_rect(center=(settings.SCREEN_WIDTH // 2, 320)))
-
-        controls = [
-            "<- -> mover   ESPAÇO pular   X mouse-chicote   SHIFT dash   F tiro   Q escudo   ESC pausar",
-        ]
-        for i, line in enumerate(controls):
-            c_surf = self.font_menu.render(line, True, (190, 190, 190))
-            self.screen.blit(c_surf, c_surf.get_rect(center=(settings.SCREEN_WIDTH // 2, 380 + i * 26)))
+        self.frontend.draw_menu(self.screen, self.menu_index)

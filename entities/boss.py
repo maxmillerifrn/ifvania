@@ -5,9 +5,8 @@ e concede uma habilidade ao ser derrotado. Herda de `Character` (vida,
 dano, desenho básico) mas NÃO usa a gravidade/colisão da base: o chefe
 flutua dentro de uma arena fixa, então cuida do próprio movimento.
 """
-import math
-import random
 import pygame
+from abc import abstractmethod
 import settings
 import assets
 from entities.character import Character
@@ -15,15 +14,16 @@ from entities.projectile import Projectile
 
 
 class Boss(Character):
+    VISUAL_SCALE = settings.CHARACTER_VISUAL_SCALE
+
     def __init__(self, x, y, name, subject, color, health=20, arena=None, sprite_file=None):
-        super().__init__(x, y, width=54, height=64, health=health)
+        super().__init__(x, y, *settings.CHARACTER_SIZE, health=health)
         self.name = name
         self.subject = subject
         self.color = color
-        size = (self.width, self.height)
         sprite_file = sprite_file or "bosses/prof_scratch.png"
-        self.sprite_r = assets.load_image(sprite_file, size, color)
-        self.sprite_l = assets.load_flipped(sprite_file, size, color)
+        self.sprite_r = assets.load_character_frames([sprite_file], color)[0]
+        self.sprite_l = pygame.transform.flip(self.sprite_r, True, False)
         self.image = self.sprite_l
         self.start_x = x
         self.arena = arena or pygame.Rect(x - 220, y - 200, 440, 260)
@@ -56,6 +56,12 @@ class Boss(Character):
             self.phase = 3
         if not self.alive:
             self.defeated = True
+            self.projectiles.empty()
+
+    @abstractmethod
+    def choose_attack(self, player):
+        """As classes concretas definem a estratégia do encontro."""
+        raise NotImplementedError("Cada boss deve implementar sua estratégia de ataques")
 
     def update(self, player, solids):
         self._t += 1
@@ -71,7 +77,7 @@ class Boss(Character):
         speed_mult = 1 + (self.phase - 1) * 0.35
 
         if self.attack_timer <= 0 and self.attack_state is None:
-            self.attack_state = random.choice(["lunge", "spread", "slam"])
+            self.attack_state = self.choose_attack(player)
             self.attack_clock = 0
 
         if self.attack_state == "lunge":
@@ -126,16 +132,12 @@ class Boss(Character):
         self.image = self.sprite_r if self.facing > 0 else self.sprite_l
 
     def draw(self, surface, camera):
-        dest = camera.apply(self.rect)
-        if self.alive:
-            # balanço sutil (só visual - não mexe no rect de colisão), para o
-            # chefe parecer "vivo" mesmo parado entre um ataque e outro
-            bob = round(1.6 * math.sin(self._t * 0.1))
-            dest = dest.move(0, bob)
-        surface.blit(self.image, dest)
+        image = self.get_draw_image()
+        dest = image.get_rect(midbottom=camera.apply(self.rect).midbottom)
+        surface.blit(image, dest)
         if self.hit_flash > 0:
             # flash branco ao levar dano, sem alterar a imagem original em cache
-            flash = self.image.copy()
+            flash = image.copy()
             flash.fill((255, 255, 255, 140), special_flags=pygame.BLEND_RGBA_MULT)
             surface.blit(flash, dest, special_flags=pygame.BLEND_RGBA_ADD)
         # indicadores de fase de raiva (não fazem parte da arte base)
@@ -155,13 +157,13 @@ BOSS_DEFS = [
     dict(name="RomerBug", subject="Lógica de Blocos", color=(50, 65, 105), health=16,
          sprite_file="bosses/romerbug_0.png", boss_type="romerbug"),
     dict(name="Prof. Python", subject="Laboratório de Lógica", color=(60, 140, 220), health=20,
-         sprite_file="bosses/prof_python.png"),
+         sprite_file="bosses/prof_python.png", boss_type="python"),
     dict(name="Prof. Java", subject="Sala de POO", color=(200, 60, 60), health=24,
-         sprite_file="bosses/prof_java.png"),
+         sprite_file="bosses/prof_java.png", boss_type="java"),
     dict(name="Prof. C", subject="Sala de Memória", color=(120, 120, 130), health=28,
-         sprite_file="bosses/prof_c.png"),
+         sprite_file="bosses/prof_c.png", boss_type="c"),
     dict(name="Prof. SQL", subject="Biblioteca de Dados", color=(60, 180, 140), health=32,
-         sprite_file="bosses/prof_sql.png"),
+         sprite_file="bosses/prof_sql.png", boss_type="sql"),
     dict(name="Prof. Assembly", subject="Núcleo do Sistema", color=(30, 30, 40), health=40,
-         sprite_file="bosses/prof_assembly.png"),
+         sprite_file="bosses/prof_assembly.png", boss_type="assembly"),
 ]

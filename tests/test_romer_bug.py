@@ -9,11 +9,12 @@ from types import SimpleNamespace
 
 import pygame
 from entities.boss import Boss
+from entities.teacher_bosses import BOSS_CLASSES
 from entities.romer_bug import RomerBug, ProfessorProjectile
 from entities.player import Player
 from powerups import Ability
 from world.level import Level
-from world.levels_data import build_levels
+from world.legacy_levels import build_legacy_levels
 
 
 class RomerBugTests(unittest.TestCase):
@@ -27,7 +28,7 @@ class RomerBugTests(unittest.TestCase):
         pygame.quit()
 
     def setUp(self):
-        self.boss = RomerBug(400, 384, arena=pygame.Rect(32, 32, 896, 480))
+        self.boss = RomerBug(400, 408, arena=pygame.Rect(32, 32, 896, 480))
         self.player = SimpleNamespace(rect=pygame.Rect(180, 408, 26, 40))
         self.floor = [pygame.Rect(0, 448, 960, 64)]
 
@@ -37,12 +38,15 @@ class RomerBugTests(unittest.TestCase):
         for _ in range(self.boss.TRANSFORM_DURATION):
             self.boss.update(self.player, self.floor)
 
-    def test_only_first_of_six_bosses_is_specialized(self):
-        levels = [Level(data) for data in build_levels()]
+    def test_each_existing_boss_has_its_registered_concrete_class(self):
+        levels = [Level(data) for data in build_legacy_levels()]
         self.assertEqual(len(levels), 6)
         self.assertIsInstance(levels[0].boss, RomerBug)
         self.assertIsInstance(levels[0].boss, Boss)
-        self.assertTrue(all(type(level.boss) is Boss for level in levels[1:]))
+        self.assertEqual(len({type(level.boss) for level in levels}), 6)
+        for level in levels:
+            self.assertIs(type(level.boss), BOSS_CLASSES[level.data['boss']['boss_type']])
+            self.assertIsNot(type(level.boss), Boss)
         self.assertEqual(levels[0].data['ability_reward'], Ability.DOUBLE_JUMP)
 
     def test_inactive_boss_neither_attacks_moves_nor_takes_damage(self):
@@ -153,7 +157,7 @@ class RomerBugTests(unittest.TestCase):
             self.assertFalse(group)
 
     def test_defeat_rewards_once_and_allows_exit(self):
-        level = Level(build_levels()[0])
+        level = Level(build_legacy_levels()[0])
         player = Player(*level.player_spawn)
         player.rect.topleft = level.tilemap.dialogue_trigger.topleft
         player.pos.update(player.rect.topleft)

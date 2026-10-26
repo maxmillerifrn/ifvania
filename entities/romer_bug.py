@@ -39,9 +39,11 @@ class RomerBug(Boss):
 
     def __init__(self, x, y, name="RomerBug", subject="Lógica de Blocos",
                  color=(50, 65, 105), health=16, arena=None,
-                 sprite_file="bosses/romerbug_0.png"):
+                 sprite_file="bosses/romerbug_0.png", cinematic_transform=False):
         super().__init__(x, y, name, subject, color, health, arena, sprite_file)
         self.transformed = False
+        self.cinematic_transform = cinematic_transform
+        self.cinematic_pending = False
         self.transform_timer = 0
         self.throw_timer = 0
         self.jump_cooldown = 0
@@ -50,17 +52,23 @@ class RomerBug(Boss):
         self.motion_frame = 0
         self.patrol_target = x - 80
         self.attack_timer = 70
+        paths = [f"bosses/{form}_{i}.png"
+                 for form in ("romerbug", "speedbug") for i in range(2)]
+        paths += [f"bosses/{form}_{action}_{i}.png"
+                  for form, action in (("romerbug", "walk"), ("speedbug", "run"))
+                  for i in range(6)]
+        frames = dict(zip(paths, assets.load_character_frames(paths)))
         self.form_sprites = {}
         for form in ("romerbug", "speedbug"):
             self.form_sprites[form] = {
-                1: [assets.load_image(f"bosses/{form}_{i}.png", (54, 64)) for i in range(2)],
-                -1: [assets.load_flipped(f"bosses/{form}_{i}.png", (54, 64)) for i in range(2)],
+                1: [frames[f"bosses/{form}_{i}.png"] for i in range(2)],
+                -1: [pygame.transform.flip(frames[f"bosses/{form}_{i}.png"], True, False) for i in range(2)],
             }
         self.motion_sprites = {}
         for form, action in (("romerbug", "walk"), ("speedbug", "run")):
             self.motion_sprites[form] = {
-                1: [assets.load_image(f"bosses/{form}_{action}_{i}.png", (54, 64)) for i in range(6)],
-                -1: [assets.load_flipped(f"bosses/{form}_{action}_{i}.png", (54, 64)) for i in range(6)],
+                1: [frames[f"bosses/{form}_{action}_{i}.png"] for i in range(6)],
+                -1: [pygame.transform.flip(frames[f"bosses/{form}_{action}_{i}.png"], True, False) for i in range(6)],
             }
         self.transform_font = pygame.font.Font(None, 22)
         self._animate_form()
@@ -74,7 +82,8 @@ class RomerBug(Boss):
             return
         if not self.transformed and self.health <= self.max_health * 0.5:
             self.transformed = True
-            self.name = "SpeedBug"
+            self.cinematic_pending = self.cinematic_transform
+            self.name = "RomerBug" if self.cinematic_pending else "SpeedBug"
             self.phase = 2
             self.transform_timer = self.TRANSFORM_DURATION
             self.attack_timer = 30
@@ -87,19 +96,32 @@ class RomerBug(Boss):
             # Este chefe possui duas formas, sem uma terceira fase a 20%.
             self.phase = 2
 
+    def finish_cinematic(self):
+        self.cinematic_pending = False
+        self.transform_timer = 0
+        self.name = 'SpeedBug'
+        self.attack_timer = 60
+        self.hit_flash = 0
+        self._animate_form()
+
+    def choose_attack(self, player):
+        return "medal" if self.transformed else "plane"
+
     def _shoot(self, player):
-        origin = pygame.Vector2(self.rect.centerx + self.facing * 22,
+        if self.cinematic_pending:
+            return
+        origin = pygame.Vector2(self.rect.centerx + self.facing * (self.width // 2 + 2),
                                 self.rect.centery - 5)
         direction = pygame.Vector2(player.rect.center) - origin
         if direction.length_squared() == 0:
             direction.update(self.facing, 0)
-        kind = "medal" if self.transformed else "plane"
+        kind = self.choose_attack(player)
         self.projectiles.add(ProfessorProjectile(origin, direction, kind))
         self.throw_timer = 12
         self.attack_timer = self.MEDAL_INTERVAL if self.transformed else self.PLANE_INTERVAL
 
     def update(self, player, solids):
-        if not self.active or not self.alive:
+        if not self.active or not self.alive or self.cinematic_pending:
             return
         self._t += 1
         self.hit_flash = max(0, self.hit_flash - 1)
@@ -172,22 +194,23 @@ class RomerBug(Boss):
             self.image = self.motion_sprites[form][self.facing][1]
 
     def get_all_hit_rects(self):
-        if self.transform_timer > 0:
+        if self.transform_timer > 0 or self.cinematic_pending:
             return []
         return super().get_all_hit_rects()
 
     def draw(self, surface, camera):
         # Os próprios quadros contêm a oscilação do corpo. Não aplicar o bob
         # flutuante de Boss, que fazia os pés deslizarem acima do chão.
-        rect = camera.apply(self.rect)
-        surface.blit(self.image, rect)
-        if self.hit_flash > 0:
-            flash = self.image.copy()
+        image = self.get_draw_image()
+        rect = image.get_rect(midbottom=camera.apply(self.rect).midbottom)
+        surface.blit(image, rect)
+        if self.alive and self.hit_flash > 0:
+            flash = image.copy()
             flash.fill((255, 255, 255, 100), special_flags=pygame.BLEND_RGBA_MULT)
             surface.blit(flash, rect, special_flags=pygame.BLEND_RGBA_ADD)
         for projectile in self.projectiles:
             projectile.draw(surface, camera)
-        if self.transform_timer > 0:
+        if self.transform_timer > 0 and not self.cinematic_pending:
             rect = camera.apply(self.rect)
             radius = 36 + (self.TRANSFORM_DURATION - self.transform_timer) // 3
             pygame.draw.circle(surface, (255, 200, 65), rect.center, radius, 3)

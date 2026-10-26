@@ -20,6 +20,8 @@ import settings
 class Character(pygame.sprite.Sprite, ABC):
     """Base comum a Player, Enemy e Boss (posição, vida, física, desenho)."""
 
+    VISUAL_SCALE = 1.0
+
     def __init__(self, x, y, width, height, health):
         super().__init__()
         self.width, self.height = width, height
@@ -110,5 +112,14 @@ class Character(pygame.sprite.Sprite, ABC):
     # Subclasses com efeitos extras (piscar, flash de dano, barra de fase)
     # chamam `super().draw(surface, camera)` e completam por cima.
     # ------------------------------------------------------------------
+    def get_draw_image(self):
+        """Escala apenas a arte; o apoio dos pés e o corpo físico são preservados."""
+        size = tuple(round(side * self.VISUAL_SCALE) for side in self.image.get_size())
+        if size == self.image.get_size():
+            return self.image
+        return pygame.transform.scale(self.image, size)
+
     def draw(self, surface, camera):
-        surface.blit(self.image, camera.apply(self.rect))
+        image = self.get_draw_image()
+        dest = camera.apply(self.rect)
+        surface.blit(image, image.get_rect(midbottom=dest.midbottom))

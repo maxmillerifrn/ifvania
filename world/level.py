@@ -5,9 +5,11 @@ import assets
 from world.tilemap import TileMap
 from world.camera import Camera
 from entities.enemy import Enemy
-from entities.boss import Boss
+from entities.teacher_bosses import BOSS_CLASSES
 from entities.romer_bug import RomerBug
+from entities.npc import Teacher
 from powerups import PowerUp
+from world.dark_school import DarkSchool
 
 TS = settings.TILE_SIZE
 
@@ -21,14 +23,17 @@ class Level:
 
         self.enemies = pygame.sprite.Group()
         for (ex, ey) in self.tilemap.enemy_spawns:
-            self.enemies.add(Enemy(ex, ey - 8))
+            self.enemies.add(Enemy(*self._grounded_spawn(ex, ey)))
 
         boss_def = level_data["boss"]
         bx, by = self.tilemap.boss_spawn
-        boss_class = RomerBug if boss_def.get("boss_type") == "romerbug" else Boss
+        boss_class = BOSS_CLASSES[boss_def["boss_type"]]
+        bx, by = self._grounded_spawn(bx, by)
         options = {}
         if boss_class is RomerBug:
-            options["arena"] = pygame.Rect(TS, TS, self.tilemap.width - 2 * TS,
+            options['cinematic_transform'] = level_data.get('cinematic_transform', False)
+            left = level_data.get('arena_left', TS)
+            options["arena"] = pygame.Rect(left, TS, self.tilemap.width - left - TS,
                                             self.tilemap.height - 2 * TS)
         self.boss = boss_class(bx, by, boss_def["name"], boss_def["subject"],
                           boss_def["color"], health=boss_def["health"],
@@ -40,21 +45,53 @@ class Level:
         self.dialogue_played = False
         self.boss_defeated_dialogue_played = False
         self.completed = False
-        self.player_spawn = self.tilemap.player_spawn
+        self.player_spawn = self._grounded_spawn(*self.tilemap.player_spawn)
+        self.requires_infection = level_data.get('requires_infection', False)
+        self.infected = not self.requires_infection
+        self.encounter_pending = False
+        self.human_teacher = Teacher(bx, by, 'romerito') if self.requires_infection else None
+        self.infection_bug = assets.load_character_frames(['enemies/bug_0.png'])[0] if self.requires_infection else None
+        self.encounter_font = pygame.font.Font(None, 20)
+        self.infection_font = pygame.font.Font(None, 24)
+        self.school_scene = (DarkSchool(self.tilemap.width, self.tilemap.height,
+                                       self.player_spawn[1]+settings.CHARACTER_SIZE[1])
+                             if level_data.get('school_battle') else None)
 
         # sprites do cenário (carregados/cacheados uma vez em assets.py)
         self.ground_img = assets.load_image("tiles/ground.png", (TS, TS), settings.GROUND_COLOR)
         self.spike_img = assets.load_image("tiles/spike.png", (TS, TS), settings.SPIKE_COLOR)
         self.bg_panel_img = assets.load_image("background/panel.png", (90, 220), settings.BG_COLOR_2)
 
+    def _grounded_spawn(self, x, y):
+        """Os marcadores do mapa indicam a coluna; os pés usam o piso abaixo."""
+        width, height = settings.CHARACTER_SIZE
+        floors = sorted({solid.top for solid in self.tilemap.solids
+                         if solid.left < x + width and solid.right > x
+                         and solid.top >= y - height},
+                        key=lambda top: abs(top - (y + TS)))
+        for floor in floors:
+            body = pygame.Rect(x, floor - height, width, height)
+            if not any(body.colliderect(solid) for solid in self.tilemap.solids):
+                return body.topleft
+        raise ValueError(f"Sem piso livre para personagem em {(x, y)}")
+
     # ------------------------------------------------------------------
     def update(self, player, dt_events):
-        # Abre o encontro antes de processar ataques: entrar pulando ou já
-        # além da entrada também ativa o chefe, sem dano antes do diálogo.
+        if self.completed or self.encounter_pending:
+            return None, None
+        if getattr(self.boss, 'cinematic_pending', False):
+            return 'boss_transform', None
+        if self.boss.defeated:
+            return self._after_defeat(player)
+        # A entrada da arena abre a conversa antes de processar qualquer dano,
+        # inclusive quando o jogador chega pulando ou além do primeiro bloco.
         if not self.dialogue_played and self.tilemap.dialogue_trigger:
             if player.rect.colliderect(self.tilemap.dialogue_trigger):
                 self.dialogue_played = True
-                self.boss.activate()
+                if self.requires_infection:
+                    self.encounter_pending = True
+                else:
+                    self.boss.activate()
                 self.camera.update(player.rect)
                 return ("dialogue", self.data["boss_dialogue"])
 
@@ -84,6 +121,11 @@ class Level:
                     self.boss.take_damage(1)
                     proj.kill()
 
+        if getattr(self.boss, 'cinematic_pending', False):
+            return 'boss_transform', None
+        if self.boss.defeated:
+            return self._after_defeat(player)
+
         # contato de inimigos comuns com o jogador
         for enemy in self.enemies:
             if enemy.rect.colliderect(player.rect):
@@ -99,20 +141,39 @@ class Level:
 
         # projéteis do chefe contra as plataformas já tratados em Boss.update
 
-        # diálogo de vitória + drop de habilidade quando o chefe morre
+        # coleta de power-up (somente mapas antigos possuem recompensas)
+        self._collect_powerups(player)
+        return self._check_transition(player)
+
+    def finish_boss_dialogue(self):
+        if self.encounter_pending:
+            self.infected = True
+            self.encounter_pending = False
+            self.boss.activate()
+
+    def _after_defeat(self, player):
+        self.camera.update(player.rect)
         if self.boss.defeated and not self.boss_defeated_dialogue_played:
             self.boss_defeated_dialogue_played = True
+            self.boss.projectiles.empty()
+            if self.data.get('clear_encounter_on_defeat'):
+                self.enemies.empty()
+                player.projectiles.empty()
             if self.data["ability_reward"] is not None:
                 pu = PowerUp(self.boss.rect.centerx, self.boss.rect.centery, self.data["ability_reward"])
                 self.powerups.add(pu)
             return ("dialogue", self.data["victory_dialogue"])
+        self.powerups.update()
+        self._collect_powerups(player)
+        return self._check_transition(player)
 
-        # coleta de power-up
+    def _collect_powerups(self, player):
         for pu in list(self.powerups):
             if pu.rect.colliderect(player.rect):
                 player.grant_ability(pu.ability)
                 pu.kill()
 
+    def _check_transition(self, player):
         # saída da fase (só habilitada após derrotar o chefe)
         if self.boss.defeated and self.tilemap.exit_trigger:
             if player.rect.colliderect(self.tilemap.exit_trigger):
@@ -128,12 +189,18 @@ class Level:
     # ------------------------------------------------------------------
     def draw(self, surface):
         surface.fill(settings.BG_COLOR)
-        self._draw_parallax(surface)
+        if self.school_scene:
+            self.school_scene.draw_background(surface, self.camera)
+        else:
+            self._draw_parallax(surface)
 
         for rect in self.tilemap.solids:
             r = self.camera.apply(rect)
             if r.colliderect(surface.get_rect()):
-                surface.blit(self.ground_img, r)
+                if self.school_scene:
+                    self.school_scene.draw_block(surface, rect, self.camera, self.tilemap.width)
+                else:
+                    surface.blit(self.ground_img, r)
 
         for rect in self.tilemap.hazards:
             # o retângulo de dano é só a metade inferior do bloco; a imagem
@@ -143,10 +210,13 @@ class Level:
             surface.blit(self.spike_img, r)
 
         if self.tilemap.exit_trigger:
-            r = self.camera.apply(self.tilemap.exit_trigger)
-            color = settings.EXIT_COLOR if self.boss.defeated else settings.GATE_COLOR
-            pygame.draw.rect(surface, color, r, border_radius=6)
-            pygame.draw.rect(surface, settings.WHITE, r, 2, border_radius=6)
+            if self.school_scene:
+                self.school_scene.draw_exit(surface, self.tilemap.exit_trigger, self.camera, self.boss.defeated)
+            else:
+                r = self.camera.apply(self.tilemap.exit_trigger)
+                color = settings.EXIT_COLOR if self.boss.defeated else settings.GATE_COLOR
+                pygame.draw.rect(surface, color, r, border_radius=6)
+                pygame.draw.rect(surface, settings.WHITE, r, 2, border_radius=6)
 
         for enemy in self.enemies:
             enemy.draw(surface, self.camera)
@@ -154,7 +224,24 @@ class Level:
         for pu in self.powerups:
             pu.draw(surface, self.camera)
 
-        self.boss.draw(surface, self.camera)
+        if self.infected:
+            self.boss.draw(surface, self.camera)
+        else:
+            self.human_teacher.draw(surface, self.camera)
+            name = self.encounter_font.render('Professor Romerito', True, settings.TEXT_COLOR)
+            rect = self.camera.apply(self.human_teacher.rect)
+            surface.blit(name, name.get_rect(midbottom=(rect.centerx, rect.top-6)))
+
+    def draw_infection(self, surface, progress):
+        rect = self.camera.apply(self.boss.rect)
+        bug = self.infection_bug
+        x = rect.centerx-bug.get_width()//2 + 90*(1-min(1, progress*2))
+        if progress < 0.5:
+            surface.blit(bug, (round(x), rect.top))
+        radius = 20+int(30*progress)
+        pygame.draw.circle(surface, (142, 230, 128), rect.center, radius, 2)
+        text = self.infection_font.render('Romerito está se transformando em RomerBug!', True, (206, 246, 164))
+        surface.blit(text, text.get_rect(center=(settings.SCREEN_WIDTH//2, 180)))
 
     def _draw_parallax(self, surface):
         for i in range(6):

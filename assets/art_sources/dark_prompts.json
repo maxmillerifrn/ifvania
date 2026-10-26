@@ -1,0 +1,30 @@
+{
+  "tool": "built-in image_gen.imagegen",
+  "assets": [
+    {
+      "key": "dark_menu",
+      "reference": [
+        "/Users/max/PycharmProjects/ifvania/assets/art_sources/school_facade.png"
+      ],
+      "prompt": "Use case: lighting-weather. Asset type: pixel art game menu background. Reference image: preserve this exact recognizable IFRN school architecture and framing, white entrance canopy, yellow tiled walls and red handrails. Transform it to a dark atmospheric NIGHT scene for a serious supernatural school platformer. Deep slate navy sky, pale moonlight, very few windows glowing cold cyan, dim amber entrance light, subdued desaturated yellow walls and dark burgundy rails. The school should feel ominous, deserted and controlled by an artificial intelligence, not ruined beyond recognition. Rich crafted pixel art, clean clusters, restrained highlights, no photographic texture, no film blur. Keep front entrance and ramps clearly visible on center/right. Left third darker and low detail to support game title and menu. No people, no monsters, no title, no buttons, no UI, no watermark. Wide 16:9 composition. Preserve architectural silhouette."
+    },
+    {
+      "key": "dark_lab",
+      "prompt": "Use case: stylized-concept. Asset type: actual background artwork for a side-scrolling 2D pixel art game. Create a long horizontal dark SCHOOL COMPUTER LAB AND CORRIDOR in a strict side-on orthographic cutaway view, approximately 3:1 wide composition. Recognizably a Brazilian public technical school interior: worn yellow/off-white tiled walls, green chalkboard, bulletin board with illegible papers, classroom doors with transom windows, tall windows at night, rows of computer workstations set BEHIND the walking lane, wall conduits and fluorescent light fixtures. Ominous abandoned-school atmosphere, deep charcoal and slate shadows, muted dusty green and ochre wall tiles, sparse cold cyan computer glow and restrained amber emergency lights. Background desks, monitors and chairs should be visibly school furniture. Ground contact line at exactly 65 percent down the composition; lower 35 percent simple dark tiled floor/subfloor, no foreground obstacles. Primary walking lane clear of furniture. Camera square to the walls, no vanishing-point perspective, no diagonal floor, no foreground platforms because game collision surfaces will be rendered separately. No people, no enemies, no characters, no labels, no readable writing, no blood. Detailed crisp professional pixel art with clusters, limited restrained palette, eerie but legible. Deliver environment only, no menus, no UI, no watermark."
+    },
+    {
+      "key": "boss_transition",
+      "reference": [
+        "/Users/max/PycharmProjects/ifvania/assets/art_sources/romerbug_speedbug.png"
+      ],
+      "transparent": true,
+      "prompt": "Use case: stylized-concept. Asset type: production animation sprite atlas for the existing RomerBug to SpeedBug boss transformation. Reference image: preserve exactly the same brown-skinned man, short black hair, short beard, navy suit with white shirt and burgundy tie for RomerBug, orange athletic shirt and black shorts for SpeedBug. Create precisely SIX full body figures in a 3 columns by 2 rows regular spacious grid on GENUINE TRANSPARENT background. Read left to right, top to bottom: 1 suited RomerBug stumbling and starting to kneel, lowering his body; 2 suited RomerBug down on ONE knee, opposite foot planted forward, one hand resting on the raised knee and head bowed in exhaustion; 3 suited RomerBug in the SAME one-knee pose raising his head toward a presence above; 4 SpeedBug in orange athletic clothes in the SAME one-knee pose, now changed clothing, NO medal or jewelry; 5 SpeedBug rising halfway from one knee; 6 SpeedBug fully upright in a tense ready-to-run stance. Face RIGHT in all six poses. Same identity, anatomical proportions and scale across all cells, natural lowered height when kneeling. Very clear one-knee posture, not sitting on both feet and not crouching with both knees raised. Match the reference's crisp pixel art, thick readable pixel silhouettes and shading. No paper plane, no medal, no weapons, no glow, no ground, no drop shadows, no labels, no numbers, no borders, no grid lines. Entire figures isolated by transparent gutters, whole body inside each cell. Only six figures."
+    },
+    {
+      "key": "entity",
+      "transparent": true,
+      "prompt": "Use case: stylized-concept. Asset type: transparent game entity sprite, companion asset for a dark school platformer boss cutscene. Create one single full-body spectral digital ENTITY hovering upright: a human-sized silhouette in a tattered charcoal academic coat/hood, face hidden in darkness with two thin cold cyan eye slits, fragmented lower robe dissolving into a few square pixels, long slender hands extended slightly as if commanding a kneeling subordinate. Ominous mysterious presence of an AI, serious and restrained, no smile and no cute elements. Crisp 2D pixel art with readable chunky silhouette matching a retro school platformer, desaturated charcoal with restrained gray-violet edge light and pale cyan highlights. Three-quarter view facing RIGHT. Simple compact shape readable at 40 by 40 game pixels; no external oversized glow. Genuine transparent background. No other characters, no props, no scene, no floor, no shadow, no text, no watermark. Single entity only."
+    }
+  ],
+  "export_command": "python prepare_dark_assets.py"
+}

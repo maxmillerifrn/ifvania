@@ -9,7 +9,7 @@ import pygame
 from entities.player import Player
 from game import Game, STATE_PLAYING, STATE_DIALOGUE
 from world.level import Level
-from world.levels_data import build_levels
+from world.legacy_levels import build_legacy_levels
 
 
 class BossEncounterTests(unittest.TestCase):
@@ -23,7 +23,7 @@ class BossEncounterTests(unittest.TestCase):
         pygame.quit()
 
     def test_entering_in_air_or_beyond_old_trigger_activates_all_bosses(self):
-        for data in build_levels():
+        for data in build_legacy_levels():
             for height in (80, 300, 408):
                 for beyond in (0, 100):
                     with self.subTest(level=data['index'], height=height, beyond=beyond):
@@ -35,14 +35,16 @@ class BossEncounterTests(unittest.TestCase):
                         self.assertNotEqual(level.update(player, [])[0], 'dialogue')
 
     def test_exploration_before_arena_does_not_activate_boss(self):
-        for data in build_levels():
+        for data in build_legacy_levels():
             level = Level(data)
-            player = Player(level.tilemap.dialogue_trigger.left - 26, 300)
+            player = Player(0, 300)
+            player.rect.right = level.tilemap.dialogue_trigger.left
+            player.pos.update(player.rect.topleft)
             self.assertIsNone(level.update(player, [])[0])
             self.assertFalse(level.boss.active)
 
     def test_all_bosses_have_clear_space_and_supporting_floor(self):
-        for data in build_levels():
+        for data in build_legacy_levels():
             level = Level(data)
             boss = level.boss
             self.assertFalse(any(boss.rect.colliderect(s) for s in level.tilemap.solids))
@@ -54,7 +56,7 @@ class BossEncounterTests(unittest.TestCase):
             self.assertFalse(any(arena_air.colliderect(s) for s in level.tilemap.solids))
 
     def test_entry_dialogue_precedes_damage_even_next_to_boss(self):
-        level = Level(build_levels()[0])
+        level = Level(build_legacy_levels()[0])
         player = Player(level.boss.rect.left - 28, 408)
         player.facing = 1
         player._try_melee()
@@ -66,6 +68,7 @@ class BossEncounterTests(unittest.TestCase):
 
     def test_game_dialogue_then_keyboard_melee_and_plane_deal_damage(self):
         game = Game()
+        game.level_defs = build_legacy_levels()
         game._load_level(0, fresh_player=True)
         game.state = STATE_PLAYING
         boss = game.level.boss

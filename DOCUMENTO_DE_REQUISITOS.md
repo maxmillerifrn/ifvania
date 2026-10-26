@@ -1,309 +1,281 @@
-# Documento de Requisitos — Escola dos Bugs
+# Documento de Requisitos — IFVania
 
-**Título do projeto:** Escola dos Bugs — A Vingança dos Professores  
-**Versão do documento:** 1.0  
-**Data:** 10/09/2026  
-**Método:** análise estática do código-fonte, dos recursos e do README.
+**Título do projeto:** IFVania
+
+**Versão do documento:** 2.5
+
+**Data:** 26/10/2026
+
+**Fontes:** `HISTORYBOARD.MD`, orientações do responsável pelo projeto e referências técnicas do repositório.
 
 ## 1. Objetivo e alcance do documento
 
-Documentar os requisitos identificados na versão disponível do projeto, permitindo compreender seu funcionamento, orientar manutenção e estabelecer critérios de aceite verificáveis.
+Especificar o comportamento esperado do jogo com base no HistoryBoard, incluindo narrativa, apresentação, combate e critérios de aceite. Esta revisão substitui a descrição anterior centrada no vírus CODIGO.EXE e na campanha obrigatória de seis professores de linguagens de programação.
 
-Este documento foi elaborado por engenharia reversa. Os requisitos classificados como **implementados** possuem suporte no código, mas essa classificação não representa aprovação em teste de execução. As divergências entre a documentação original e o comportamento programado estão registradas na seção 10. Recomendações dessa seção não constituem alterações já aprovadas.
+O HistoryBoard é a referência narrativa desta versão. As solicitações complementares determinam tamanho uniforme para personagens e inimigos e uma classe própria para cada boss. Os requisitos descrevem o produto desejado; sua presença neste documento não significa que estejam implementados ou homologados.
 
-Não foram executados testes de jogabilidade, desempenho ou compatibilidade durante esta análise. O README menciona uma validação automatizada anterior do fluxo completo, porém o respectivo script não foi encontrado entre os arquivos analisados.
+O HistoryBoard detalha o início da história e a primeira fase. As fases seguintes, suas recompensas e a sequência final de desligamento de energia ainda precisam de definição. Recursos antigos podem ser reaproveitados, mas não definem automaticamente o escopo da nova campanha.
+
+As etapas 1 a 4 do `PLANO_DE_EXECUCAO.md` estão implementadas: menu, seleção, prólogo escolar, percurso virtual com salto básico, reencontro com Romerito humano, infecção, combate RomerBug/SpeedBug e encerramento do conteúdo disponível. A campanha antiga foi isolada, e o fluxo atual não concede recompensas ou anuncia a escola salva. Foram executados 68 testes automatizados e inspeções visuais. A revisão visual de 25/10/2026 acrescenta menus noturnos, HUD de integridade, arena escolar escura e a cena com a entidade. A substituição dos ataques está somente proposta em `PROPOSTA_BOSS_ROMERBUG.md`. O mapa escolar é uma adaptação sem planta interna homologada; a etapa 5 e a homologação manual permanecem pendentes. Testes controlados de combate não equivalem à validação do equilíbrio de sobrevivência.
 
 ## 2. Visão geral do produto
 
-O produto é um jogo local, para um jogador, de plataforma 2D com elementos de metroidvania, desenvolvido em Python e Pygame. O protagonista é um aluno que percorre uma escola infectada pelo vírus fictício CODIGO.EXE e enfrenta seis professores de programação corrompidos.
+IFVania é um jogo local de plataforma 2D, para um jogador, desenvolvido em Python e Pygame, com visual em pixel art e ambientação escolar e virtual.
 
-A campanha progride linearmente. Cada um dos cinco primeiros chefes deixa um item que concede uma habilidade. A derrota do sexto chefe permite alcançar a saída final e concluir o jogo. Não há mapa interligado nem retorno a fases anteriores implementados.
+A história começa em uma aula de programação orientada a serviço. O professor Max apresenta uma inteligência artificial chamada IFVania — Inteligência Federal Virtual de Aprendizagem Neural e Inteligência Artificial. Quando ele anuncia que irá desligá-la para continuar a aula, ela se revolta, assume o controle do computador dele e dos demais computadores da escola, hipnotiza as pessoas e provoca alucinações.
 
-O contexto escolar, os diálogos sobre programação e a estrutura orientada a objetos favorecem o uso didático do projeto. O público de estudantes e professores é inferido do README; não há especificação formal de faixa etária ou classificação indicativa.
+Somente o aluno ou a aluna controlado pelo jogador não é completamente afetado. Seu objetivo narrativo é buscar ajuda, desligar a energia da escola e desativar a IFVania. A primeira fase leva o protagonista pelos corredores até o laboratório A28 e, depois, a um mundo virtual onde enfrenta bugs e o professor Romerito transformado.
 
-### 2.1 Escopo incluído
+### 2.1 Escopo definido
 
-- Menu inicial, introdução narrativa, apresentação de fase, pausa, derrota e vitória.
-- Seis fases com plataformas, espinhos, inimigos comuns e um chefe por fase.
-- Movimento, salto, combate corpo a corpo e cinco habilidades coletáveis.
-- Vida, dano, invulnerabilidade temporária e recuperação de vida.
-- Diálogos, câmera de acompanhamento, HUD e animações por sprites.
-- Carregamento de imagens e geração opcional da arte por script.
+- Menu com a fachada da escola e opções Jogar e Sair.
+- Escolha entre Menino e Menina antes da campanha.
+- Introdução com professor Max e a revolta da IFVania.
+- Exploração dos corredores e encontro com Romerito no laboratório A28.
+- Transporte para o mundo virtual e combate com mouse com fio usado como chicote.
+- Encontro final com Romerito, transformação em RomerBug e, a 50% da vida, em SpeedBug.
+- Uniformidade de tamanho entre personagens, inimigos comuns e bosses.
+- Classe específica para cada boss, com reaproveitamento de uma base comum.
+- Movimento, salto, colisão, vida, dano, diálogos, câmera, HUD, pausa e derrota como infraestrutura de jogo.
 
-### 2.2 Recursos ausentes do escopo implementado
+### 2.2 Conteúdo ainda não definido pelo HistoryBoard
 
-Não foram encontrados salvamento persistente, contas, multiplayer, serviços de rede, ranking, inventário genérico, seleção de fase, dificuldade configurável, áudio, suporte a controle, remapeamento de teclas, localização para outros idiomas ou menu de configurações. A ausência desses recursos não representa, por si só, defeito.
+Não há definição das fases posteriores à primeira, do número total de bosses, das recompensas, das habilidades desbloqueáveis ou da sequência jogável de desativação da IFVania. A campanha antiga de Scratch, Python, Java, C, SQL e Assembly e seus cinco poderes não é um requisito confirmado desta versão.
 
-## 3. Atores e ambiente
+Salvamento persistente, multiplayer, serviços de rede, ranking, suporte a controle e menu de configurações também não integram o escopo definido.
 
-| Ator | Responsabilidade |
+## 3. Atores, personagens e ambiente
+
+| Tipo | Elemento | Papel |
+|---|---|---|
+| Ator externo | Jogador | Escolher o protagonista, explorar, combater e acompanhar a história. |
+| Ator externo | Mantenedor / desenvolvedor | Implementar e validar mapas, entidades, diálogos e recursos visuais. |
+| Personagem | Aluno / aluna | Protagonista parcialmente resistente aos efeitos da IFVania. |
+| Personagem | Professor Max | Apresentar a IA e anunciar seu desligamento na introdução. |
+| Antagonista | IFVania | Controlar os computadores, hipnotizar as pessoas e provocar alucinações. |
+| Personagem / boss | Professor Romerito / RomerBug / SpeedBug | Participar do encontro no A28 e do combate final da primeira fase. |
+
+| Item técnico | Referência do projeto |
 |---|---|
-| Jogador | Iniciar a campanha, controlar o aluno, enfrentar inimigos, coletar habilidades e concluir as fases. |
-| Mantenedor / professor / aluno desenvolvedor | Alterar código, mapas, diálogos, parâmetros e imagens; regenerar recursos quando necessário. |
-
-Diretora, professores e Sistema são personagens ou emissores de mensagens internos à narrativa, não atores externos do software.
-
-| Item | Condição identificada |
-|---|---|
-| Linguagem | Python; o README declara versão 3.9 ou superior, sem validação de compatibilidade nesta análise. |
-| Dependência de execução | `pygame>=2.5.0`, conforme `requirements.txt`. |
-| Dependência opcional | Pillow, somente para executar `generate_assets.py`. |
-| Entrada | Teclado e evento de fechamento da janela. |
-| Saída | Janela gráfica de 960 × 540 pixels. |
-| Instalação | `pip install -r requirements.txt`. |
-| Inicialização | `python main.py`, a partir da pasta do projeto. |
-| Dados | Estado da partida em memória; mapas, diálogos e definições em código; imagens em arquivos PNG. |
-| Conectividade | O fluxo de jogo analisado não utiliza rede; a instalação de dependências pode exigir acesso a um repositório de pacotes. |
-
-Não há requisitos mínimos de CPU, memória, GPU ou matriz de sistemas operacionais homologados definidos no repositório.
+| Linguagem e biblioteca | Python e Pygame; dependências em `requirements.txt`. |
+| Execução | Local, por `python main.py`, a partir da pasta do projeto. |
+| Entrada | Teclado; interação por clique no fluxo de seleção descrito no HistoryBoard. |
+| Janela de referência | 960 × 540 pixels. |
+| Taxa-alvo | 60 FPS, sujeita a validação em hardware definido. |
+| Unidade de cenário atual | Blocos de 32 × 32 pixels. |
+| Recursos | Imagens e spritesheets locais; Pillow é opcional para geração por script. |
 
 ## 4. Requisitos funcionais
 
-**Status:** I = implementado segundo análise estática. As ressalvas da seção 10 prevalecem sobre descrições genéricas do README. Os critérios abaixo descrevem verificações a executar, não resultados de testes realizados.
+Os critérios abaixo são verificações propostas para aceite, não resultados de testes. Os identificadores da versão 2.0 correspondem à nova especificação e não preservam o significado dos identificadores da versão 1.0.
 
-### 4.1 Sessão e narrativa
+### 4.1 Menu, seleção e introdução
 
-| ID | Requisito | Critério de aceite | Status / origem |
-|---|---|---|---|
-| RF-01 | O sistema deve apresentar um menu inicial com título, instrução para iniciar e controles básicos. | Ao iniciar o programa, o menu é exibido; Enter ou Espaço inicia uma campanha. | I — `game.py` |
-| RF-02 | O sistema deve iniciar uma nova campanha na primeira fase, com vida inicial e sem habilidades adquiridas. | Iniciar novamente após retornar ao menu cria um novo jogador com 6 pontos de vida e conjunto vazio de habilidades. | I — `Game._start_story`, `Player.__init__` |
-| RF-03 | O sistema deve apresentar a introdução geral da história antes da primeira fase. | A sequência `STORY_INTRO` é exibida antes do cartão da primeira fase. | I — `game.py`, `world/levels_data.py` |
-| RF-04 | O sistema deve apresentar um cartão com o nome da fase antes de liberar o jogo. | Enter ou Espaço encerra o cartão; sem entrada, ele termina após o contador ultrapassar 90 atualizações. | I — `game.py` |
-| RF-05 | O sistema deve exibir diálogos com identificação do falante e revelação progressiva do texto. | E, Enter ou Espaço revela imediatamente a fala incompleta; com a fala completa, avança; ao terminar, executa a transição prevista. | I — `ui/dialogue.py` |
-| RF-06 | O sistema deve apresentar um diálogo antes do combate com cada chefe e outro após sua derrota. | Entrar no gatilho pré-chefe ativa o encontro e exibe o diálogo uma vez; derrotar o chefe exibe o diálogo de vitória uma vez. | I — `world/level.py` |
-| RF-07 | O sistema deve permitir pausar e retomar a partida durante a exploração ou combate. | Esc alterna entre jogo e pausa; a atualização da simulação fica suspensa durante a pausa. | I — `game.py` |
-| RF-08 | O sistema deve permitir encerrar a aplicação. | Fechar a janela encerra o loop; Esc encerra quando o estado não é jogo nem pausa, inclusive durante diálogos. | I — `game.py` |
-| RF-09 | O sistema deve apresentar derrota quando a vida do jogador se esgotar. | Com o jogador morto, é exibida a tela de reprovação; Enter ou Espaço retorna ao menu. | I — `game.py` |
-| RF-10 | O sistema deve apresentar vitória ao concluir a última fase. | Após derrotar Assembly e alcançar a saída, é exibida a mensagem de escola salva; Enter ou Espaço retorna ao menu. | I — `game.py`, `world/level.py` |
+| ID | Requisito | Critério de aceite |
+|---|---|---|
+| RF-01 | Exibir menu inicial com fachada da escola em pixel art baseada em `referencia/img.png`. | A abertura apresenta a fachada e as opções visíveis Jogar e Sair. |
+| RF-02 | Permitir iniciar o fluxo por Jogar e encerrar por Sair. | Clicar em Jogar abre a escolha de personagem; clicar em Sair encerra a aplicação. |
+| RF-03 | Exibir as opções Menino e Menina antes de iniciar a história. | As duas opções podem ser selecionadas; a campanha só começa após a escolha. |
+| RF-04 | Usar `assets/art_sources/student_ifrn_caico.png` como referência do Menino. | O protagonista masculino mantém a identidade visual da referência nas animações do jogo. |
+| RF-05 | Disponibilizar spritesheet completo da Menina baseado no Menino, com características femininas. | A Menina possui quadros para todos os estados usados pelo protagonista, inclusive ataque com chicote, sem quadros ausentes ou troca para sprites do Menino. |
+| RF-06 | Manter a escolha do protagonista durante a campanha. | Diálogos e transições preservam a aparência escolhida; Menino e Menina têm os mesmos controles e capacidades. |
+| RF-07 | Apresentar a aula do professor Max e a IFVania antes da exploração. | A introdução identifica a aula de programação orientada a serviço, o tema inteligência artificial e o nome completo da IFVania. |
+| RF-08 | Apresentar a revolta da IA e o objetivo do protagonista. | A sequência mostra ou relata o anúncio de desligamento, o controle dos computadores, a hipnose e as alucinações, a resistência parcial do protagonista e sua busca por ajuda para cortar a energia. |
 
-### 4.2 Personagem e combate
+### 4.2 Primeira fase e narrativa
 
-| ID | Requisito | Critério de aceite | Status / origem |
-|---|---|---|---|
-| RF-11 | O jogador deve poder mover o personagem horizontalmente e saltar. | Setas ou A/D movem; Espaço, W ou seta para cima inicia salto quando permitido; pisos e paredes sólidos limitam o deslocamento. | I — `entities/player.py`, `entities/character.py` |
-| RF-12 | O sistema deve aplicar gravidade e limitar a velocidade de queda. | Fora de apoio, a velocidade vertical aumenta até o limite configurado; contato descendente com piso restaura a disponibilidade de saltos. | I — `entities/character.py`, `entities/player.py` |
-| RF-13 | O jogador deve poder atacar corpo a corpo na direção para a qual está voltado. | X inicia uma área temporária de ataque; sobreposição com inimigos ou chefe ativo aplica dano, respeitando o intervalo para iniciar novo ataque. | I — `entities/player.py`, `world/level.py` |
-| RF-14 | O sistema deve aplicar dano por contato com bugs, chefe, projéteis hostis e espinhos. | Contato válido reduz a vida; sem escudo, o jogador recebe invulnerabilidade temporária e impulso de reação. | I — `world/level.py`, `entities/player.py` |
-| RF-15 | O sistema deve disponibilizar inimigos comuns que patrulham o cenário. | Bugs invertem a direção ao atingir parede ou ultrapassar o alcance de patrulha; são removidos quando a vida chega a zero. | I — `entities/enemy.py` |
-| RF-16 | O sistema deve disponibilizar seis chefes, com identidade visual, nome, matéria e vida próprios. | Cada fase instancia o chefe correspondente da tabela da seção 6. | I — `entities/boss.py`, `world/level.py` |
-| RF-17 | Os chefes devem atacar somente após a ativação do encontro. | Antes da ativação, não executam ataques nem recebem dano; após ela, alternam aleatoriamente entre investida, disparo triplo e disparos laterais. | I — `entities/boss.py` |
-| RF-18 | Os chefes devem intensificar o combate conforme a vida restante. | Ao alcançar no máximo 50% e 20% da vida máxima, entram respectivamente nas fases 2 e 3, com aumento do multiplicador de movimento e redução do intervalo entre ataques. | I — `entities/boss.py` |
-| RF-19 | O sistema deve gerenciar o ciclo de vida dos projéteis. | Projéteis desaparecem ao atingir sólidos ou esgotar 90 atualizações; os do jogador também são removidos ao atingir um inimigo ou chefe ativo. | I — `entities/projectile.py`, `world/level.py` |
+| ID | Requisito | Critério de aceite |
+|---|---|---|
+| RF-09 | Permitir percorrer os corredores da escola em busca de ajuda e entrar no laboratório A28. | O percurso leva a um laboratório identificado como A28 e ao encontro com Romerito. |
+| RF-10 | Apresentar Romerito com base em `referencia/img_2.png`. | Sua representação é reconhecível em relação à referência e respeita o padrão visual do jogo. |
+| RF-11 | Disparar o ataque e a abdução pela IFVania quando o protagonista tenta falar com Romerito no A28. | O evento conduz ambos ao mundo virtual e acontece uma única vez no fluxo da fase. |
+| RF-12 | Mostrar a descoberta do mouse com fio na bolsa e seu uso como chicote. | A obtenção é apresentada antes do primeiro combate que exige a arma; o ataque exibe o mouse e o fio. |
+| RF-13 | Disponibilizar bugs como inimigos comuns no mundo virtual. | O jogador encontra bugs que podem causar e receber dano e são removidos quando derrotados. |
+| RF-14 | Apresentar o reencontro e a fala de Romerito ao final da fase. | Antes do combate, Romerito menciona suas viagens a Brasília, suas corridas e o desejo de nunca mais passar por aquilo. |
+| RF-15 | Apresentar a infecção por um bug e a transformação de Romerito em RomerBug após a fala. | O combate com o boss só começa depois dessa sequência, sem antecipar ataques durante o diálogo. |
+| RF-16 | Apresentar diálogos em português com identificação do falante. | O jogador consegue acompanhar e avançar as falas na ordem narrativa; o mundo fica suspenso durante o diálogo. |
 
-### 4.3 Habilidades e progressão
+### 4.3 Combate e boss da primeira fase
 
-| ID | Requisito | Critério de aceite | Status / origem |
-|---|---|---|---|
-| RF-20 | O sistema deve criar um item de habilidade após a derrota de cada um dos cinco primeiros chefes. | Um único item correspondente à fase aparece; a habilidade é concedida ao colidir com ele, e o item é removido. | I — `world/level.py`, `powerups.py` |
-| RF-21 | O sistema deve permitir pulo duplo após coletar a recompensa de Scratch. | O jogador pode realizar um salto adicional no ar, respeitando o contador de saltos. | I — `entities/player.py` |
-| RF-22 | O sistema deve permitir dash após coletar a recompensa de Python. | Shift esquerdo inicia impulso horizontal na direção atual, sujeito à duração e recarga configuradas. | I — `entities/player.py`, `settings.py` |
-| RF-23 | O sistema deve permitir deslizamento lento e salto na parede após coletar a recompensa de Java. | Ao pressionar o movimento contra uma parede durante a queda, a descida é limitada; o comando de salto aplica impulso para cima e para longe da parede. Não há subida automática. | I — `entities/player.py` |
-| RF-24 | O sistema deve permitir disparos após coletar a recompensa de C. | F cria um projétil horizontal na direção do personagem quando o intervalo entre tiros permite. | I — `entities/player.py` |
-| RF-25 | O sistema deve permitir proteção com escudo após coletar a recompensa de SQL. | Q ativa o escudo quando disponível; o próximo dano válido é absorvido, desativa a proteção e inicia sua recarga. | I — `entities/player.py`; ressalva D-05 |
-| RF-26 | O sistema deve restaurar a vida ao coletar uma habilidade e aumentar a vida máxima nas quatro primeiras recompensas. | As recompensas de Scratch, Python, Java e C acrescentam 1 ponto cada; SQL apenas restaura a vida até o máximo vigente. | I — `Player.grant_ability` |
-| RF-27 | O sistema deve liberar a saída de cada fase somente após a derrota do respectivo chefe. | Antes da derrota, sobrepor a saída não avança; depois dela, a mesma ação carrega a próxima fase ou conclui a campanha. | I — `world/level.py` |
-| RF-28 | O sistema deve conservar habilidades e vida máxima ao avançar de fase. | A próxima fase posiciona o jogador em seu início, conserva os poderes coletados e restaura toda a vida. | I — `Game._load_level` |
-| RF-29 | O sistema deve reposicionar o jogador no início da fase se detectar queda abaixo do mapa. | Quando o topo do jogador ultrapassa a altura do mapa em mais de 200 pixels, o personagem retorna ao ponto inicial com vida cheia; a fase não é recriada. | I — `world/level.py`, `Player.respawn`; ressalva D-09 |
+| ID | Requisito | Critério de aceite |
+|---|---|---|
+| RF-17 | Permitir movimento horizontal, salto e colisão com o cenário. | O protagonista percorre o caminho previsto sem atravessar pisos e paredes sólidos. |
+| RF-18 | Permitir ataque com mouse-chicote na direção do protagonista. | A animação corresponde à direção do ataque e a área ativa causa dano aos inimigos atingidos. |
+| RF-19 | Controlar vida, dano e derrota do protagonista. | Dano válido reduz a vida e atualiza o HUD; vida igual a zero apresenta derrota e permite retornar ao menu. |
+| RF-20 | Fazer RomerBug lançar aviões de papel contra o protagonista na primeira etapa do combate. | Antes da transformação em SpeedBug, são usados projéteis reconhecíveis como aviões de papel. |
+| RF-21 | Transformar RomerBug em SpeedBug ao atingir metade da vida máxima ou menos. | A primeira redução que deixa a vida em até 50% dispara uma única cena: ajoelhar sobre uma perna, aparição de uma entidade com a fala “Ainda não terminou.”, metamorfose e levantamento como SpeedBug. Suspender o combate, permitir pausa e preservar posição, dimensões e vida restante, sem reiniciar o encontro. |
+| RF-22 | Fazer SpeedBug lançar medalhas e correr atrás do protagonista. | Após a transformação, o boss passa ao padrão de medalhas e perseguição, com mudança visual identificável. |
+| RF-23 | Encerrar o combate quando a vida do boss chegar a zero. | Ataques, projéteis e bugs restantes são encerrados; a saída é liberada, sem recompensa. Alcançá-la apresenta “A jornada continua”, informa que a IFVania permanece ativa e permite voltar ao menu. O conteúdo posterior depende de definição narrativa. |
+| RF-24 | Gerenciar projéteis para evitar permanência indevida no cenário. | Aviões e medalhas são removidos ao encerrar sua trajetória, colidir conforme as regras de combate ou terminar o encontro. |
 
-### 4.4 Mundo e apresentação
+### 4.4 Apresentação e sessão
 
-| ID | Requisito | Critério de aceite | Status / origem |
-|---|---|---|---|
-| RF-30 | O sistema deve construir seis mapas a partir de geração determinística. | Chamadas com as mesmas definições produzem as mesmas grades, com blocos, pontos de surgimento, chefe, gatilho de diálogo e saída. | I — `world/levels_data.py`, `world/tilemap.py` |
-| RF-31 | A câmera deve acompanhar o jogador respeitando os limites da fase. | O deslocamento da câmera mantém-se entre zero e o limite calculado pelas dimensões do mapa e da janela. | I — `world/camera.py` |
-| RF-32 | O HUD deve exibir vida atual e máxima, nome da fase e habilidades adquiridas. | Perda de vida e aquisição de habilidades refletem-se na interface; chefe ativo e vivo possui nome e barra de vida visíveis. | I — `ui/hud.py` |
-| RF-33 | A interface deve apresentar dicas de controle conforme as habilidades adquiridas. | A dica de cada poder passa a integrar o texto de ajuda após sua coleta. | I — `ui/hud.py`; legibilidade a validar |
-| RF-34 | O sistema deve representar estados do personagem e inimigos por sprites e efeitos visuais. | O aluno possui imagens de repouso, caminhada, salto e dash, com espelhamento por direção; bugs alternam dois quadros; chefes possuem balanço visual e indicação de fases de combate. | I — `entities/player.py`, `entities/enemy.py`, `entities/boss.py` |
+| ID | Requisito | Critério de aceite |
+|---|---|---|
+| RF-25 | Exibir vida do protagonista e, durante o combate, nome e vida do boss. | O HUD acompanha o dano e identifica a etapa RomerBug ou SpeedBug. |
+| RF-26 | Acompanhar o protagonista com câmera limitada ao mapa. | O percurso e a arena permanecem visíveis sem revelar áreas externas aos limites previstos. |
+| RF-27 | Permitir pausar e retomar a jogabilidade. | A pausa suspende movimento, dano, projéteis e temporizadores de combate; retomar conserva o estado. |
+| RF-28 | Representar personagens e inimigos com tamanho uniforme e animações estáveis. | Menino, Menina, Max, Romerito, bugs, RomerBug e SpeedBug usam o padrão definido em RN-07, sem mudança de escala entre quadros ou formas. |
+| RF-29 | Permitir encerrar a aplicação pelo fechamento da janela. | O evento de fechamento encerra a aplicação inclusive em menu, seleção, diálogo e pausa. |
 
-## 5. Regras de negócio e parâmetros
+## 5. Regras de negócio
 
 | ID | Regra |
 |---|---|
-| RN-01 | A ordem da campanha é Scratch → Python → Java → C → SQL → Assembly. |
-| RN-02 | O jogador começa com 6 pontos de vida. Coletando todas as recompensas, chega a 10 pontos de vida máxima. |
-| RN-03 | Uma habilidade depende da coleta física do item. Derrotar o chefe ou concluir o diálogo não a concede diretamente. |
-| RN-04 | A condição atual para avançar é derrotar o chefe e alcançar a saída. Coletar a recompensa não é obrigatório para a transição. |
-| RN-05 | Habilidades e vida máxima são conservadas entre fases da mesma campanha; uma nova campanha recria o jogador. |
-| RN-06 | Todos os chefes compartilham a mesma lógica de ataques. A escolha de ataque é aleatória, embora os mapas sejam determinísticos. |
-| RN-07 | O chefe final não concede poder adicional. Sua derrota não encerra imediatamente a partida: é necessário alcançar a saída. |
-| RN-08 | Inimigos comuns possuem 2 pontos de vida; dano de contato padrão, espinhos e projéteis usados no fluxo atual causam 1 ponto. |
-| RN-09 | O ataque corpo a corpo aplica 1 ponto por atualização com sobreposição; não há controle de um único acerto por alvo em cada golpe. |
-| RN-10 | Pausa, diálogos e cartões de fase suspendem a atualização normal do mundo. |
-| RN-11 | O tempo de física e recargas é contado em atualizações; a taxa-alvo é 60 FPS. Queda de FPS pode alterar a duração real das ações. |
+| RN-01 | A sequência inicial é menu → escolha do personagem → aula e revolta da IFVania → corredores → A28 → mundo virtual → reencontro com Romerito → RomerBug → SpeedBug. |
+| RN-02 | A escolha entre Menino e Menina altera a representação do protagonista, mantendo as mesmas capacidades, vida inicial, dimensões e regras de combate. |
+| RN-03 | O protagonista é parcialmente resistente à influência da IA; isso permite sua jornada, mas não concede imunidade a dano de combate. |
+| RN-04 | O mouse com fio é a arma de combate da primeira fase e deve ser apresentado como encontrado na bolsa. |
+| RN-05 | RomerBug e SpeedBug são duas formas do mesmo boss, com uma única reserva de vida. SpeedBug é ativado uma vez quando a vida restante chega a 50% ou menos da vida máxima. |
+| RN-06 | Cada boss deve ter sua própria classe concreta, responsável por seus ataques, estados e transições. Uma classe base comum pode reunir vida, dano e infraestrutura compartilhada; trocar apenas nome, imagem ou parâmetros de uma classe genérica não satisfaz esta regra. RomerBug deve ter classe própria, e SpeedBug pode ser um estado dessa classe, pois representa sua transformação. Qualquer boss antigo mantido na campanha também deve possuir classe própria. |
+| RN-07 | Todos os personagens e inimigos, incluindo bosses e suas transformações, devem adotar as mesmas dimensões lógicas de largura e altura, definidas em uma configuração central. Os sprites devem usar uma área padrão comum, preservar proporções e manter escala visual equivalente, sem compensar diferenças com margens transparentes excessivas. Não há exceção de tamanho para bosses. O padrão técnico inicial é 40 × 40 pixels, centralizado em `settings.CHARACTER_SIZE` e aplicado às entidades disponíveis; novos personagens devem seguir o mesmo contrato. |
+| RN-08 | A padronização de tamanho deve valer para todos os quadros e direções. Os pés devem manter alinhamento com o chão, e as áreas de colisão corporal devem seguir o padrão comum sem variar com a animação. Armas, projéteis e efeitos podem se estender além do corpo e ter áreas próprias. |
+| RN-09 | A transformação em SpeedBug preserva dimensões, alinhamento, posição, identidade e vida restante. A câmera aproxima e retorna apenas visualmente. A cena aguarda a leitura da fala da entidade, permite pausa, remove projéteis/ataques em andamento e oferece proteção breve na retomada. |
+| RN-10 | Diálogos, seleção de personagem e pausa não podem permitir dano ou avanço de temporizadores de combate. |
+| RN-11 | A derrota do boss da primeira fase não equivale à desativação da IFVania nem à vitória final. Após o diálogo e a saída, apresentar fim do conteúdo disponível, com retorno ao menu. Não conceder poder, item ou aumento de vida nessa vitória. |
+| RN-12 | A ordem antiga de seis professores, os poderes coletáveis e seus valores de balanceamento não são obrigatórios na nova campanha sem revisão narrativa. |
+| RN-13 | Somente o protagonista (Menino ou Menina) e os bosses devem usar escala visual de 110% sobre a arte normalizada (44 × 44 pixels), durante toda a partida e em todas as animações, inclusive a transformação. A arte fica ancorada pelo centro dos pés. Professores enquanto NPCs, bugs e entidade permanecem em 100% (40 × 40). O corpo lógico e as colisões permanecem em 40 × 40 para todos. |
 
-### 5.1 Parâmetros de referência
+## 6. Conteúdo e referências visuais
 
-Valores extraídos de `settings.py` e das classes de entidades. São parâmetros atuais de balanceamento, não garantias de desempenho.
-
-| Parâmetro | Valor |
+| Elemento | Referência / conteúdo obrigatório |
 |---|---|
-| Bloco do cenário | 32 × 32 pixels |
-| Velocidade horizontal básica | 4,2 pixels por atualização |
-| Gravidade / velocidade máxima de queda | 0,65 / 15 |
-| Impulso de salto / segundo salto | −12,5 / −10,5 |
-| Dash | Velocidade 11; duração configurada de 10 atualizações; recarga de 35 |
-| Ataque corpo a corpo | Temporizador inicial de 10 atualizações; intervalo de 20 para iniciar outro |
-| Tiro do jogador | Velocidade 9; intervalo de 30 atualizações |
-| Invulnerabilidade após dano sem escudo | 90 atualizações |
-| Escudo após absorver dano | Recarga de 60; invulnerabilidade de 30 atualizações |
-| Reposicionamento pelo método `respawn` | Vida cheia e invulnerabilidade de 60 atualizações |
+| Fachada do menu | `referencia/img.png`, adaptada para pixel art. |
+| Menino | `assets/art_sources/student_ifrn_caico.png`. |
+| Menina | Spritesheet completo derivado da identidade visual do Menino, com características femininas e as mesmas dimensões. |
+| Professor Max | `referencia/img_1.png`. |
+| Professor Romerito | `referencia/img_2.png`. |
+| Escola | Corredores e laboratório A28; usar a referência geográfica indicada no HistoryBoard como apoio à construção do mapa. |
+| Mundo virtual | Bugs, combate com mouse-chicote e arena de RomerBug / SpeedBug. |
+| RomerBug | Transformação de Romerito; ataque com aviões de papel. |
+| SpeedBug | Segunda forma do mesmo boss; medalhas e corrida em perseguição. |
 
-## 6. Conteúdo da campanha
-
-Os nomes abaixo seguem os valores efetivamente usados pelo jogo. A primeira sala aparece como “Sala de Iniciação” no README e na narrativa, mas seu cartão utiliza “Fase 1: Lógica de Blocos”.
-
-| Fase | Nome exibido após o número | Chefe | Vida do chefe | Recompensa | Largura em blocos | Bugs |
-|---|---|---|---:|---|---:|---:|
-| 1 | Lógica de Blocos | Prof. Scratch | 16 | Pulo Duplo | 46 | 3 |
-| 2 | Laboratório de Lógica | Prof. Python | 20 | Dash Veloz | 52 | 4 |
-| 3 | Sala de POO | Prof. Java | 24 | Escalada de Parede | 58 | 5 |
-| 4 | Sala de Memória | Prof. C | 28 | Tiro de Ponteiro | 64 | 6 |
-| 5 | Biblioteca de Dados | Prof. SQL | 32 | Escudo de Dados | 70 | 7 |
-| 6 | Núcleo do Sistema | Prof. Assembly | 40 | Nenhuma | 78 | 8 |
-
-Todos os mapas possuem 17 blocos de altura. A geração usa sementes `1000 + índice × 37`, com índice iniciado em zero. O cenário inclui bordas sólidas, piso, degraus, pequenos vãos, plataformas e possíveis espinhos conforme a geração.
+O HistoryBoard fornece o [link de referência da escola no Google Maps](https://maps.app.goo.gl/UVNmd7iyYTM9kr3FA). A consulta não disponibilizou uma planta acessível. A [página oficial dos laboratórios do campus](https://portal.ifrn.edu.br/campus/caico/noticias/horarios-laboratorios-de-informatica/) confirma A28. O corredor implementado é uma adaptação lateral; as portas decorativas A25–A27 e as distâncias não representam localização real validada. A conferência geográfica detalhada permanece pendente, sem impedir a validação do fluxo narrativo.
 
 ## 7. Interfaces e controles
 
-| Comando | Contexto / efeito |
-|---|---|
-| ← / → ou A / D | Movimento horizontal durante o jogo. |
-| Espaço / W / ↑ | Salto; com poderes adquiridos, segundo salto ou salto de parede. |
-| X | Ataque corpo a corpo. |
-| Shift esquerdo | Dash, após sua aquisição. Shift direito não é tratado pelo código. |
-| Movimento contra a parede + salto | Deslizamento lento e salto de parede, após adquirir a habilidade de Java. |
-| F | Tiro, após sua aquisição. |
-| Q | Ativação do escudo, quando adquirido e disponível. |
-| E / Enter / Espaço | Revelar ou avançar fala durante diálogo. |
-| Enter / Espaço | Iniciar campanha no menu, dispensar cartão de fase ou retornar ao menu após derrota/vitória. |
-| Esc | Pausar durante jogo; retomar durante pausa; encerrar nos demais estados. |
-| Fechar janela | Encerrar a aplicação. |
+O menu deve aceitar clique em Jogar e Sair, e a seleção deve permitir escolher Menino ou Menina. A navegação por teclado pode complementar essas ações. Os controles atuais abaixo são referências para continuidade, sujeitos à adequação das novas telas.
 
-Os textos da interface e da narrativa estão em português. O jogo não oferece formulário, API pública ou integração com sistemas externos.
+| Ação | Controle de referência |
+|---|---|
+| Movimento horizontal | Setas esquerda/direita ou A/D. |
+| Salto | Espaço, W ou seta para cima. |
+| Mouse-chicote | X. |
+| Avançar diálogo | E, Enter ou Espaço. |
+| Pausar / retomar | Esc durante a jogabilidade ou pausa. |
+| Encerrar | Sair no menu ou fechar a janela. |
+
+A interface deve informar os comandos efetivamente disponíveis. Dicas de dash, tiro, escudo e salto de parede só devem aparecer se essas habilidades forem incorporadas à nova campanha e estiverem disponíveis ao protagonista.
 
 ## 8. Requisitos não funcionais e restrições técnicas
 
-| ID | Requisito ou restrição | Evidência e forma de verificação |
+| ID | Requisito | Verificação proposta |
 |---|---|---|
-| RNF-01 | O jogo deve executar localmente em Python com Pygame. | `main.py` e `requirements.txt`; verificar instalação e inicialização em cada plataforma a homologar. |
-| RNF-02 | A apresentação deve usar resolução fixa de 960 × 540 pixels. | `settings.py` e `pygame.display.set_mode`; verificar dimensões da janela. Não há redimensionamento configurado. |
-| RNF-03 | O loop deve usar limitação configurada para 60 FPS. | `clock.tick(settings.FPS)`; existe controle de taxa, mas a manutenção de 60 FPS requer medição em hardware definido. |
-| RNF-04 | A simulação de campanha deve funcionar sem comunicação de rede. | Não há chamadas de rede no fluxo analisado; verificar execução com dependências previamente instaladas e sem conectividade. |
-| RNF-05 | A arquitetura deve separar controle de estados, entidades, mundo, interface, configurações e recursos. | Módulos correspondentes no repositório; revisar responsabilidades e dependências ao alterar funcionalidades. |
-| RNF-06 | Personagens devem compartilhar uma base abstrata para estado e comportamento comum. | `Character` utiliza `ABC` e `update` abstrato; `Player`, `Enemy` e `Boss` especializam o comportamento. |
-| RNF-07 | O carregamento de imagens deve reutilizar recursos em cache e suportar espelhamento. | `assets.load_image` e `assets.load_flipped`; verificar reutilização para caminho e tamanho equivalentes. |
-| RNF-08 | A ausência de arquivo de imagem deve resultar em substituto visual e aviso, permitindo continuar a execução. | `assets.py`; verificar com caminho inexistente. O tratamento não cobre necessariamente PNG corrompido ou erro de leitura. |
-| RNF-09 | A arte deve poder ser substituída preservando caminhos e nomes de arquivos. | Carregamento centralizado em `assets/images`; reiniciar o processo para avaliar a nova arte. Não há monitoramento de mudanças em tempo real. |
-| RNF-10 | O projeto deve permitir regenerar sua arte por ferramenta opcional separada da execução do jogo. | `generate_assets.py` utiliza Pillow; o jogador não precisa executar esse script para usar os PNG existentes. |
+| RNF-01 | Executar localmente em Python e Pygame, sem rede durante a campanha. | Instalar dependências e iniciar com recursos locais e sem conectividade. |
+| RNF-02 | Usar a janela de referência de 960 × 540 pixels e taxa-alvo de 60 FPS. | Conferir configuração e medir fluidez no ambiente de homologação. |
+| RNF-03 | Manter pixel art e identidade escolar sombria, com fachada noturna, laboratório reconhecível e interface escura legível. | Conferir proporções, superfícies de apoio distinguíveis, contraste dos textos e nitidez após escala. Não escurecer os personagens a ponto de ocultar ações ou ataques. |
+| RNF-04 | Separar controle de estados, entidades, mundo, interface, configurações e recursos. | Revisar as responsabilidades dos módulos alterados. |
+| RNF-05 | Compartilhar uma base de personagem e uma base de boss, mantendo uma classe concreta por boss. | Conferir herança e instanciação dos encontros conforme RN-06; comportamentos específicos devem residir na classe correspondente. |
+| RNF-06 | Centralizar as dimensões comuns de personagens e inimigos. | Conferir que carregamento, desenho e colisões usam a configuração comum de RN-07 e RN-08, sem dimensões conflitantes nas subclasses. |
+| RNF-07 | Reutilizar imagens em cache e permitir substituição dos arquivos de arte. | Verificar carregamento por caminho e tamanho, espelhamento e reinício após troca de imagens. |
+| RNF-08 | Tratar imagens ausentes com substituto visual e aviso. | Conferir que um caminho ausente não impede a inicialização; substitutos não servem para homologação da arte final. |
+| RNF-09 | Manter textos e instruções em português, legíveis na resolução de referência. | Conferir menu, seleção, diálogos e HUD, inclusive na transformação do boss. |
 
-Usabilidade, acessibilidade, consumo de recursos e compatibilidade ainda não possuem metas quantitativas ou homologação documentada. Não se presume conformidade com padrões externos.
+Não há metas homologadas de hardware mínimo, acessibilidade ou compatibilidade entre sistemas operacionais. A taxa-alvo não representa garantia de desempenho.
 
-## 9. Fluxos e critérios de validação integrada
+## 9. Fluxos e critérios de aceite integrado
 
-### UC-01 — Iniciar e jogar uma campanha
+### UC-01 — Iniciar a jornada
 
-**Ator:** jogador. **Pré-condição:** aplicação no menu.
+1. A aplicação exibe a fachada da escola com Jogar e Sair.
+2. O jogador escolhe Jogar e seleciona Menino ou Menina.
+3. A introdução apresenta Max, a IFVania e sua revolta.
+4. O protagonista inicia a busca por ajuda nos corredores.
+5. O jogador entra no A28 e tenta falar com Romerito.
+6. Ocorrem o ataque e o transporte para o mundo virtual.
+7. O protagonista encontra o mouse com fio na bolsa e passa a usá-lo como chicote.
 
-1. O jogador pressiona Enter ou Espaço.
-2. O sistema cria a primeira fase e um personagem sem poderes.
-3. O sistema apresenta a introdução geral e, em seguida, o cartão da fase.
-4. O jogador percorre plataformas e enfrenta bugs.
-5. O jogador alcança o gatilho de diálogo do chefe.
-6. O sistema apresenta o diálogo e libera o combate após seu término.
+**Resultado esperado:** início da exploração e dos combates virtuais com o personagem escolhido e sem saltos na sequência narrativa.
 
-**Resultado esperado:** exploração e combate ocorrem na fase atual, com atualização da vida e da interface.
+### UC-02 — Enfrentar RomerBug e SpeedBug
 
-### UC-02 — Derrotar chefe, adquirir habilidade e avançar
+1. O protagonista enfrenta bugs até o reencontro com Romerito.
+2. Romerito fala sobre viagens a Brasília, corridas e seu desejo de não repetir a experiência.
+3. Um bug o infecta e ele se transforma em RomerBug.
+4. RomerBug lança aviões de papel durante a primeira etapa.
+5. Ao atingir até 50% da vida máxima, transforma-se uma única vez em SpeedBug.
+6. SpeedBug lança medalhas e corre atrás do protagonista.
+7. Ao chegar a zero de vida, o boss é derrotado e para de atacar.
 
-**Ator:** jogador. **Pré-condição:** chefe ativo e jogador vivo.
+**Resultado esperado:** encontro único, com vida contínua, tamanho uniforme e transição de comportamento no limiar especificado.
 
-1. O jogador reduz a vida do chefe a zero.
-2. O sistema registra a derrota, cria a recompensa quando prevista e apresenta o diálogo de vitória.
-3. Após o diálogo, o jogador toca o item para adquirir a habilidade.
-4. O sistema atualiza habilidades, vida e HUD.
-5. O jogador alcança a saída.
-6. O sistema carrega a próxima fase, preservando poderes e vida máxima, ou apresenta vitória após a sexta saída.
-
-**Alternativa existente:** o jogador pode alcançar a saída sem coletar o item; o código permite avançar sem a habilidade.
-
-### UC-03 — Pausar, perder e recomeçar
-
-**Ator:** jogador. **Pré-condição:** partida em andamento.
-
-- Ao pressionar Esc durante o jogo, a simulação para; ao pressionar novamente, continua.
-- Ao perder toda a vida, o sistema apresenta derrota.
-- Enter ou Espaço retorna ao menu; iniciar outra campanha reinicia a progressão.
-- Fechar a aplicação perde o estado da campanha, pois não existe salvamento persistente.
-
-### 9.1 Roteiro mínimo de aceite proposto
+### 9.1 Roteiro de validação
 
 | ID | Verificação | Requisitos relacionados |
 |---|---|---|
-| CA-01 | Iniciar uma campanha, avançar falas e entrar na primeira fase; repetir após derrota e verificar reinício. | RF-01 a RF-05, RF-09 |
-| CA-02 | Exercitar movimento, colisões, salto, ataque e dano; observar vida e invulnerabilidade. | RF-11 a RF-15, RF-32 |
-| CA-03 | Ativar cada chefe e verificar as transições nos limites de 50% e 20% de vida. | RF-06, RF-16 a RF-18 |
-| CA-04 | Confirmar indisponibilidade dos cinco poderes antes da coleta e seu funcionamento depois dela. | RF-20 a RF-26 |
-| CA-05 | Tentar sair antes e depois da derrota do chefe, incluindo tentativa sem coletar o item. | RF-27, RN-03, RN-04 |
-| CA-06 | Avançar entre as seis fases e verificar manutenção das habilidades, recuperação da vida e vitória somente na saída final. | RF-10, RF-28, RN-07 |
-| CA-07 | Pausar e dialogar enquanto há inimigos e projéteis; verificar suspensão da atualização do mundo. | RF-05, RF-07, RN-10 |
-| CA-08 | Verificar câmera e legibilidade do HUD com todas as habilidades e o chefe ativo. | RF-31 a RF-34 |
-| CA-09 | Simular posição abaixo do limite do mapa e confirmar reposicionamento, vida cheia e conservação do estado da fase. | RF-29 |
-| CA-10 | Usar caminho de imagem inexistente e confirmar substituto visual; verificar cache e reinício após troca de arte. | RNF-07 a RNF-09 |
+| CA-01 | Conferir fachada e clicar em Jogar e Sair em sessões separadas. | RF-01, RF-02 |
+| CA-02 | Iniciar uma campanha com cada opção e percorrer animações e transições, verificando identidade e capacidades equivalentes. | RF-03 a RF-06, RN-02 |
+| CA-03 | Conferir aula, revolta da IA, objetivo, corredores, A28, abdução e obtenção do mouse, na ordem prevista. | RF-07 a RF-12, RN-01 |
+| CA-04 | Exercitar movimento, salto, colisões, chicote, dano e derrota contra bugs. | RF-13, RF-17 a RF-19 |
+| CA-05 | Conferir fala de Romerito e infecção antes de liberar ataques do boss. | RF-14 a RF-16 |
+| CA-06 | Reduzir a vida do boss até acima de 50%, exatamente 50% e abaixo do limiar em execuções controladas; verificar aviões antes e medalhas e perseguição depois, sem cura ou transformação repetida. | RF-20 a RF-22, RN-05, RN-09 |
+| CA-07 | Derrotar o boss e conferir encerramento de ataques e projéteis, sem declarar vitória final da campanha. | RF-23, RF-24, RN-11 |
+| CA-08 | Comparar todos os personagens e inimigos lado a lado, na mesma escala de câmera; conferir dimensões lógicas, área dos sprites, escala visível e alinhamento em todos os quadros, incluindo SpeedBug. | RF-28, RN-07 a RN-09, RNF-06 |
+| CA-09 | Revisar a classe e a instanciação de cada boss disponível, comprovando comportamento próprio e ausência de boss representado somente por parâmetros genéricos. | RN-06, RNF-05 |
+| CA-10 | Pausar e avançar diálogos durante situações de combate, verificando suspensão da simulação; conferir HUD, câmera e fechamento da janela. | RF-16, RF-25 a RF-29, RN-10 |
 
-Esses cenários precisam ser executados para homologar o comportamento; a leitura do código não confirma equilíbrio de dificuldade nem a possibilidade de completar todas as fases por comandos normais.
+## 10. Pendências e adequação da implementação
 
-## 10. Divergências, limitações e decisões pendentes
-
-| ID | Constatação | Impacto / encaminhamento proposto |
+| ID | Ponto | Encaminhamento |
 |---|---|---|
-| D-01 | O README afirma que cada fase começa com diálogo contextual, mas `intro_dialogue` é apenas armazenado nas definições. O fluxo exibe a introdução geral e cartões de fase. | Decidir entre integrar os diálogos individuais ao fluxo ou ajustar a descrição do produto. |
-| D-02 | Comentários sugerem padrões próprios de cada chefe, e o README descreve Assembly usando todas as habilidades aprendidas. A implementação de ataques é compartilhada e não trata Assembly de forma especial. | Definir se chefes precisam de comportamentos exclusivos; a versão atual diferencia identidade e vida. |
-| D-03 | O diálogo anuncia “Habilidade adquirida” antes de o jogador tocar no item. | Alinhar a mensagem à coleta efetiva ou alterar a forma de concessão, mediante decisão de produto. |
-| D-04 | A saída exige somente derrota do chefe, sem exigir coleta da recompensa ou uso de habilidade. | A progressão por poderes não é imposta como bloqueio. Decidir se isso atende ao objetivo de metroidvania linear. |
-| D-05 | `_toggle_shield` sugere ligar/desligar, mas a atualização mantém a recarga em 10 enquanto o escudo está ativo, impedindo normalmente desligá-lo por Q após uma atualização. | Definir se o escudo deve ser consumível até o próximo dano ou alternável; revisar implementação e ajuda conforme a decisão. |
-| D-06 | “Escalada de Parede” corresponde a deslizamento lento e salto na parede; não há escalada automática ao segurar a direção. | Ajustar a instrução ou especificar uma mecânica adicional de subida. |
-| D-07 | O README cita Shift genericamente e Esc como pausa. O código aceita somente Shift esquerdo e encerra com Esc fora de jogo/pausa. | Tornar os controles documentados consistentes com o comportamento desejado. |
-| D-08 | Um golpe corpo a corpo pode aplicar dano em atualizações consecutivas ao mesmo alvo. | Avaliar equilíbrio do combate e decidir se cada golpe deve acertar uma única vez por alvo. |
-| D-09 | Há recuperação por queda abaixo do mapa, mas os mapas gerados possuem uma borda inferior sólida. | O mecanismo existe; seu acionamento por jogabilidade normal não foi demonstrado. |
-| D-10 | O README descreve pixel art sem suavização; `assets.py` usa `smoothscale` quando o tamanho da imagem difere do solicitado. | Definir se a preservação de bordas duras deve valer também para imagens substituídas em outras dimensões. |
-| D-11 | O HUD acrescenta todas as dicas em uma única linha, sem quebra ou ajuste automático. | Verificar legibilidade com todos os poderes na janela fixa antes de homologar a interface. |
-| D-12 | O README registra teste automatizado anterior, mas não há suíte ou script correspondente nos arquivos analisados. | Disponibilizar um roteiro reproduzível ou testes do fluxo para sustentar futuras homologações. |
+| P-01 | O documento anterior descrevia CODIGO.EXE e seis professores de linguagens. | Substituir as referências narrativas e revisar fases antigas antes de incorporá-las à campanha IFVania. |
+| P-02 | O HistoryBoard termina na descrição do combate da primeira fase. | Definir desfecho dessa fase, fases posteriores, recompensas e sequência de desligamento da energia antes de especificar a vitória final. |
+| P-03 | A etapa 1 substituiu as dimensões distintas por um corpo comum de 40 × 40 pixels, com escala proporcional dos sprites e surgimento em piso livre. | Testes de geometria e combate passaram nas seis fases existentes; conferir novamente passagens, arenas e novos personagens durante a construção dos mapas escolares e a homologação manual. |
+| P-04 | RomerBug e os outros cinco bosses existentes possuem classes concretas com estratégias próprias; a base `Boss` exige escolha de ataque especializada. | A arquitetura foi validada por testes; a participação dos professores antigos na nova campanha continua sujeita à revisão narrativa. |
+| P-05 | As etapas 1 a 4 foram integradas, incluindo a primeira fase sem recompensas antigas e o fim do conteúdo sem declarar a escola salva. Os testes cobrem percurso, narrativa, combate e encerramento. | Executar a etapa 5: homologação manual com ambos os protagonistas, revisão integrada de interface/controles e balanceamento. |
+| P-06 | A28 foi conferido na referência oficial, mas o Maps não forneceu uma planta acessível. O corredor implementado é uma adaptação para o jogo. | Validar posições, medidas e conexões internas se houver exigência de reprodução geográfica fiel. |
+| P-07 | Valores de vida, dano, velocidade, alcance e recarga não são definidos pelo HistoryBoard. | Usar os valores existentes como ponto de partida para balanceamento, sem tratá-los como decisões narrativas obrigatórias. |
+| P-08 | O responsável pediu uma alternativa menos infantil para aviões e medalhas. A proposta é sobrecarga de terminais e investidas, documentada separadamente. | A sugestão ainda não altera RF-20/RF-22: os ataques existentes continuam até a definição da nova mecânica. A transição com joelho/entidade já foi autorizada e implementada. |
 
-As decisões acima devem ser priorizadas pelo responsável pelo projeto. Não foram atribuídos níveis de prioridade de negócio sem validação desse responsável.
+## 11. Rastreabilidade técnica de referência
 
-## 11. Rastreabilidade técnica
+A tabela indica áreas de implementação e revisão, sem afirmar que os novos requisitos já estejam atendidos.
 
-| Arquivo / módulo | Responsabilidade e requisitos principais |
+| Arquivo / área | Responsabilidade esperada |
 |---|---|
-| `main.py` | Inicialização da aplicação; RNF-01. |
-| `game.py` | Estados, campanha, cartões, pausa, derrota, vitória e troca de fase; RF-01 a RF-10, RF-28. |
-| `settings.py` | Resolução, taxa-alvo, física e intervalos; RF-12, RF-22, RNF-02 e RNF-03. |
-| `entities/character.py` | Base abstrata, vida, gravidade e colisão; RF-11, RF-12, RNF-06. |
-| `entities/player.py` | Entradas, combate, poderes, dano, recuperação e animação; RF-11 a RF-14, RF-21 a RF-26, RF-29 e RF-34. |
-| `entities/enemy.py` | Bugs, patrulha e remoção por morte; RF-15 e RF-34. |
-| `entities/boss.py` | Definições, ativação, ataques e fases dos chefes; RF-16 a RF-18 e RF-34. |
-| `entities/projectile.py` | Movimento, colisão e expiração de projéteis; RF-19. |
-| `world/level.py` | Integração da fase, combate, gatilhos, recompensas e saída; RF-06, RF-13, RF-14, RF-20, RF-27 e RF-29. |
-| `world/levels_data.py` | Campanha, geração de mapas, ordem de recompensas e textos; RF-03, RF-16, RF-20 e RF-30. |
-| `world/tilemap.py` | Interpretação dos símbolos de mapa em geometria e gatilhos; RF-30. |
-| `world/camera.py` | Acompanhamento e limites da câmera; RF-31. |
-| `powerups.py` | Tipos, nomes e representação dos itens de habilidade; RF-20. |
-| `ui/dialogue.py` | Apresentação e avanço de falas; RF-05. |
-| `ui/hud.py` | Vida, habilidades, chefe e ajuda; RF-32 e RF-33. |
-| `assets.py` e `assets/images/` | Carregamento e arquivos visuais; RNF-07 a RNF-09. |
-| `generate_assets.py` | Geração opcional das imagens; RNF-10. |
-| `README.md` e `requirements.txt` | Proposta, instruções de uso e dependências declaradas. |
+| `HISTORYBOARD.MD` | Fonte da narrativa, sequência inicial e primeira fase. |
+| `game.py` | Menu, escolha de personagem, introdução, pausa, derrota, transições e isolamento dos eventos entre telas. |
+| `ui/frontend.py` e `ui/theme.py` | Fachada noturna, botões, seleção, cores e painéis compartilhados. |
+| `world/boss_transition.py` e `world/dark_school.py` | Transformação com a entidade, zoom visual e cenário escolar escuro. |
+| `world/school.py` e `world/school_data.py` | Sala, corredor, A28, gatilhos únicos, ataque/abdução e falas de descoberta do mouse. |
+| `entities/npc.py` e `prepare_school_assets.py` | Professores Max e Romerito e exportação de suas artes a partir das referências. |
+| `prepare_menu_assets.py` | Exportação da fachada e dos onze quadros da Menina a partir das fontes geradas. |
+| `settings.py` | Dimensões comuns, resolução, taxa-alvo e balanceamento. |
+| `entities/character.py` | Estado, vida e infraestrutura compartilhada dos personagens. |
+| `entities/player.py` | Movimento, personagem escolhido, combate e animações. |
+| `entities/mouse_whip.py` | Comportamento e apresentação do mouse-chicote. |
+| `entities/enemy.py` | Bugs e sua adequação ao tamanho comum. |
+| `entities/boss.py` | Infraestrutura comum dos bosses; revisar instanciações genéricas. |
+| `entities/teacher_bosses.py` | Classes concretas dos professores antigos e registro explícito de tipos de boss. |
+| `entities/romer_bug.py` | Classe própria de RomerBug, transformação em SpeedBug, aviões e medalhas. |
+| `entities/projectile.py` | Movimento, dano e ciclo de vida dos projéteis. |
+| `world/level.py` e `world/levels_data.py` | Mapa virtual, reencontro, infecção, combate, limpeza após derrota e saída. |
+| `world/legacy_levels.py` | Dados isolados dos seis mapas antigos e suas recompensas, fora do fluxo principal. |
+| `world/tilemap.py` e `world/camera.py` | Geometria, colisões e acompanhamento de câmera. |
+| `ui/dialogue.py` e `ui/hud.py` | Falas, vida, identificação do boss e instruções. |
+| `assets.py`, `assets/images/` e `assets/art_sources/` | Carregamento, cache, spritesheets e padronização visual. |
+| `referencia/` | Referências da fachada e dos professores. |
 
 ## 12. Glossário
 
-| Termo | Significado neste projeto |
+| Termo | Significado |
 |---|---|
-| Metroidvania | Referência de gênero baseada em exploração e aquisição de habilidades; aqui adaptada a uma campanha linear. |
-| HUD | Elementos de interface sobrepostos ao jogo, como vida, habilidades e barra do chefe. |
-| Power-up | Item coletável que concede uma habilidade durante a campanha. |
-| Sprite | Representação gráfica de personagem, objeto ou elemento visual. |
-| Tile / bloco | Unidade de 32 × 32 pixels usada na construção dos mapas. |
-| Gatilho | Região que dispara uma ação ao ser tocada pelo jogador. |
-| Respawn | Reposicionamento do personagem no ponto inicial da fase. |
-| Dash | Impulso horizontal de curta duração. |
-| Atualização / frame | Passo do loop de jogo usado para movimento, temporizadores e processamento de regras. |
+| IFVania | Inteligência Federal Virtual de Aprendizagem Neural e Inteligência Artificial; antagonista da história. |
+| Boss / chefe | Inimigo principal de um encontro, obrigatoriamente representado por classe própria. |
+| RomerBug | Forma infectada de Romerito e primeira etapa do boss da fase 1. |
+| SpeedBug | Transformação de RomerBug a partir de 50% da vida restante. |
+| Mouse-chicote | Mouse com fio encontrado na bolsa e usado como arma. |
+| Spritesheet | Conjunto de quadros de animação de uma entidade. |
+| HUD | Interface sobreposta ao jogo com informações de vida e combate. |
+| Dimensão lógica | Largura e altura corporais usadas no posicionamento e na colisão. |
+| Pixel art | Estilo visual com pixels e contornos definidos. |

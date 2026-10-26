@@ -66,3 +66,37 @@ def load_flipped(relative_path, size=None, fallback_color=(255, 0, 255)):
 
 def clear_cache():
     _cache.clear()
+
+
+def load_character_frames(paths, fallback_color=(255, 0, 255)):
+    """Normaliza uma sequência inteira, preservando proporções e escala.
+
+    Remove margens externas comuns, usa uma única escala entre poses e
+    alinha os pés. O mesmo grupo deve incluir todos os estados/formas que
+    compartilham o corpo, para não variar o tamanho durante a animação.
+    """
+    import settings
+
+    paths = tuple(paths)
+    size = settings.CHARACTER_SIZE
+    key = ("character_frames", paths, size, fallback_color)
+    if key in _cache:
+        return _cache[key]
+    originals = [load_image(path, fallback_color=fallback_color) for path in paths]
+    bounds = [frame.get_bounding_rect() for frame in originals]
+    width = max((rect.width for rect in bounds), default=1) or 1
+    height = max((rect.height for rect in bounds), default=1) or 1
+    scale = min(size[0] / width, size[1] / height)
+    frames = []
+    for original, rect in zip(originals, bounds):
+        frame = pygame.Surface(size, pygame.SRCALPHA)
+        if rect.width and rect.height:
+            cropped = original.subsurface(rect)
+            scaled = pygame.transform.scale(cropped, (
+                max(1, round(rect.width * scale)),
+                max(1, round(rect.height * scale)),
+            ))
+            frame.blit(scaled, scaled.get_rect(midbottom=(size[0] // 2, size[1])))
+        frames.append(frame)
+    _cache[key] = frames
+    return frames

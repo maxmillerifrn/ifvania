@@ -11,21 +11,23 @@ from entities.character import Character
 
 
 class Enemy(Character):
+    VISUAL_SCALE = 1.0
     _SPRITES = None
     _ANIM_SPEED = 10  # quadros de jogo entre cada troca de perna/antena
 
     @classmethod
     def _load_sprites(cls):
         if cls._SPRITES is None:
-            size = (26, 24)
+            frames = assets.load_character_frames(
+                [f"enemies/bug_{i}.png" for i in range(2)], settings.ENEMY_COLOR)
             cls._SPRITES = {
-                1: [assets.load_image(f"enemies/bug_{i}.png", size, settings.ENEMY_COLOR) for i in range(2)],
-                -1: [assets.load_flipped(f"enemies/bug_{i}.png", size, settings.ENEMY_COLOR) for i in range(2)],
+                1: frames,
+                -1: [pygame.transform.flip(frame, True, False) for frame in frames],
             }
         return cls._SPRITES
 
     def __init__(self, x, y, patrol_range=80, speed=1.4, health=2, color=None):
-        super().__init__(x, y, width=26, height=24, health=health)
+        super().__init__(x, y, *settings.CHARACTER_SIZE, health=health)
         self.sprites = self._load_sprites()
         self.image = self.sprites[1][0]
         self.vel.x = speed

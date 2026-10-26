@@ -16,35 +16,47 @@ from entities.mouse_whip import MouseWhip
 
 
 class Player(Character):
+    VISUAL_SCALE = settings.CHARACTER_VISUAL_SCALE
     # imagens carregadas uma única vez e compartilhadas por todas as instâncias
-    _SPRITES = None
+    _SPRITES = {}
+    CHARACTERS = {"boy": "Menino", "girl": "Menina"}
 
     # quantos quadros de jogo cada estado de animação segura antes de avançar
     # para o próximo quadro (menor = mais rápido)
     _ANIM_SPEED = {"idle": 22, "walk": 7, "jump": 1, "dash": 1}
 
     @classmethod
-    def _load_sprites(cls):
-        if cls._SPRITES is None:
-            size = (26, 40)
+    def _load_sprites(cls, character="boy"):
+        if character not in cls.CHARACTERS:
+            raise ValueError(f"Personagem desconhecido: {character}")
+        cache_key = (character, settings.CHARACTER_SIZE)
+        if cache_key not in cls._SPRITES:
             uniform = (36, 112, 76)
-            cls._SPRITES = {
-                "idle_r": [assets.load_image(f"player/idle_{i}.png", size, uniform) for i in range(2)],
-                "idle_l": [assets.load_flipped(f"player/idle_{i}.png", size, uniform) for i in range(2)],
-                "walk_r": [assets.load_image(f"player/walk_{i}.png", size, uniform) for i in range(4)],
-                "walk_l": [assets.load_flipped(f"player/walk_{i}.png", size, uniform) for i in range(4)],
-                "jump_r": assets.load_image("player/jump.png", size, uniform),
-                "jump_l": assets.load_flipped("player/jump.png", size, uniform),
-                "dash_r": assets.load_image("player/dash.png", size, (150, 220, 190)),
-                "dash_l": assets.load_flipped("player/dash.png", size, (150, 220, 190)),
-                "attack_r": [assets.load_image(f"player/attack_{i}.png", (36, 40), uniform) for i in range(3)],
-                "attack_l": [assets.load_flipped(f"player/attack_{i}.png", (36, 40), uniform) for i in range(3)],
+            folder = "player" if character == "boy" else "player/girl"
+            paths = [f"{folder}/idle_{i}.png" for i in range(2)]
+            paths += [f"{folder}/walk_{i}.png" for i in range(4)]
+            paths += [f"{folder}/jump.png", f"{folder}/dash.png"]
+            paths += [f"{folder}/attack_{i}.png" for i in range(3)]
+            frames = assets.load_character_frames(paths, uniform)
+            flipped = [pygame.transform.flip(frame, True, False) for frame in frames]
+            sprites = {
+                "attack_r": frames[8:],
+                "attack_l": flipped[8:],
             }
-        return cls._SPRITES
+            for suffix, sequence in (("_r", frames), ("_l", flipped)):
+                sprites.update({
+                    "idle" + suffix: sequence[:2],
+                    "walk" + suffix: sequence[2:6],
+                    "jump" + suffix: sequence[6],
+                    "dash" + suffix: sequence[7],
+                })
+            cls._SPRITES[cache_key] = sprites
+        return cls._SPRITES[cache_key]
 
-    def __init__(self, x, y):
-        super().__init__(x, y, width=26, height=40, health=6)
-        self.sprites = self._load_sprites()
+    def __init__(self, x, y, character="boy"):
+        super().__init__(x, y, *settings.CHARACTER_SIZE, health=6)
+        self.character = character
+        self.sprites = self._load_sprites(character)
 
         # Animação (estado atual: idle/walk/jump/dash + quadro dentro dele)
         self.anim_state = "idle"
@@ -63,6 +75,7 @@ class Player(Character):
         self.attack_cooldown = 0
         self.attacking_timer = 0
         self.whip = MouseWhip()
+        self.whip_unlocked = True  # Fases de combate antigas; o prólogo bloqueia a arma.
         self._solids = ()
 
         # Timers de habilidades
@@ -155,7 +168,7 @@ class Player(Character):
             self.shield_active = not self.shield_active
 
     def _try_melee(self):
-        if self.attack_cooldown <= 0:
+        if self.whip_unlocked and self.attack_cooldown <= 0:
             self.attack_cooldown = settings.ATTACK_COOLDOWN
             self.attacking_timer = self.whip.DURATION
             self.whip.start(self.facing)
@@ -277,7 +290,8 @@ class Player(Character):
         blink = self.invuln_timer > 0 and (self.invuln_timer // 4) % 2 == 0
         dest = camera.apply(self.rect)
         if not blink:
-            surface.blit(self.image, self.image.get_rect(midbottom=dest.midbottom))
+            image = self.get_draw_image()
+            surface.blit(image, image.get_rect(midbottom=dest.midbottom))
         if self.attacking_timer > 0:
             self.whip.draw(surface, camera, self, self._solids)
         if self.shield_active:
