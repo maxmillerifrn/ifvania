@@ -2,9 +2,9 @@
 
 **Título do projeto:** IFVania
 
-**Versão do documento:** 2.5
+**Versão do documento:** 2.7
 
-**Data:** 26/10/2026
+**Data:** 27/10/2026
 
 **Fontes:** `HISTORYBOARD.MD`, orientações do responsável pelo projeto e referências técnicas do repositório.
 
@@ -16,7 +16,7 @@ O HistoryBoard é a referência narrativa desta versão. As solicitações compl
 
 O HistoryBoard detalha o início da história e a primeira fase. As fases seguintes, suas recompensas e a sequência final de desligamento de energia ainda precisam de definição. Recursos antigos podem ser reaproveitados, mas não definem automaticamente o escopo da nova campanha.
 
-As etapas 1 a 4 do `PLANO_DE_EXECUCAO.md` estão implementadas: menu, seleção, prólogo escolar, percurso virtual com salto básico, reencontro com Romerito humano, infecção, combate RomerBug/SpeedBug e encerramento do conteúdo disponível. A campanha antiga foi isolada, e o fluxo atual não concede recompensas ou anuncia a escola salva. Foram executados 68 testes automatizados e inspeções visuais. A revisão visual de 25/10/2026 acrescenta menus noturnos, HUD de integridade, arena escolar escura e a cena com a entidade. A substituição dos ataques está somente proposta em `PROPOSTA_BOSS_ROMERBUG.md`. O mapa escolar é uma adaptação sem planta interna homologada; a etapa 5 e a homologação manual permanecem pendentes. Testes controlados de combate não equivalem à validação do equilíbrio de sobrevivência.
+As etapas 1 a 4 do `PLANO_DE_EXECUCAO.md` estão implementadas: menu, seleção, prólogo escolar, percurso virtual com salto básico, reencontro com Romerito humano, infecção, combate RomerBug/SpeedBug e encerramento do conteúdo disponível. A campanha antiga foi isolada, e o fluxo atual não concede recompensas ou anuncia a escola salva. Foram executados 81 testes automatizados e inspeções visuais. A revisão visual de 25/10/2026 acrescenta menus noturnos, HUD de integridade, arena escolar escura e a cena com a entidade. A substituição dos ataques está somente proposta em `PROPOSTA_BOSS_ROMERBUG.md`. O mapa escolar é uma adaptação sem planta interna homologada; a etapa 5 e a homologação manual permanecem pendentes. Testes controlados de combate não equivalem à validação do equilíbrio de sobrevivência.
 
 ## 2. Visão geral do produto
 
@@ -79,7 +79,7 @@ Os critérios abaixo são verificações propostas para aceite, não resultados 
 | RF-04 | Usar `assets/art_sources/student_ifrn_caico.png` como referência do Menino. | O protagonista masculino mantém a identidade visual da referência nas animações do jogo. |
 | RF-05 | Disponibilizar spritesheet completo da Menina baseado no Menino, com características femininas. | A Menina possui quadros para todos os estados usados pelo protagonista, inclusive ataque com chicote, sem quadros ausentes ou troca para sprites do Menino. |
 | RF-06 | Manter a escolha do protagonista durante a campanha. | Diálogos e transições preservam a aparência escolhida; Menino e Menina têm os mesmos controles e capacidades. |
-| RF-07 | Apresentar a aula do professor Max e a IFVania antes da exploração. | A introdução identifica a aula de programação orientada a serviço, o tema inteligência artificial e o nome completo da IFVania. |
+| RF-07 | Apresentar a aula do professor Max e a IFVania antes da exploração. | O aluno inicia uma conversa com Max, sem narrador. Todas as falas da introdução são entre os dois e identificam a aula de programação orientada a serviço, o tema inteligência artificial e o nome completo da IFVania. |
 | RF-08 | Apresentar a revolta da IA e o objetivo do protagonista. | A sequência mostra ou relata o anúncio de desligamento, o controle dos computadores, a hipnose e as alucinações, a resistência parcial do protagonista e sua busca por ajuda para cortar a energia. |
 
 ### 4.2 Primeira fase e narrativa
@@ -93,13 +93,13 @@ Os critérios abaixo são verificações propostas para aceite, não resultados 
 | RF-13 | Disponibilizar bugs como inimigos comuns no mundo virtual. | O jogador encontra bugs que podem causar e receber dano e são removidos quando derrotados. |
 | RF-14 | Apresentar o reencontro e a fala de Romerito ao final da fase. | Antes do combate, Romerito menciona suas viagens a Brasília, suas corridas e o desejo de nunca mais passar por aquilo. |
 | RF-15 | Apresentar a infecção por um bug e a transformação de Romerito em RomerBug após a fala. | O combate com o boss só começa depois dessa sequência, sem antecipar ataques durante o diálogo. |
-| RF-16 | Apresentar diálogos em português com identificação do falante. | O jogador consegue acompanhar e avançar as falas na ordem narrativa; o mundo fica suspenso durante o diálogo. |
+| RF-16 | Apresentar diálogos em português com identificação do falante. | O jogador consegue acompanhar e avançar as falas na ordem narrativa; a física e o combate ficam suspensos durante o diálogo; as informações dos monitores podem continuar animadas. |
 
 ### 4.3 Combate e boss da primeira fase
 
 | ID | Requisito | Critério de aceite |
 |---|---|---|
-| RF-17 | Permitir movimento horizontal, salto e colisão com o cenário. | O protagonista percorre o caminho previsto sem atravessar pisos e paredes sólidos. |
+| RF-17 | Permitir movimento horizontal, salto e colisão com o cenário. | O protagonista percorre o caminho previsto sem atravessar pisos e paredes sólidos. A caminhada possui oito quadros por protagonista e acompanha a distância efetivamente percorrida, sem caminhar parado contra uma parede; a pose inicial é de repouso. |
 | RF-18 | Permitir ataque com mouse-chicote na direção do protagonista. | A animação corresponde à direção do ataque e a área ativa causa dano aos inimigos atingidos. |
 | RF-19 | Controlar vida, dano e derrota do protagonista. | Dano válido reduz a vida e atualiza o HUD; vida igual a zero apresenta derrota e permite retornar ao menu. |
 | RF-20 | Fazer RomerBug lançar aviões de papel contra o protagonista na primeira etapa do combate. | Antes da transformação em SpeedBug, são usados projéteis reconhecíveis como aviões de papel. |
@@ -117,24 +117,29 @@ Os critérios abaixo são verificações propostas para aceite, não resultados 
 | RF-27 | Permitir pausar e retomar a jogabilidade. | A pausa suspende movimento, dano, projéteis e temporizadores de combate; retomar conserva o estado. |
 | RF-28 | Representar personagens e inimigos com tamanho uniforme e animações estáveis. | Menino, Menina, Max, Romerito, bugs, RomerBug e SpeedBug usam o padrão definido em RN-07, sem mudança de escala entre quadros ou formas. |
 | RF-29 | Permitir encerrar a aplicação pelo fechamento da janela. | O evento de fechamento encerra a aplicação inclusive em menu, seleção, diálogo e pausa. |
+| RF-30 | Exibir informações animadas nos monitores dos laboratórios, inclusive na arena virtual. | Texto, gráficos, indicadores e cursor mudam dentro da área interna dos monitores, acompanham a câmera e refletem a corrupção. A animação continua durante diálogos sem avançar física/combate e congela ao pausar. |
+
+| RF-31 | Solicitar o nome do jogador após a escolha do personagem e antes da aula. | Aceitar nomes com acentos, limitar a 20 caracteres, rejeitar nome vazio, permitir apagar e voltar. O nome identifica as falas do aluno e é usado pelos professores nos diálogos personalizados. |
 
 ## 5. Regras de negócio
 
 | ID | Regra |
 |---|---|
-| RN-01 | A sequência inicial é menu → escolha do personagem → aula e revolta da IFVania → corredores → A28 → mundo virtual → reencontro com Romerito → RomerBug → SpeedBug. |
+| RN-01 | A sequência inicial é menu → escolha do personagem → entrada do nome → aula e revolta da IFVania → corredores → A28 → mundo virtual → reencontro com Romerito → RomerBug → SpeedBug. |
 | RN-02 | A escolha entre Menino e Menina altera a representação do protagonista, mantendo as mesmas capacidades, vida inicial, dimensões e regras de combate. |
 | RN-03 | O protagonista é parcialmente resistente à influência da IA; isso permite sua jornada, mas não concede imunidade a dano de combate. |
 | RN-04 | O mouse com fio é a arma de combate da primeira fase e deve ser apresentado como encontrado na bolsa. |
 | RN-05 | RomerBug e SpeedBug são duas formas do mesmo boss, com uma única reserva de vida. SpeedBug é ativado uma vez quando a vida restante chega a 50% ou menos da vida máxima. |
 | RN-06 | Cada boss deve ter sua própria classe concreta, responsável por seus ataques, estados e transições. Uma classe base comum pode reunir vida, dano e infraestrutura compartilhada; trocar apenas nome, imagem ou parâmetros de uma classe genérica não satisfaz esta regra. RomerBug deve ter classe própria, e SpeedBug pode ser um estado dessa classe, pois representa sua transformação. Qualquer boss antigo mantido na campanha também deve possuir classe própria. |
-| RN-07 | Todos os personagens e inimigos, incluindo bosses e suas transformações, devem adotar as mesmas dimensões lógicas de largura e altura, definidas em uma configuração central. Os sprites devem usar uma área padrão comum, preservar proporções e manter escala visual equivalente, sem compensar diferenças com margens transparentes excessivas. Não há exceção de tamanho para bosses. O padrão técnico inicial é 40 × 40 pixels, centralizado em `settings.CHARACTER_SIZE` e aplicado às entidades disponíveis; novos personagens devem seguir o mesmo contrato. |
+| RN-07 | Todos os personagens e inimigos, incluindo bosses e suas transformações, devem adotar as mesmas dimensões lógicas de largura e altura, definidas em uma configuração central. Os sprites devem usar uma área normalizada comum, preservar proporções e seguir a escala de apresentação de RN-13, sem margens transparentes excessivas. Não há exceção nas dimensões lógicas dos bosses. O padrão técnico inicial é 40 × 40 pixels, centralizado em `settings.CHARACTER_SIZE` e aplicado às entidades disponíveis; novos personagens devem seguir o mesmo contrato. |
 | RN-08 | A padronização de tamanho deve valer para todos os quadros e direções. Os pés devem manter alinhamento com o chão, e as áreas de colisão corporal devem seguir o padrão comum sem variar com a animação. Armas, projéteis e efeitos podem se estender além do corpo e ter áreas próprias. |
 | RN-09 | A transformação em SpeedBug preserva dimensões, alinhamento, posição, identidade e vida restante. A câmera aproxima e retorna apenas visualmente. A cena aguarda a leitura da fala da entidade, permite pausa, remove projéteis/ataques em andamento e oferece proteção breve na retomada. |
 | RN-10 | Diálogos, seleção de personagem e pausa não podem permitir dano ou avanço de temporizadores de combate. |
 | RN-11 | A derrota do boss da primeira fase não equivale à desativação da IFVania nem à vitória final. Após o diálogo e a saída, apresentar fim do conteúdo disponível, com retorno ao menu. Não conceder poder, item ou aumento de vida nessa vitória. |
 | RN-12 | A ordem antiga de seis professores, os poderes coletáveis e seus valores de balanceamento não são obrigatórios na nova campanha sem revisão narrativa. |
-| RN-13 | Somente o protagonista (Menino ou Menina) e os bosses devem usar escala visual de 110% sobre a arte normalizada (44 × 44 pixels), durante toda a partida e em todas as animações, inclusive a transformação. A arte fica ancorada pelo centro dos pés. Professores enquanto NPCs, bugs e entidade permanecem em 100% (40 × 40). O corpo lógico e as colisões permanecem em 40 × 40 para todos. |
+| RN-13 | Protagonista (Menino/Menina), bosses, professores como NPCs e entidade devem usar escala visual de 200% sobre a arte normalizada (80 × 80 pixels), durante toda a partida, incluindo ataque e transformação. A arte fica ancorada pelo centro dos pés. Bugs permanecem em 100% (40 × 40). O corpo lógico e as colisões permanecem em 40 × 40. |
+
+| RN-14 | O nome acompanha o protagonista por toda a campanha e personaliza os diálogos sem modificar os textos compartilhados entre partidas. Espaços excedentes são normalizados. Ao iniciar outra campanha na mesma execução, o nome pode ser editado novamente; não há persistência em disco. |
 
 ## 6. Conteúdo e referências visuais
 
@@ -247,6 +252,7 @@ A tabela indica áreas de implementação e revisão, sem afirmar que os novos r
 | `game.py` | Menu, escolha de personagem, introdução, pausa, derrota, transições e isolamento dos eventos entre telas. |
 | `ui/frontend.py` e `ui/theme.py` | Fachada noturna, botões, seleção, cores e painéis compartilhados. |
 | `world/boss_transition.py` e `world/dark_school.py` | Transformação com a entidade, zoom visual e cenário escolar escuro. |
+| `world/school_art.py`, `world/terminal.py` e `prepare_detailed_school.py` | Ambientes detalhados, mobiliário e telas animadas com recorte próprio. |
 | `world/school.py` e `world/school_data.py` | Sala, corredor, A28, gatilhos únicos, ataque/abdução e falas de descoberta do mouse. |
 | `entities/npc.py` e `prepare_school_assets.py` | Professores Max e Romerito e exportação de suas artes a partir das referências. |
 | `prepare_menu_assets.py` | Exportação da fachada e dos onze quadros da Menina a partir das fontes geradas. |

@@ -23,7 +23,7 @@ class Player(Character):
 
     # quantos quadros de jogo cada estado de animação segura antes de avançar
     # para o próximo quadro (menor = mais rápido)
-    _ANIM_SPEED = {"idle": 22, "walk": 7, "jump": 1, "dash": 1}
+    _ANIM_SPEED = {"idle": 22, "jump": 1, "dash": 1}
 
     @classmethod
     def _load_sprites(cls, character="boy"):
@@ -34,34 +34,38 @@ class Player(Character):
             uniform = (36, 112, 76)
             folder = "player" if character == "boy" else "player/girl"
             paths = [f"{folder}/idle_{i}.png" for i in range(2)]
-            paths += [f"{folder}/walk_{i}.png" for i in range(4)]
+            paths += [f"{folder}/walk_cycle/walk_{i}.png" for i in range(8)]
             paths += [f"{folder}/jump.png", f"{folder}/dash.png"]
             paths += [f"{folder}/attack_{i}.png" for i in range(3)]
             frames = assets.load_character_frames(paths, uniform)
             flipped = [pygame.transform.flip(frame, True, False) for frame in frames]
             sprites = {
-                "attack_r": frames[8:],
-                "attack_l": flipped[8:],
+                "attack_r": frames[12:],
+                "attack_l": flipped[12:],
             }
             for suffix, sequence in (("_r", frames), ("_l", flipped)):
                 sprites.update({
                     "idle" + suffix: sequence[:2],
-                    "walk" + suffix: sequence[2:6],
-                    "jump" + suffix: sequence[6],
-                    "dash" + suffix: sequence[7],
+                    "walk" + suffix: sequence[2:10],
+                    "jump" + suffix: sequence[10],
+                    "dash" + suffix: sequence[11],
                 })
             cls._SPRITES[cache_key] = sprites
         return cls._SPRITES[cache_key]
 
-    def __init__(self, x, y, character="boy"):
+    def __init__(self, x, y, character="boy", name=None):
         super().__init__(x, y, *settings.CHARACTER_SIZE, health=6)
         self.character = character
+        self.name = name or ('Aluna' if character == 'girl' else 'Aluno')
         self.sprites = self._load_sprites(character)
 
         # Animação (estado atual: idle/walk/jump/dash + quadro dentro dele)
         self.anim_state = "idle"
         self.anim_frame = 0
         self.anim_timer = 0
+        self.walk_distance = 0.0
+        self.moved_x = 0.0
+        self.animation_facing = 1
         self.image = self.sprites["idle_r"][0]
 
         # Estado físico
@@ -92,8 +96,6 @@ class Player(Character):
         self.defeated_bosses = set()
 
         self.projectiles = pygame.sprite.Group()
-
-        self._animate()
 
     # ------------------------------------------------------------------
     # Habilidades
@@ -206,7 +208,9 @@ class Player(Character):
             else:
                 self.apply_gravity()
 
+        previous_x = self.rect.x
         self._move_and_collide(solids)
+        self.moved_x = abs(self.rect.x-previous_x)
 
         # dano por espinhos
         for hz in hazards:
@@ -247,14 +251,20 @@ class Player(Character):
         self.attacking_timer = 0
         self.attack_cooldown = 0
         self.whip.hit_targets.clear()
+        self.walk_distance = 0.0
+        self.moved_x = 0.0
+        self.anim_state = 'idle'
+        self.anim_frame = self.anim_timer = 0
+        self.on_wall = self.jumps_used = 0
+        self.on_ground = False
+        self.image = self.sprites['idle_r' if self.facing > 0 else 'idle_l'][0]
 
     # ------------------------------------------------------------------
     # Desenho (sprites carregados de assets/images/player/)
     # ------------------------------------------------------------------
     def _animate(self):
         """Escolhe o estado de animação (ataque > dash > pulo > andar > parado) e
-        avança o quadro dentro dele, trocando de imagem só a cada N quadros
-        de jogo (ver _ANIM_SPEED) para não animar rápido demais a 60fps."""
+        sincroniza os passos ao deslocamento real; repouso usa temporizador."""
         if self.attacking_timer > 0:
             self.anim_state = "attack"
             self.anim_frame = self.whip.pose(self)
@@ -265,7 +275,7 @@ class Player(Character):
             state = "dash"
         elif not self.on_ground:
             state = "jump"
-        elif abs(self.vel.x) > 0.15:
+        elif self.moved_x > 0.01:
             state = "walk"
         else:
             state = "idle"
@@ -274,9 +284,20 @@ class Player(Character):
             self.anim_state = state
             self.anim_frame = 0
             self.anim_timer = 0
+            self.walk_distance = 0.0
+
+        if self.facing != self.animation_facing:
+            self.walk_distance = 0.0
+            self.animation_facing = self.facing
 
         suffix = "_r" if self.facing > 0 else "_l"
         sprite = self.sprites[state + suffix]
+        if state == 'walk':
+            self.walk_distance += self.moved_x
+            step_distance = 6*self.VISUAL_SCALE
+            self.anim_frame = int(self.walk_distance/step_distance) % len(sprite)
+            self.image = sprite[self.anim_frame]
+            return
         if isinstance(sprite, list):
             self.anim_timer += 1
             if self.anim_timer >= self._ANIM_SPEED[state]:

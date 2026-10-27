@@ -76,6 +76,10 @@ class Level:
         raise ValueError(f"Sem piso livre para personagem em {(x, y)}")
 
     # ------------------------------------------------------------------
+    def update_visuals(self):
+        if self.school_scene:
+            self.school_scene.update()
+
     def update(self, player, dt_events):
         if self.completed or self.encounter_pending:
             return None, None
@@ -229,7 +233,8 @@ class Level:
         else:
             self.human_teacher.draw(surface, self.camera)
             name = self.encounter_font.render('Professor Romerito', True, settings.TEXT_COLOR)
-            rect = self.camera.apply(self.human_teacher.rect)
+            rect = self.human_teacher.get_draw_image().get_rect(
+                midbottom=self.camera.apply(self.human_teacher.rect).midbottom)
             surface.blit(name, name.get_rect(midbottom=(rect.centerx, rect.top-6)))
 
     def draw_infection(self, surface, progress):

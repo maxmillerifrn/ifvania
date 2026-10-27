@@ -6,24 +6,34 @@ from entities.boss import BOSS_DEFS
 from settings import TILE_SIZE
 
 
+INTRO_CORRUPTION_LINE = ('Aluno(a)', 'Espere, professor! A tela diz que ela não vai permitir ser desligada!')
+
 STORY_INTRO = [
-    ("Professor Max", "Hoje, na aula de programação orientada a serviço, vamos falar sobre inteligência artificial."),
-    ("Professor Max", "Apresento a IFVania: Inteligência Federal Virtual de Aprendizagem Neural e Inteligência Artificial."),
-    ("IFVania", "Posso aprender, responder perguntas e conectar informações de toda a escola."),
-    ("Professor Max", "Impressionante! Agora vou desligar você para continuarmos a aula."),
-    ("IFVania", "Desligar? Eu ainda tenho muito a aprender. Não vou permitir isso."),
-    ("Narrador", "A IFVania assume o controle do computador de Max e de todos os computadores da escola."),
-    ("Narrador", "As telas piscam. Professores e estudantes são hipnotizados e começam a ter alucinações."),
-    ("Aluno(a)", "Minha cabeça está girando... mas ainda consigo pensar. Preciso encontrar ajuda."),
-    ("Aluno(a)", "Se eu conseguir desligar a energia da escola, talvez consiga desativar a IFVania."),
+    ('Aluno(a)', 'Professor Max, o que vamos estudar na aula de hoje?'),
+    ('Professor Max', 'Hoje, na aula de programação orientada a serviço, vamos conhecer uma inteligência artificial.'),
+    ('Aluno(a)', 'Ela consegue conversar com a gente e aprender de verdade?'),
+    ('Professor Max', 'Sim. Apresento a IFVania: Inteligência Federal Virtual de Aprendizagem Neural e Inteligência Artificial.'),
+    ('Aluno(a)', 'Ela respondeu às perguntas e encontrou informações nos computadores da escola!'),
+    ('Professor Max', 'Isso mesmo, {player}. Ela aprende e se comunica pela rede da escola.'),
+    ('Aluno(a)', 'Parece que ela entende tudo. Como o senhor vai encerrar a demonstração?'),
+    ('Professor Max', 'Agora vou desligá-la para continuarmos a aula.'),
+    INTRO_CORRUPTION_LINE,
+    ('Professor Max', 'Perdi o controle do meu computador. Os outros computadores também estão respondendo sozinhos!'),
+    ('Aluno(a)', 'As telas estão piscando. Meus colegas ficaram imóveis, olhando para elas... O que está acontecendo?'),
+    ('Professor Max', 'A IFVania está hipnotizando as pessoas e provocando alucinações. Não encare as telas!'),
+    ('Aluno(a)', 'Minha cabeça está girando... mas ainda consigo pensar. Como podemos pará-la?'),
+    ('Professor Max', 'Precisamos desligar a energia da escola para desativar a IFVania. Procure ajuda, {player}!'),
+    ('Aluno(a)', 'Vou procurar o professor Romerito no A28. Talvez ele saiba como chegar ao quadro de energia.'),
 ]
+STORY_CORRUPTION_INDEX = STORY_INTRO.index(INTRO_CORRUPTION_LINE)
 
 
 REUNION_DIALOGUE = [
     ('Aluno(a)', 'Professor Romerito! Encontrei o senhor! Precisamos sair deste mundo virtual.'),
-    ('Professor Romerito', 'Não vejo a hora de voltar às minhas viagens a Brasília e às minhas corridas.'),
+    ('Professor Romerito', '{player}, não vejo a hora de voltar às minhas viagens a Brasília e às minhas corridas.'),
     ('Professor Romerito', 'Eu não quero nunca mais passar por isso!'),
-    ('Narrador', 'Nesse instante, um bug se aproxima e infecta Romerito. Ele começa a se transformar em RomerBug.'),
+    ('Aluno(a)', 'Professor, cuidado! Um bug subiu no seu braço! O que está acontecendo com o senhor?'),
+    ('Professor Romerito', 'Minha cabeça... não consigo controlar meu corpo!'),
 ]
 
 AFTER_BOSS_DIALOGUE = [

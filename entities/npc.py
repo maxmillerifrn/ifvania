@@ -5,6 +5,7 @@ from entities.character import Character
 
 
 class Teacher(Character):
+    VISUAL_SCALE = settings.CHARACTER_VISUAL_SCALE
     NAMES = {'max': 'Professor Max', 'romerito': 'Professor Romerito'}
 
     def __init__(self, x, y, identity):

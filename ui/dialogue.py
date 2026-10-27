@@ -14,13 +14,18 @@ class DialogueBox:
         self.name_font = pygame.font.Font(None, 24)
         self._char_shown = 0
         self._typing_speed = 2  # caracteres por frame
+        self.player_name = 'Aluno(a)'
+
+    def resolve_lines(self, lines):
+        return [(self.player_name if speaker in ('Aluno(a)', '{player}') else speaker,
+                 text.replace('{player}', self.player_name)) for speaker, text in lines]
 
     def start(self, lines, on_finish=None):
         if not lines:
             if on_finish:
                 on_finish()
             return
-        self.lines = lines
+        self.lines = self.resolve_lines(lines)
         self.index = 0
         self.active = True
         self.on_finish = on_finish

@@ -77,7 +77,7 @@ class SchoolStoryTests(unittest.TestCase):
                 for _ in range(self.game.abduction_duration):
                     self.game._update(self.keys, [])
                 self.assertEqual(self.game.state, STATE_DIALOGUE)
-                self.assertEqual(self.game.dialogue_box.lines, MOUSE_DISCOVERY)
+                self.assertEqual(self.game.dialogue_box.lines, self.game.dialogue_box.resolve_lines(MOUSE_DISCOVERY))
                 self.assertEqual(self.game.player.character, character)
                 self.assertIs(self.game.player, player)
                 self.assertFalse(player.whip_unlocked)
@@ -105,7 +105,8 @@ class SchoolStoryTests(unittest.TestCase):
         self.assertEqual(room.room, 'classroom')
         self.assertEqual(next(iter(room.npcs)).name, 'Professor Max')
         self.assertFalse(room.corrupted)
-        self.game.dialogue_box.index = 4
+        from world.levels_data import STORY_CORRUPTION_INDEX
+        self.game.dialogue_box.index = STORY_CORRUPTION_INDEX
         self.game._update(self.keys, [])
         self.assertTrue(room.corrupted)
         self.assertEqual(room.ticks, 0)

@@ -18,6 +18,8 @@ class Frontend:
         self.character_rects = [pygame.Rect(244, 132, 220, 272), pygame.Rect(496, 132, 220, 272)]
         self.confirm_rect = pygame.Rect(320, 428, 320, 48)
         self.back_rect = pygame.Rect(28, 28, 120, 40)
+        self.name_rect = pygame.Rect(240, 224, 480, 72)
+        self.name_confirm_rect = pygame.Rect(320, 336, 320, 48)
         self.characters = tuple(Player.CHARACTERS)
         self.previews = {}
         for character in self.characters:
@@ -89,3 +91,25 @@ class Frontend:
                      f'Jogar com {Player.CHARACTERS[self.characters[character_index]]}', True)
         self._center(surface, 'Mesmos controles e habilidades para os dois personagens.', (480, 501), self.font_small, theme.MUTED)
         self._center(surface, 'SETAS escolher    ENTER começar    ESC voltar', (480, 526), self.font_small, theme.MUTED)
+
+    def draw_name_entry(self, surface, name, character, error=''):
+        surface.blit(self.background, (0, 0))
+        overlay = pygame.Surface(surface.get_size(), pygame.SRCALPHA)
+        overlay.fill((*theme.INK, 220))
+        surface.blit(overlay, (0, 0))
+        self._button(surface, self.back_rect, 'Voltar')
+        self._center(surface, 'COMO VOCÊ QUER SER CHAMADO?', (480, 100), self.font_heading)
+        self._center(surface, 'Seu nome aparecerá nos diálogos da jornada.', (480, 142), self.font_small, theme.MUTED)
+        self._center(surface, 'PERSONAGEM / '+Player.CHARACTERS[character].upper(), (480, 181), self.font_small, theme.AMBER)
+        theme.panel(surface, self.name_rect, theme.DANGER if error else theme.CYAN)
+        value = name or 'Digite seu nome'
+        theme.text(surface, self.font, value, (self.name_rect.x+20, self.name_rect.y+26),
+                   theme.PAPER if name else theme.MUTED)
+        if (self.animation_tick//30) % 2 == 0:
+            x = self.name_rect.x+20+(self.font.size(name)[0] if name else 0)
+            pygame.draw.line(surface, theme.CYAN, (x, self.name_rect.y+22), (x, self.name_rect.y+48), 2)
+        theme.text(surface, self.font_small, f'{len(name)} / 20', (self.name_rect.right-60, 308), theme.MUTED)
+        self._button(surface, self.name_confirm_rect, 'Começar a jornada', True)
+        if error:
+            self._center(surface, error, (480, 411), self.font_small, theme.DANGER)
+        self._center(surface, 'ENTER confirmar    BACKSPACE apagar    ESC voltar', (480, 477), self.font_small, theme.MUTED)

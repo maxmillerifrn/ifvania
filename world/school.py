@@ -8,6 +8,8 @@ import pygame
 import settings
 from entities.npc import Teacher
 from world.camera import Camera
+from world.school_art import SchoolArt
+from ui import theme
 
 
 class SchoolLevel:
@@ -37,6 +39,8 @@ class SchoolLevel:
         self.interaction_fired = False
         self.corrupted = room != 'classroom'
         self.ticks = 0
+        self.visual_ticks = 0
+        self.art = SchoolArt(room, width)
         self.font = pygame.font.Font(None, 22)
         self.small_font = pygame.font.Font(None, 18)
         self.prompt = None
@@ -88,71 +92,53 @@ class SchoolLevel:
         rect = self.camera.apply(image.get_rect(topleft=(x, y)))
         surface.blit(image, rect)
 
-    def _monitor(self, surface, x, y):
-        self._rect(surface, (27, 44, 52), (x, y, 54, 40))
-        color = (166, 55, 99) if self.corrupted else (49, 148, 126)
-        self._rect(surface, color, (x+4, y+4, 46, 30))
-        for line in range(3):
-            self._rect(surface, (216, 225, 191), (x+10, y+10+line*7, 24-line*5, 2))
-        self._rect(surface, (47, 57, 60), (x+23, y+40, 8, 9))
-        self._rect(surface, (47, 57, 60), (x+12, y+48, 30, 3))
+    def update_visuals(self):
+        self.visual_ticks += 1
 
     def _door(self, surface, x, label, active=False):
-        self._rect(surface, (104, 91, 71), (x-6, 212, 92, 140))
-        self._rect(surface, (57, 94, 93) if active else (98, 119, 108), (x, 218, 80, 134))
-        self._rect(surface, (45, 63, 68), (x+10, 229, 60, 45))
-        self._rect(surface, (224, 202, 121), (x+64, 296, 5, 5))
-        self._rect(surface, (24, 60, 60), (x-6, 180, 92, 24))
-        self._text(surface, label, x+15, 184)
+        # Porta metálica: caixilho, visor, dobradiças, puxador e chapa inferior.
+        self._rect(surface, (21, 29, 34), (x-7, 210, 94, 142))
+        self._rect(surface, (89, 100, 101), (x-4, 213, 88, 139), 2)
+        self._rect(surface, (43, 57, 63), (x, 218, 80, 134))
+        self._rect(surface, (71, 85, 89), (x+3, 221, 74, 128), 1)
+        self._rect(surface, (14, 28, 35), (x+12, 230, 56, 42))
+        self._rect(surface, (96, 123, 128), (x+12, 230, 56, 42), 2)
+        self._rect(surface, (26, 47, 56), (x+16, 234, 48, 34))
+        self._rect(surface, (65, 91, 99), (x+20, 237, 2, 27))
+        self._rect(surface, (101, 113, 110), (x+61, 290, 10, 21))
+        self._rect(surface, (164, 173, 163), (x+58, 295, 11, 3))
+        self._rect(surface, (56, 69, 73), (x+8, 328, 64, 19))
+        for hy in (239, 289, 327):
+            self._rect(surface, (100, 107, 103), (x+2, hy, 4, 9))
+        for sy in (334, 339, 344):
+            self._rect(surface, (83, 93, 91), (x+15, sy, 46, 1))
+        self._rect(surface, (13, 27, 33), (x-5, 180, 90, 25))
+        self._rect(surface, (95, 117, 118), (x-5, 180, 90, 25), 1)
+        self._text(surface, label, x+20, 185)
+        if active:
+            self._rect(surface, (110, 182, 179), (x+91, 288, 7, 4))
 
     def draw(self, surface):
-        surface.fill((222, 216, 182))
-        width = self.tilemap.width
-        self._rect(surface, (236, 228, 196), (0, 0, width, 210))
-        self._rect(surface, (190, 171, 112), (0, 210, width, 142))
-        for x in range(0, width, 32):
-            self._rect(surface, (180, 161, 105), (x, 210, 1, 142))
-        for y in range(210, 352, 32):
-            self._rect(surface, (180, 161, 105), (0, y, width, 1))
-        self._rect(surface, (90, 100, 88), (0, 346, width, 6))
-        self._rect(surface, (160, 165, 146), (0, 352, width, 188))
-        for y in range(352, 540, 32):
-            self._rect(surface, (142, 148, 134), (0, y, width, 1))
-        for x in range(0, width, 64):
-            self._rect(surface, (142, 148, 134), (x, 352, 1, 188))
-        for x in range(90, width, 360):
-            self._rect(surface, (150, 159, 140), (x, 72, 150, 10))
-            self._rect(surface, (250, 246, 211), (x+4, 74, 142, 4))
+        self.art.draw(surface, self.camera, self.visual_ticks, self.corrupted)
         if self.room == 'corridor':
             for x, label in ((160, 'A25'), (640, 'A26'), (1120, 'A27')):
                 self._door(surface, x, label)
             self._door(surface, self.a28_door.x, 'A28', True)
-            for x in (340, 820, 1300):
-                self._rect(surface, (57, 94, 93), (x, 120, 200, 95))
-                self._rect(surface, (118, 170, 181), (x+6, 126, 188, 83))
-                self._rect(surface, (106, 138, 91), (x+6, 174, 188, 35))
-                self._rect(surface, (57, 94, 93), (x+96, 120, 8, 95))
-                # Corrimão vermelho, retomando a referência da fachada.
-                self._rect(surface, (151, 59, 58), (x-10, 260, 220, 5))
-                for rx in range(x, x+210, 50):
-                    self._rect(surface, (151, 59, 58), (rx, 260, 4, 82))
-            self._rect(surface, (24, 60, 60), (1280, 95, 250, 30))
+            self._rect(surface, (17, 34, 40), (1280, 95, 250, 30))
             self._text(surface, 'LABORATÓRIO A28  >', 1295, 102)
         else:
-            self._rect(surface, (112, 103, 77), (370, 105, 470, 100))
-            self._rect(surface, (27, 69, 64), (376, 111, 458, 88))
             title = 'IFVania — inteligência artificial' if self.room == 'classroom' else 'LABORATÓRIO A28'
-            self._text(surface, title, 398, 130)
+            self._text(surface, title, 454, 170)
             self._text(surface, 'Programação orientada a serviço' if self.room == 'classroom'
-                       else 'O sistema está sob controle da IFVania.', 398, 167, small=True)
-            for x in (120, 280, 440, 600):
-                self._rect(surface, (102, 80, 63), (x-12, 323, 100, 9))
-                self._rect(surface, (73, 78, 73), (x-8, 332, 5, 20))
-                self._rect(surface, (73, 78, 73), (x+73, 332, 5, 20))
-                self._monitor(surface, x+8, 270)
+                       else 'Sistema sob controle da IFVania.', 454, 200, small=True)
         for npc in self.npcs:
             npc.draw(surface, self.camera)
-            self._text(surface, npc.name, npc.rect.x-32, npc.rect.y-24, (31, 55, 48), small=True)
+            image = npc.get_draw_image()
+            visual = image.get_rect(midbottom=npc.rect.midbottom)
+            label = self.small_font.render(npc.name, True, theme.PAPER)
+            rect = label.get_rect(midbottom=(npc.rect.centerx, visual.top-8))
+            pygame.draw.rect(surface, theme.PANEL, self.camera.apply(rect.inflate(12, 6)))
+            surface.blit(label, self.camera.apply(rect))
         if self.prompt:
             panel = pygame.Surface((340, 32), pygame.SRCALPHA)
             panel.fill((15, 31, 38, 230))
@@ -165,12 +151,15 @@ class SchoolLevel:
         overlay.fill((16, 8, 59, int(180*progress)))
         surface.blit(overlay, (0, 0))
         if progress < 0.25:
+            visual = player.get_draw_image().get_rect(
+                midbottom=self.camera.apply(player.rect).midbottom)
             pygame.draw.rect(surface, (244, 201, 118),
-                             self.camera.apply(player.rect).inflate(8, 8), 2)
+                             visual.inflate(8, 8), 2)
         # Fios e anéis visuais representam a captura; não causam dano físico.
-        for body in [player.rect, *[npc.rect for npc in self.npcs]]:
-            rect = self.camera.apply(body)
-            radius = 26 + int(progress*60)
+        for actor in [player, *self.npcs]:
+            rect = actor.get_draw_image().get_rect(
+                midbottom=self.camera.apply(actor.rect).midbottom)
+            radius = rect.width//2+6 + int(progress*60)
             pygame.draw.ellipse(surface, (127, 227, 216),
                                 (rect.centerx-radius, rect.centery-12, radius*2, 24), 2)
             pygame.draw.line(surface, (127, 227, 216), (rect.centerx, 90), rect.midtop, 2)

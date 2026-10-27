@@ -1,18 +1,21 @@
 """Laboratório escolar corrompido; desenho independente da geometria física."""
 import pygame
-import assets
 from ui import theme
+from world.school_art import SchoolArt
 
 
 class DarkSchool:
     def __init__(self, width, height, floor_y):
-        source = assets.load_image('background/dark_lab.png')
-        self.background = pygame.transform.scale(source, (width, height))
+        self.art = SchoolArt('lab', width)
+        self.visual_ticks = 0
         self.floor_y = floor_y
         self.font = pygame.font.Font(None, 18)
 
     def draw_background(self, surface, camera):
-        surface.blit(self.background, (-round(camera.offset.x), -round(camera.offset.y)))
+        self.art.draw(surface, camera, self.visual_ticks, True)
+
+    def update(self):
+        self.visual_ticks += 1
 
     def draw_block(self, surface, rect, camera, world_width):
         dest = camera.apply(rect)

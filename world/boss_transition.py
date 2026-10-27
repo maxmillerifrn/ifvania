@@ -83,7 +83,8 @@ class BossTransition:
         body = self.level.camera.apply(self.boss.rect)
         entity_visible = self.stage != 'kneel'
         if entity_visible:
-            image = pygame.transform.flip(self.entity, self.facing < 0, False).copy()
+            size = tuple(round(side*settings.CHARACTER_VISUAL_SCALE) for side in self.entity.get_size())
+            image = pygame.transform.flip(pygame.transform.scale(self.entity, size), self.facing < 0, False)
             alpha = 255
             if self.stage == 'arrival':
                 alpha = round(255*self.tick/self.DURATIONS['arrival'])

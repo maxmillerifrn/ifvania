@@ -26,7 +26,9 @@ os testes usaram um ambiente separado com Python 3.9.6.
 
 1. Menu com fachada em pixel art, Jogar e Sair; navegação por clique ou setas/Enter.
 2. Escolha Menino/Menina, com prévia animada e confirmação por botão ou Enter.
-3. Aula de Max, apresentação da IFVania e revolta após o anúncio de desligamento.
+3. Digitação do nome (obrigatório, até 20 caracteres); Enter confirma e Esc volta.
+   A aula começa com o aluno conversando com Max, sem narrador, e apresenta a
+   IFVania e sua revolta após o anúncio de desligamento.
 4. Corredor navegável, entrada no A28 e encontro com Romerito por **E**.
 5. Investida de Romerito, abdução e transporte ao mundo virtual.
 6. Descoberta do mouse na bolsa; o chicote é liberado ao terminar esse diálogo.
@@ -38,9 +40,13 @@ os testes usaram um ambiente separado com Python 3.9.6.
     a saída encerra o conteúdo disponível e permite voltar ao menu.
 
 O prólogo e a fase virtual funcionam com os dois protagonistas, com os mesmos
-atributos e corpo lógico de 40 × 40 pixels. Somente o protagonista e os bosses são desenhados
-com escala visual de 110% (44 × 44), em todas as cenas e animações. Professores
-como NPCs, bugs e a entidade mantêm a escala de 100%. A escolha é preservada nas transições.
+atributos e corpo lógico de 40 × 40 pixels. Protagonista, bosses, professores
+e entidade são apresentados em 80 × 80 pixels, em todas as cenas e animações.
+Os bugs permanecem em 40 × 40. Os pés, as colisões e a geometria do mapa são
+preservados. A escolha do protagonista e o nome permanecem nas transições. O nome identifica
+as falas do aluno e aparece nas respostas dos professores. Não há gravação do
+nome em disco. A caminhada usa oito quadros por personagem, sincronizados com
+a distância percorrida; ao encontrar uma parede, o personagem para de caminhar.
 O corredor é uma adaptação de cenário; o traçado interno real não foi homologado.
 A referência oficial de A28 está no [documento de requisitos](DOCUMENTO_DE_REQUISITOS.md).
 
@@ -109,6 +115,7 @@ deixa claro que o objetivo de desligar a energia ainda precisa ser cumprido.
 | `ui/` | Tema, menu, seleção, diálogos e HUD |
 | `world/boss_transition.py` | Cena dos 50%, entidade, metamorfose e zoom visual |
 | `world/dark_school.py` | Fundo escolar e bancadas, sem alterar colisões |
+| `world/school_art.py` / `terminal.py` | Arte em camadas e informações animadas nos monitores |
 | `assets.py` | Cache, substitutos visuais e normalização dos sprites |
 
 Cada boss possui classe concreta própria. A base `Boss` exige uma estratégia
@@ -133,6 +140,7 @@ python prepare_boss_sprites.py
 python prepare_motion_sprites.py
 python prepare_menu_assets.py
 python prepare_school_assets.py
+python prepare_detailed_school.py
 ```
 
 Alguns PNG antigos conservam suas dimensões de exportação originais; o carregador
@@ -141,12 +149,26 @@ normaliza todos para o contrato corporal comum em execução. `generate_assets.p
 reaplicam as fontes atuais depois dessa geração.
 
 O visual atual usa fachada noturna, HUD de integridade, painéis escuros com
-acentos em âmbar e ciano e uma arena que representa o laboratório escolar:
-computadores, quadros, portas e bancadas. Os objetos do cenário não alteram
+acentos em âmbar e ciano e novos ambientes escolares em resolução nativa:
+paredes texturizadas, quadros, murais, janelas, luminárias, conduítes e portas.
+O mobiliário tem tampos, gavetas, gabinetes, teclados e cabos em camadas.
+
+Os monitores alternam registros, CPU/memória, gráficos e estados da rede.
+Tudo fica restrito à tela interna, acompanha a câmera e passa a mostrar a
+IFVania após a corrupção. A animação visual continua nos diálogos, sem avançar
+a física ou o combate, e congela na pausa. A saída do chicote acompanha a mão
+maior, mantendo a trajetória final da ponta e o bloqueio pelas paredes. Os objetos do cenário não alteram
 os blocos de colisão nem exigem novas habilidades. As dicas de controle quebram
 em linhas quando necessário, inclusive nos mapas antigos com todos os poderes.
 
-Prévia atual: [menu](assets/art_sources/dark_menu_preview.png),
+Prévias dos novos ambientes: [laboratório](assets/art_sources/detailed_lab_preview.png),
+[corredor](assets/art_sources/detailed_corridor_preview.png),
+[arena](assets/art_sources/detailed_battle_preview.png) e
+[monitores animados](assets/art_sources/animated_monitors_preview.gif).
+Fontes e prompts: [detailed_school_prompts.json](assets/art_sources/detailed_school_prompts.json).
+Exportação: `python prepare_detailed_school.py`.
+
+Prévias da revisão anterior: [menu](assets/art_sources/dark_menu_preview.png),
 [arena](assets/art_sources/dark_battle_preview.png) e
 [animação da transformação](assets/art_sources/boss_transformation_preview.gif).
 Fontes e prompts da ferramenta integrada estão em
@@ -163,11 +185,13 @@ Capturas anteriores da etapa 4: [reencontro](assets/art_sources/virtual_reunion_
 python -m unittest discover -s tests -v
 ```
 
-**68 testes passaram**, incluindo o percurso com salto básico para ambos os
+**81 testes passaram**, incluindo o percurso com salto básico para ambos os
 protagonistas, reencontro antes da infecção, transformação a 50%, projéteis,
 pausa, limpeza de ameaças, ausência de recompensas e retorno ao menu. Os novos
 testes também cobrem as seis poses da cena, fala da entidade, câmera visual,
-pausa durante o diálogo, preservação do corpo/vida e retomada sem repetir a cena. O combate
+pausa durante o diálogo, preservação do corpo/vida e retomada sem repetir a cena.
+Os testes de arte verificam também o recorte dos monitores, o acompanhamento
+da câmera, a escala ampliada e o congelamento visual na pausa. O combate
 com chicote foi verificado em condições controladas; isso não comprova o equilíbrio
 de sobrevivência por controle manual.
 

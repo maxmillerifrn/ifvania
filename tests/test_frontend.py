@@ -13,7 +13,7 @@ from entities.player import Player
 from entities.enemy import Enemy
 from game import (Game, STATE_MENU, STATE_CHARACTER_SELECT, STATE_DIALOGUE,
                   STATE_LEVEL_CARD, STATE_PLAYING, STATE_PAUSE, STATE_GAME_OVER,
-                  STATE_CONTENT_END)
+                  STATE_CONTENT_END, STATE_NAME_ENTRY)
 
 
 class FrontendTests(unittest.TestCase):
@@ -37,6 +37,10 @@ class FrontendTests(unittest.TestCase):
         self.assertIsNone(self.game.player)
         self.key(pygame.K_RIGHT)
         self.key(pygame.K_RETURN)
+        self.assertEqual(self.game.state, STATE_NAME_ENTRY)
+        self.assertIsNone(self.game.player)
+        self.game._process_events([pygame.event.Event(pygame.TEXTINPUT, text='Mara')])
+        self.key(pygame.K_RETURN)
         self.assertEqual(self.game.state, STATE_DIALOGUE)
         self.assertEqual(self.game.player.character, 'girl')
         self.assertEqual(self.game.dialogue_box.index, 0)
@@ -51,6 +55,10 @@ class FrontendTests(unittest.TestCase):
                 self.click(self.game.frontend.character_rects[i])
                 self.assertEqual(self.game.state, STATE_CHARACTER_SELECT)
                 self.click(self.game.frontend.confirm_rect)
+                self.assertEqual(self.game.state, STATE_NAME_ENTRY)
+                self.game.name_buffer = ''
+                self.game._process_events([pygame.event.Event(pygame.TEXTINPUT, text='Alex')])
+                self.click(self.game.frontend.name_confirm_rect)
                 self.assertEqual(self.game.player.character, character)
                 self.assertEqual(self.game.dialogue_box.index, 0)
 
@@ -97,6 +105,9 @@ class FrontendTests(unittest.TestCase):
         self.key(pygame.K_RETURN)
         self.key(pygame.K_RETURN)
         self.key(pygame.K_RETURN)
+        self.assertEqual(self.game.state, STATE_NAME_ENTRY)
+        self.game._process_events([pygame.event.Event(pygame.TEXTINPUT, text='Lia')])
+        self.key(pygame.K_RETURN)
         self.assertIsNot(self.game.player, player)
         self.assertEqual(self.game.player.character, 'girl')
         self.assertEqual(self.game.player.abilities, set())
@@ -132,9 +143,9 @@ class FrontendTests(unittest.TestCase):
 
     def test_window_closes_from_each_screen(self):
         self.game._start_story()
-        for state in (STATE_MENU, STATE_CHARACTER_SELECT, STATE_DIALOGUE,
+        for state in (STATE_MENU, STATE_CHARACTER_SELECT, STATE_NAME_ENTRY, STATE_DIALOGUE,
                       STATE_LEVEL_CARD, STATE_PLAYING, STATE_PAUSE,
-                      STATE_GAME_OVER, STATE_CONTENT_END):
+                      STATE_GAME_OVER, STATE_CONTENT_END, STATE_NAME_ENTRY):
             self.game.state = state
             self.game.running = True
             self.game._process_events([pygame.event.Event(pygame.QUIT)])

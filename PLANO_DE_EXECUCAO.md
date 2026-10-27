@@ -1,8 +1,8 @@
 # Plano de execução — IFVania
 
-**Data:** 25/10/2026
+**Data:** 27/10/2026
 
-Referências: `DOCUMENTO_DE_REQUISITOS.md` versão 2.4 e `HISTORYBOARD.MD`.
+Referências: `DOCUMENTO_DE_REQUISITOS.md` versão 2.7 e `HISTORYBOARD.MD`.
 
 ## Estratégia
 
@@ -100,7 +100,7 @@ Artes feitas com a ferramenta integrada image_gen, fontes preservadas em
 `assets/art_sources/`, prompts em `dark_prompts.json` e exportação reproduzível
 com `python prepare_dark_assets.py`. A entidade permanece de origem indefinida.
 
-Validação atual: 68 testes passaram. Os sete novos testes cobrem transição,
+Validação da revisão de 25/10: 68 testes passaram. Os sete novos testes cobrem transição,
 pausa e fala, vida/corpo, retomada, zoom visual, poses e legibilidade das dicas.
 Foram inspecionadas capturas do menu, seleção, arena e etapas da transformação;
 prévia animada em `assets/art_sources/boss_transformation_preview.gif`.
@@ -115,3 +115,41 @@ os bosses recebem escala visual de 110%, durante toda a partida, incluindo
 exploração, combate e transformação. São desenhados em 44 × 44 com apoio dos pés
 preservado. Professores enquanto NPCs, bugs e entidade permanecem em 40 × 40. Colisões, velocidades, alcance e geometria do mapa permanecem iguais.
 A escala fica centralizada em `settings.CHARACTER_VISUAL_SCALE`.
+
+## Escala e arte escolar — 27/10/2026
+
+A solicitação atual amplia também os NPCs e substitui a escala da revisão de
+26/10: protagonista, bosses, professores e entidade usam 80 × 80 visuais; bugs
+mantêm 40 × 40. Colisões de todos permanecem em 40 × 40. Os nomes dos NPCs,
+a captura pela IFVania e a saída do chicote acompanham a nova apresentação.
+
+Os laboratórios e corredores receberam novas fontes em resolução nativa de
+960 × 540 por módulo, sem esticar um único painel para todo o corredor. Móveis,
+portas e computadores recebem detalhes em camadas. Os terminais mudam texto,
+gráficos e estados dentro da tela, acompanham a câmera e refletem a corrupção.
+Seu relógio é visual: funciona em diálogos sem atualizar física/combate e congela
+na pausa. A arena usa o mesmo sistema de monitores.
+
+Artes novas feitas com image_gen e preservadas em `assets/art_sources/`;
+prompts em `detailed_school_prompts.json`. Exportação:
+`python prepare_detailed_school.py`. Prévia animada:
+`assets/art_sources/animated_monitors_preview.gif`.
+
+Validação atual: 74 testes passaram; seis novos testes cobrem escala, recorte
+dos monitores, câmera, animação em diálogos/pausa e alcance da ponta do chicote.
+Inspeção visual de aula, laboratório, corredor, arena, ataque e transformação.
+A homologação manual e o balanceamento da etapa 5 continuam pendentes.
+
+
+## Caminhada e diálogos personalizados — 27/10/2026
+
+- [x] Criar ciclos de oito quadros para Menino e Menina, preservando as artes anteriores.
+- [x] Sincronizar os quadros com o deslocamento real e interromper a caminhada contra paredes; corrigir a pose de entrada e reaparecimento.
+- [x] Inserir tela de nome entre seleção e aula, com acentos, limite de 20 caracteres, validação, edição e retorno.
+- [x] Reescrever a introdução como diálogo iniciado pelo aluno com Max, sem narrador.
+- [x] Aplicar o nome nas falas do aluno e nas respostas dos professores, preservando-o nas transições.
+- [x] Validar 81 testes automatizados e inspecionar capturas da entrada de nome e dos diálogos.
+
+Prévias em `assets/art_sources/player_name_preview.png`,
+`student_intro_preview.png`, `named_reply_preview.png` e
+`player_walk_preview.gif`. A homologação manual da etapa 5 permanece pendente.

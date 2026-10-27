@@ -1,10 +1,11 @@
 """Máquina de estados principal do jogo."""
 import sys
+import unicodedata
 import pygame
 import settings
 from entities.player import Player
 from world.level import Level
-from world.levels_data import build_levels, STORY_INTRO
+from world.levels_data import build_levels, STORY_INTRO, STORY_CORRUPTION_INDEX
 from world.school import SchoolLevel
 from world.school_data import ENCOUNTER_DIALOGUE, MOUSE_DISCOVERY
 from world.boss_transition import BossTransition
@@ -14,6 +15,7 @@ from ui.frontend import Frontend
 
 STATE_MENU = "menu"
 STATE_CHARACTER_SELECT = "character_select"
+STATE_NAME_ENTRY = 'name_entry'
 STATE_PLAYING = "playing"
 STATE_DIALOGUE = "dialogue"
 STATE_LEVEL_CARD = "level_card"
@@ -39,6 +41,9 @@ class Game:
         self.menu_index = 0
         self.character_index = 0
         self.selected_character = "boy"
+        self.player_name = ''
+        self.name_buffer = ''
+        self.name_error = ''
 
         self.level_defs = build_levels()
         self.level_index = 0
@@ -86,7 +91,29 @@ class Game:
 
     def _handle_event(self, event):
         if event.type == pygame.QUIT:
+            pygame.key.stop_text_input()
             self.running = False
+            return
+        if self.state == STATE_NAME_ENTRY:
+            if event.type == pygame.TEXTINPUT:
+                value = ''.join(c for c in event.text if c.isprintable())
+                self.name_buffer = unicodedata.normalize('NFC', self.name_buffer+value)[:20]
+                self.name_error = ''
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_BACKSPACE:
+                    self.name_buffer = self.name_buffer[:-1]
+                    self.name_error = ''
+                elif event.key == pygame.K_RETURN:
+                    self._confirm_name()
+                elif event.key == pygame.K_ESCAPE:
+                    pygame.key.stop_text_input()
+                    self.state = STATE_CHARACTER_SELECT
+            elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                if self.frontend.name_confirm_rect.collidepoint(event.pos):
+                    self._confirm_name()
+                elif self.frontend.back_rect.collidepoint(event.pos):
+                    pygame.key.stop_text_input()
+                    self.state = STATE_CHARACTER_SELECT
             return
         # Um evento pertence a uma única tela, mesmo se o callback trocar estado.
         if self.state == STATE_DIALOGUE or (self.state == STATE_BOSS_TRANSFORMATION and self.dialogue_box.active):
@@ -128,6 +155,18 @@ class Game:
 
     def _confirm_character(self):
         self.selected_character = self.frontend.characters[self.character_index]
+        self.state = STATE_NAME_ENTRY
+        self.name_error = ''
+        pygame.key.start_text_input()
+        pygame.key.set_text_input_rect(self.frontend.name_rect)
+
+    def _confirm_name(self):
+        name = ' '.join(self.name_buffer.split())
+        if not name:
+            self.name_error = 'Digite seu nome para continuar.'
+            return
+        self.player_name = self.name_buffer = name
+        pygame.key.stop_text_input()
         self._start_story()
 
     def _handle_keydown(self, event, events):
@@ -166,6 +205,7 @@ class Game:
 
     # ------------------------------------------------------------------
     def _start_story(self):
+        self.dialogue_box.player_name = self.player_name or ('Aluna' if self.selected_character == 'girl' else 'Aluno')
         self.boss_transition = None
         self.level_index = 0
         self._load_school('classroom', fresh_player=True)
@@ -176,10 +216,12 @@ class Game:
     def _load_school(self, room, fresh_player=False):
         self.level = SchoolLevel(room)
         if fresh_player:
-            self.player = Player(*self.level.player_spawn, character=self.selected_character)
+            self.player = Player(*self.level.player_spawn, character=self.selected_character,
+                                 name=self.player_name or None)
         else:
             self.player.respawn(*self.level.player_spawn)
         self.player.whip_unlocked = False
+        self.player.on_ground = True
         self.level.camera.update(self.player.rect)
 
     def _begin_corridor(self):
@@ -210,7 +252,7 @@ class Game:
         self.level = Level(self.level_defs[index])
         spawn = self.level.player_spawn
         if fresh_player or self.player is None:
-            self.player = Player(*spawn, character=self.selected_character)
+            self.player = Player(*spawn, character=self.selected_character, name=self.player_name or None)
         else:
             saved_abilities = self.player.abilities
             saved_health_bonus = self.player.max_health
@@ -219,6 +261,8 @@ class Game:
             self.player.max_health = saved_health_bonus
             self.player.health = self.player.max_health
         self.player.whip_unlocked = True
+        self.player.on_ground = True
+        self.dialogue_box.player_name = self.player.name
         self.level.camera.update(self.player.rect)
 
     def _show_level_card(self):
@@ -228,7 +272,10 @@ class Game:
 
     # ------------------------------------------------------------------
     def _update(self, keys, events):
-        if self.state in (STATE_MENU, STATE_CHARACTER_SELECT):
+        if self.level and self.state in (STATE_PLAYING, STATE_DIALOGUE, STATE_ABDUCTION,
+                                        STATE_INFECTION, STATE_BOSS_TRANSFORMATION):
+            self.level.update_visuals()
+        if self.state in (STATE_MENU, STATE_CHARACTER_SELECT, STATE_NAME_ENTRY):
             self.frontend.update()
         elif self.state == STATE_PLAYING:
             if getattr(self.level.boss, 'cinematic_pending', False):
@@ -259,7 +306,7 @@ class Game:
 
         elif self.state == STATE_DIALOGUE:
             self.dialogue_box.update()
-            if self.in_story_intro and self.dialogue_box.index >= 4:
+            if self.in_story_intro and self.dialogue_box.index >= STORY_CORRUPTION_INDEX:
                 self.level.corrupted = True
 
         elif self.state == STATE_ABDUCTION:
@@ -314,6 +361,9 @@ class Game:
             self._draw_menu()
         elif self.state == STATE_CHARACTER_SELECT:
             self.frontend.draw_selection(self.screen, self.character_index)
+        elif self.state == STATE_NAME_ENTRY:
+            self.frontend.draw_name_entry(self.screen, self.name_buffer,
+                                          self.selected_character, self.name_error)
         elif self.state == STATE_BOSS_TRANSFORMATION or (self.state == STATE_PAUSE
                                                         and self.pause_return_state == STATE_BOSS_TRANSFORMATION):
             self.boss_transition.draw(self.screen)

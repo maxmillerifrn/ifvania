@@ -168,3 +168,48 @@ Capturas: `dark_menu_preview.png`, `dark_selection_preview.png`,
 `boss_transformation_preview.gif` foi renderizado com o próprio jogo e convertido
 para GIF com ffmpeg, usado somente para essa prévia; não é dependência do jogo.
 As colisões e o mapa não mudam durante a aproximação visual da câmera.
+
+## Laboratórios e corredores detalhados — 27/10/2026
+
+Novas fontes geradas com a ferramenta integrada `image_gen`: `lab_detailed.png`
+e `corridor_detailed.png`. Os prompts completos estão em
+`detailed_school_prompts.json`; as fontes anteriores foram preservadas.
+
+```bash
+python prepare_detailed_school.py
+```
+
+Exporta para `assets/images/background/lab_detailed.png` e
+`assets/images/background/corridor_detailed.png`, em 960 × 540 pixels.
+Os ambientes recebem computadores e móveis em camadas editáveis de
+`world/school_art.py`. O conteúdo das telas é produzido por `world/terminal.py`,
+com superfície própria para impedir texto ou gráficos fora do monitor.
+
+Capturas: `detailed_classroom_preview.png`, `detailed_lab_preview.png`,
+`detailed_corridor_preview.png`, `detailed_battle_preview.png`,
+`large_entity_preview.png` e `large_whip_*_preview.png`.
+A prévia `animated_monitors_preview.gif` foi renderizada pelo jogo e convertida
+com ffmpeg, que continua sendo opcional e não integra a execução do jogo.
+
+Personagens, bosses e NPCs agora têm apresentação visual de 80 × 80 pixels,
+com colisões de 40 × 40 e pés alinhados. Bugs não foram ampliados.
+
+
+## Nova caminhada — 27/10/2026
+
+`player_walk_cycle.png` foi criado com a ferramenta integrada `image_gen`,
+usando os atlas anteriores dos dois alunos como referência. O prompt completo,
+as referências e o destino estão em `player_walk_prompts.json`.
+
+```bash
+python prepare_player_walk.py
+```
+
+O exportador valida 16 figuras e grava oito quadros de 40 × 40 por personagem
+em `assets/images/player/walk_cycle/` e `assets/images/player/girl/walk_cycle/`.
+As caminhadas antigas foram preservadas. O jogo usa os novos quadros conforme
+a distância percorrida, mantendo os pés alinhados e a escala visual de 200%.
+`player_walk_preview.gif` mostra os dois protagonistas em movimento; ffmpeg
+foi usado apenas na conversão da prévia. `player_name_preview.png`,
+`student_intro_preview.png` e `named_reply_preview.png` registram o novo fluxo
+de nome e a conversa inicial sem narrador.

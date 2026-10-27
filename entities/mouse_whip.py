@@ -41,8 +41,16 @@ class MouseWhip:
         # Pontos de fixação nas mãos das três poses, relativos ao corpo.
         hands = [(-9, -9), (15, -3), (2, 0)]
         hx, hy = hands[self.pose(player)]
-        hand = pygame.Vector2(player.rect.centerx + hx * self.facing,
-                              player.rect.centery + hy)
+        logical_hand = pygame.Vector2(player.rect.centerx + hx * self.facing,
+                                      player.rect.centery + hy)
+        scale = player.VISUAL_SCALE
+        hand = pygame.Vector2(player.rect.centerx + hx*scale*self.facing,
+                              player.rect.bottom + (hy-player.height/2)*scale)
+        # O desenho ampliado da mão não permite iniciar o fio além de uma parede.
+        entries = [solid.clipline(logical_hand, hand) for solid in solids]
+        entries = [pygame.Vector2(line[0]) for line in entries if line]
+        if entries:
+            hand = min(entries, key=lambda p: p.distance_squared_to(logical_hand))
         if age < self.WINDUP:
             t = self._smooth(age / self.WINDUP)
             end = pygame.Vector2(-18 - 12 * t, 12 - 42 * t)
@@ -56,7 +64,8 @@ class MouseWhip:
             end = pygame.Vector2(self.REACH * (1 - t) + 7 * t, 6 + 12 * t)
             bend = 18 * math.sin(t * math.pi)
         end.x *= self.facing
-        tip = hand + end
+        # A mão acompanha o sprite maior, mas a trajetória da ponta mantém o alcance.
+        tip = logical_hand + end
         control = (hand + tip) / 2 + pygame.Vector2(0, bend)
         points = [hand]
         for i in range(1, 25):
