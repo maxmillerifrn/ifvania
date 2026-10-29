@@ -1,8 +1,8 @@
 # Plano de execução — IFVania
 
-**Data:** 28/10/2026
+**Data:** 29/10/2026
 
-Referências: `DOCUMENTO_DE_REQUISITOS.md` versão 3.0 e `ROTEIRO_HISTORIA.md`.
+Referências: `DOCUMENTO_DE_REQUISITOS.md` versão 3.1 e `ROTEIRO_HISTORIA.md`.
 
 ## Estratégia
 
@@ -199,3 +199,13 @@ da etapa 5 continua pendente.
 Cenários determinísticos sem invulnerabilidade artificial cobrem fuga da descarga
 e salto sobre a investida. Isso não substitui homologação humana de sobrevivência,
 ritmo e dificuldade; a etapa 5 permanece pendente.
+
+
+## Ciclo de projéteis e investida — 29/10/2026
+
+- [x] Restaurar aviões de RomerBug, com 2,3 s entre lançamentos e aviso prévio.
+- [x] Restaurar medalhas de SpeedBug a cada 1,5 s, com movimento curto limitado.
+- [x] Alternar dois lançamentos, pausa, investida anunciada e recuperação.
+- [x] Esperar os projéteis saírem antes de preparar a investida.
+- [x] Manter transformação, proteção, controles do aluno e plataformas.
+- [x] Validar 95 testes; homologação humana de ritmo/dificuldade segue pendente.

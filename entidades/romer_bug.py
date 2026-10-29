@@ -12,7 +12,7 @@ class ProjetilProfessor(Projetil):
     def __init__(self, origem, direcao, tipo):
         self.tipo = tipo
         tamanho = (26, 14) if tipo == "plane" else (18, 22)
-        velocidade = 5 if tipo == "plane" else 6.5
+        velocidade = 4.5 if tipo == "plane" else 5.0
         super().__init__(*origem, direcao, dono="boss", velocidade=velocidade)
         nome_arquivo = "aviao_papel.png" if tipo == "plane" else "medalha.png"
         self.image = recursos.load_image(f"projeteis/{nome_arquivo}", tamanho)
@@ -23,7 +23,7 @@ class ProjetilProfessor(Projetil):
 
 
 class RomerBug(Chefe):
-    """Professor formal que, ferido, veste roupa de corrida e persegue o aluno.
+    """Professor que alterna lançamentos, pausa e investida nas duas formas.
 
     SpeedBug é a segunda forma da mesma instância: vida, recompensa e estado
     de derrota continuam pertencendo ao mesmo chefe.
@@ -34,12 +34,16 @@ class RomerBug(Chefe):
     ACELERACAO = 0.20
     FRENAGEM = 0.32
     DURACAO_TRANSFORMACAO = 45
+    DISPAROS_POR_CICLO = 2
+    INTERVALO_AVIAO = 108
+    INTERVALO_MEDALHA = 66
+    PAUSA_ANTES_INVESTIDA = 48
+    VELOCIDADE_DISPARANDO = 0.55
 
     def __init__(self, x, y, nome="RomerBug", disciplina="Lógica de Blocos",
                  cor=(50, 65, 105), vida=16, arena=None,
                  arquivo_figura="chefes/romerbug_0.png", transformacao_cinematica=False):
         super().__init__(x, y, nome, disciplina, cor, vida, arena, arquivo_figura)
-        self.zona_descarga = None
         self.direcao_investida = 1
         self.distancia_investida = 0.0
         self.estado_ataque = 'aproximar'
@@ -48,7 +52,9 @@ class RomerBug(Chefe):
         self.cinematica_pendente = False
         self.temporizador_transformacao = 0
         self.temporizador_lancamento = 0
-        self.espera_salto = 0
+        self.disparos_no_ciclo = 0
+        self.origem_ciclo = float(x)
+        self.mira_disparo = pygame.Vector2(x, y)
         self.no_chao = False
         self.distancia_passada = 0.0
         self.quadro_movimento = 0
@@ -81,7 +87,6 @@ class RomerBug(Chefe):
         super().take_damage(quantidade, recuo)
         if not self.vivo:
             self.projeteis.empty()
-            self.zona_descarga = None
             return
         if not self.transformado and self.vida <= self.vida_maxima * 0.5:
             self.transformado = True
@@ -92,7 +97,8 @@ class RomerBug(Chefe):
             self.temporizador_ataque = 30
             self.temporizador_lancamento = 0
             self.estado_ataque = 'aproximar'
-            self.zona_descarga = None
+            self.disparos_no_ciclo = 0
+            self.origem_ciclo = self.posicao.x
             self.velocidade.update(0, 0)
             self.distancia_passada = 0
             self.projeteis.empty()
@@ -107,12 +113,13 @@ class RomerBug(Chefe):
         self.nome = 'SpeedBug'
         self.temporizador_ataque = 60
         self.estado_ataque = 'aproximar'
-        self.zona_descarga = None
+        self.disparos_no_ciclo = 0
+        self.origem_ciclo = self.posicao.x
         self.brilho_dano = 0
         self._animate_form()
 
     def choose_attack(self, jogador):
-        return 'investida' if self.transformado else 'sobrecarga'
+        return 'medalha' if self.transformado else 'aviao'
 
     def preparar_ataque(self, jogador, solidos):
         self.estado_ataque = 'preparar'
@@ -121,14 +128,33 @@ class RomerBug(Chefe):
         self.direcao_olhar = self.direcao_investida
         self.velocidade.x = 0
         self.distancia_investida = 0
-        if not self.transformado:
-            centro = max(self.arena.left+48, min(self.arena.right-48, jogador.rect.centerx))
-            pisos = [p.top for p in solidos if p.left <= centro < p.right
-                     and p.top >= jogador.rect.bottom-4]
-            y_piso = min(pisos) if pisos else self.rect.bottom
-            self.zona_descarga = pygame.Rect(centro-48, y_piso-14, 96, 14)
         from sons import tocar
         tocar('aviso')
+
+    def preparar_disparo(self, jogador):
+        self.estado_ataque = 'preparar_disparo'
+        self.temporizador_ataque = 24 if self.transformado else 30
+        self.mira_disparo = pygame.Vector2(jogador.rect.center)
+        self.direcao_olhar = 1 if self.mira_disparo.x >= self.rect.centerx else -1
+        self.velocidade.x = 0
+        from sons import tocar
+        tocar('aviso')
+
+    def lancar_projetil(self):
+        origem = pygame.Vector2(self.rect.centerx+self.direcao_olhar*(self.largura//2+16),
+                                self.rect.centery-5)
+        direcao = self.mira_disparo-origem
+        if direcao.length_squared() == 0:
+            direcao.update(self.direcao_olhar, 0)
+        self.projeteis.add(ProjetilProfessor(origem, direcao, 'medal' if self.transformado else 'plane'))
+        self.disparos_no_ciclo += 1
+        self.temporizador_lancamento = 12
+        if self.disparos_no_ciclo >= self.DISPAROS_POR_CICLO:
+            self.estado_ataque = 'pausa'
+            self.temporizador_ataque = self.PAUSA_ANTES_INVESTIDA
+        else:
+            self.estado_ataque = 'intervalo_disparo'
+            self.temporizador_ataque = self.INTERVALO_MEDALHA if self.transformado else self.INTERVALO_AVIAO
 
     def update(self, jogador, solidos):
         if not self.ativo or not self.vivo or self.cinematica_pendente:
@@ -143,7 +169,9 @@ class RomerBug(Chefe):
         velocidade_alvo = 0
         if self.estado_ataque == 'aproximar':
             if self.transformado:
-                velocidade_alvo = (1 if dx > 0 else -1)*self.VELOCIDADE_CORRIDA if abs(dx) > 120 else 0
+                velocidade_alvo = self.VELOCIDADE_DISPARANDO*(1 if dx > 0 else -1)
+                if abs(self.posicao.x-self.origem_ciclo) >= 24:
+                    velocidade_alvo = 0
             else:
                 if abs(self.alvo_patrulha-self.posicao.x) < 10:
                     self.alvo_patrulha = self.x_inicial+65 if self.alvo_patrulha < self.x_inicial else self.x_inicial-80
@@ -153,7 +181,10 @@ class RomerBug(Chefe):
             self.velocidade.x += max(-aceleracao,min(aceleracao, velocidade_alvo-self.velocidade.x))
             if abs(self.velocidade.x) > 0.15:
                 self.direcao_olhar = 1 if self.velocidade.x > 0 else -1
-        elif self.estado_ataque == 'executar' and self.transformado:
+        elif self.estado_ataque == 'intervalo_disparo' and self.transformado:
+            alvo = max(self.origem_ciclo-24, min(self.origem_ciclo+24, jogador.rect.x))
+            self.velocidade.x = max(-self.VELOCIDADE_DISPARANDO, min(self.VELOCIDADE_DISPARANDO, alvo-self.posicao.x))
+        elif self.estado_ataque == 'executar':
             passo = min(6, 160-self.distancia_investida)
             self.velocidade.x = self.direcao_investida*max(0, passo)
             self.distancia_investida += passo
@@ -161,6 +192,9 @@ class RomerBug(Chefe):
             self.velocidade.x = 0
         x_anterior = self.rect.x
         parede = self.move_and_collide_x(solidos)
+        if self.transformado and self.estado_ataque in ('aproximar','intervalo_disparo'):
+            self.posicao.x = max(self.origem_ciclo-24,min(self.origem_ciclo+24,self.posicao.x))
+            self.rect.x = round(self.posicao.x)
         x_limitado = max(self.arena.left, min(self.rect.x, self.arena.right-self.largura))
         if x_limitado != self.rect.x or parede:
             self.rect.x = x_limitado
@@ -168,25 +202,35 @@ class RomerBug(Chefe):
             self.velocidade.x = 0
             if self.estado_ataque == 'aproximar':
                 self.alvo_patrulha = self.posicao.x-parede*80
-            elif self.estado_ataque == 'executar' and self.transformado:
+            elif self.estado_ataque == 'executar':
                 self.temporizador_ataque = 1
         self.apply_gravity()
         self.no_chao = self.move_and_collide_y(solidos)
         if self.no_chao:
             self.distancia_passada += abs(self.rect.x-x_anterior)
+        self.temporizador_lancamento = max(0, self.temporizador_lancamento-1)
+        self.projeteis.update(solidos)
         self.temporizador_ataque -= 1
         if self.temporizador_ataque <= 0:
-            if self.estado_ataque == 'aproximar':
-                self.preparar_ataque(jogador, solidos)
+            if self.estado_ataque in ('aproximar', 'intervalo_disparo'):
+                self.preparar_disparo(jogador)
+            elif self.estado_ataque == 'preparar_disparo':
+                self.lancar_projetil()
+            elif self.estado_ataque == 'pausa':
+                if self.projeteis:
+                    self.temporizador_ataque = 1
+                else:
+                    self.preparar_ataque(jogador, solidos)
             elif self.estado_ataque == 'preparar':
                 self.estado_ataque = 'executar'
-                self.temporizador_ataque = 27 if self.transformado else 15
+                self.temporizador_ataque = 27
             elif self.estado_ataque == 'executar':
                 self.estado_ataque = 'recuperar'
                 self.temporizador_ataque = 78 if self.transformado else 60
                 self.velocidade.x = 0
-                self.zona_descarga = None
             else:
+                self.disparos_no_ciclo = 0
+                self.origem_ciclo = self.posicao.x
                 self.estado_ataque = 'aproximar'
                 self.temporizador_ataque = 60
         self._animate_form()
@@ -195,8 +239,10 @@ class RomerBug(Chefe):
         forma = "speedbug" if self.transformado else "romerbug"
         if self.temporizador_transformacao > 0:
             self.image = self.figuras_formas[forma][self.direcao_olhar][0]
-        elif self.estado_ataque in ('preparar', 'recuperar'):
-            self.image = self.figuras_formas[forma][self.direcao_olhar][int(self.estado_ataque == 'preparar')]
+        elif self.temporizador_lancamento > 0:
+            self.image = self.figuras_formas[forma][self.direcao_olhar][1]
+        elif self.estado_ataque in ('preparar', 'preparar_disparo', 'pausa', 'recuperar'):
+            self.image = self.figuras_formas[forma][self.direcao_olhar][int(self.estado_ataque in ('preparar', 'preparar_disparo'))]
         elif self.transformado and not self.no_chao:
             self.image = self.figuras_movimento[forma][self.direcao_olhar][2]
         elif abs(self.velocidade.x) > 0.15:
@@ -207,13 +253,13 @@ class RomerBug(Chefe):
             self.image = self.figuras_movimento[forma][self.direcao_olhar][1]
 
     def get_all_hit_rects(self):
-        if self.temporizador_transformacao > 0 or self.cinematica_pendente:
+        if (self.temporizador_transformacao > 0 or self.cinematica_pendente
+                or not self.ativo or not self.vivo):
             return []
-        if not self.ativo or not self.vivo or self.estado_ataque != 'executar':
-            return []
-        if self.transformado:
-            return [(self.rect, self.dano_contato)]
-        return [(self.zona_descarga, 1)] if self.zona_descarga is not None else []
+        ataques = [(p.rect, p.dano) for p in self.projeteis]
+        if self.estado_ataque == 'executar':
+            ataques.append((self.rect, self.dano_contato))
+        return ataques
 
     def draw(self, superficie, camera):
         # Os próprios quadros contêm a oscilação do corpo. Não aplicar o bob
@@ -242,29 +288,26 @@ class RomerBug(Chefe):
             texto = self.fonte_transformacao.render('EXPOSTO', True, (176, 205, 181))
             posicao = camera.apply(self.rect).midbottom
             superficie.blit(texto, texto.get_rect(midbottom=(posicao[0], posicao[1]-85)))
+        elif self.estado_ataque == 'preparar_disparo':
+            centro = camera.apply(self.rect).center
+            rotulo = 'MEDALHA' if self.transformado else 'AVIÃO'
+            texto = self.fonte_transformacao.render(rotulo, True, (228, 190, 123))
+            superficie.blit(texto, texto.get_rect(midbottom=(centro[0], centro[1]-64)))
+            mira = self.mira_disparo-camera.deslocamento
+            pygame.draw.circle(superficie, (203, 167, 106), (round(mira.x), round(mira.y)), 9, 1)
+        elif self.estado_ataque == 'pausa':
+            texto = self.fonte_transformacao.render('PREPARANDO AVANÇO', True, (188, 194, 179))
+            centro = camera.apply(self.rect).center
+            superficie.blit(texto, texto.get_rect(midbottom=(centro[0], centro[1]-64)))
         elif self.estado_ataque in ('preparar', 'executar'):
-            if not self.transformado and self.zona_descarga is not None:
-                area = camera.apply(self.zona_descarga)
-                cor = (231, 178, 95) if self.estado_ataque == 'preparar' else (230, 225, 197)
-                pygame.draw.rect(superficie, (26, 27, 31), area.inflate(4, 6))
-                pygame.draw.rect(superficie, cor, area, 2)
-                for x in range(area.left+3, area.right-3, 12):
-                    pygame.draw.line(superficie, cor, (x, area.bottom-2), (x+6, area.top+2), 2)
-                if self.estado_ataque == 'executar':
-                    pontos = [(area.left+i, area.top-5-(i%13)) for i in range(0, area.width, 5)]
-                    pygame.draw.lines(superficie, cor, False, pontos, 3)
-                rotulo = 'SAIA DA FAIXA' if self.estado_ataque == 'preparar' else 'DESCARGA'
-                texto = self.fonte_transformacao.render(rotulo, True, cor)
-                superficie.blit(texto, texto.get_rect(midbottom=(area.centerx, area.top-12)))
-            elif self.transformado:
-                origem = camera.apply(self.rect).midbottom
-                destino_x = max(self.arena.left+self.largura//2,
-                    min(self.arena.right-self.largura//2, self.rect.centerx+self.direcao_investida*160))
-                fim = (origem[0]+destino_x-self.rect.centerx, origem[1]-3)
-                cor = (226, 172, 109)
-                pygame.draw.line(superficie, cor, (origem[0], origem[1]-3), fim, 3)
-                pygame.draw.lines(superficie, cor, False,
-                    [(fim[0]-self.direcao_investida*12, fim[1]-8), fim,
-                     (fim[0]-self.direcao_investida*12, fim[1]+8)], 3)
-                texto = self.fonte_transformacao.render('INVESTIDA' if self.estado_ataque == 'preparar' else 'RUPTURA', True, cor)
-                superficie.blit(texto, texto.get_rect(midbottom=(origem[0], origem[1]-86)))
+            origem = camera.apply(self.rect).midbottom
+            destino_x = max(self.arena.left+self.largura//2,
+                min(self.arena.right-self.largura//2, self.rect.centerx+self.direcao_investida*160))
+            fim = (origem[0]+destino_x-self.rect.centerx, origem[1]-3)
+            cor = (226, 172, 109)
+            pygame.draw.line(superficie, cor, (origem[0], origem[1]-3), fim, 3)
+            pygame.draw.lines(superficie, cor, False,
+                [(fim[0]-self.direcao_investida*12, fim[1]-8), fim,
+                 (fim[0]-self.direcao_investida*12, fim[1]+8)], 3)
+            texto = self.fonte_transformacao.render('INVESTIDA' if self.estado_ataque == 'preparar' else 'RUPTURA', True, cor)
+            superficie.blit(texto, texto.get_rect(midbottom=(origem[0], origem[1]-86)))

@@ -66,7 +66,7 @@ class TestesEncontroChefe(unittest.TestCase):
         self.assertEqual(jogador.vida, jogador.vida_maxima)
         self.assertFalse(fase.chefe.projeteis)
 
-    def test_dialogo_golpe_e_descarga_causam_dano(self):
+    def test_dialogo_golpe_e_aviao_causam_dano(self):
         jogo = Jogo()
         jogo.definicoes_fases = build_legacy_levels()
         jogo._load_level(0, novo_jogador=True)
@@ -92,7 +92,7 @@ class TestesEncontroChefe(unittest.TestCase):
             jogo._update(teclas, [])
         self.assertLess(chefe.vida, chefe.vida_maxima)
         self.assertEqual(chefe.vida, chefe.vida_maxima - 1)
-        # A descarga marca a posição do aluno e causa dano se ele ficar parado.
+        # O avião usa a mira anunciada e pode atingir o aluno parado.
         jogador.posicao.x -= 80
         jogador.rect.x = round(jogador.posicao.x)
         for _ in range(120):

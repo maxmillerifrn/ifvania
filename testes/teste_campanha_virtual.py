@@ -157,12 +157,12 @@ class TestesCampanhaVirtual(unittest.TestCase):
         self.jogo._process_events([pygame.event.Event(pygame.QUIT)])
         self.assertFalse(self.jogo.executando)
 
-    def test_sobrecarga_investida_e_transformacao_preservam_vida_e_corpo(self):
+    def test_projeteis_investida_e_transformacao_preservam_vida_e_corpo(self):
         fase, jogador, chefe = self.start_fight()
         antes = chefe.rect.copy()
         chefe.preparar_ataque(jogador, fase.mapa_blocos.solidos)
-        self.assertEqual(chefe.choose_attack(jogador), 'sobrecarga')
-        self.assertIsNotNone(chefe.zona_descarga)
+        self.assertEqual(chefe.choose_attack(jogador), 'aviao')
+        self.assertEqual(chefe.estado_ataque, 'preparar')
         chefe.take_damage(7)
         self.assertFalse(chefe.transformado)
         chefe.take_damage(1)
@@ -172,8 +172,8 @@ class TestesCampanhaVirtual(unittest.TestCase):
         self.assertEqual(chefe.rect.size, configuracoes.TAMANHO_PERSONAGEM)
         self.finish_transformation()
         chefe.preparar_ataque(jogador, fase.mapa_blocos.solidos)
-        self.assertEqual(chefe.choose_attack(jogador), 'investida')
-        self.assertIsNone(chefe.zona_descarga)
+        self.assertEqual(chefe.choose_attack(jogador), 'medalha')
+        self.assertEqual(chefe.estado_ataque, 'preparar')
         chefe.take_damage(1)
         self.assertEqual(chefe.vida, 7)
         self.assertEqual(chefe.temporizador_transformacao, 0)

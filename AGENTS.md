@@ -52,7 +52,8 @@ Instruções atuais do usuário prevalecem sobre estas orientações.
 - A introdução é uma conversa do aluno com Max, sem narrador. O nome informado
   acompanha o jogador e personaliza as falas sem modificar textos compartilhados.
 - O ataque carregado usa X na soltura; Shift oferece esquiva básica após a descoberta
-  do mouse. RomerBug usa sobrecarga e SpeedBug investida anunciada, com recuperação
+  do mouse. RomerBug lança aviões e SpeedBug medalhas com pouco deslocamento;
+  ambos alternam dois lançamentos, pausa e investida anunciada, com recuperação
   sem dano de contato. Preserve cancelamento de carga em pausa, foco e transições.
 - Caminhada acompanha deslocamento real; pressionar contra parede não deve
   manter o ciclo andando. Mudanças visuais não devem alterar colisões.

@@ -34,8 +34,9 @@ os testes usaram um ambiente separado com Python 3.9.6.
 6. Descoberta do mouse na bolsa; o chicote é liberado ao terminar esse diálogo.
 7. Percurso com bugs e degraus de 32 ou 64 pixels, alcançável com o salto básico.
 8. Reencontro com Romerito humano, fala sobre Brasília e corridas e infecção por um bug.
-9. RomerBug marca descargas no piso; com até 50% da vida, vira SpeedBug, que
-   prepara uma investida de direção fixa e fica exposto após executá-la.
+9. RomerBug alterna dois aviões espaçados, pausa e investida; com até 50% da
+   vida, vira SpeedBug, que lança duas medalhas com pouco deslocamento e depois
+   faz uma pausa, investida anunciada e recuperação.
 10. A derrota encerra as ameaças e libera a saída, sem conceder poderes. Alcançar
     a saída encerra o conteúdo disponível e permite voltar ao menu.
 
@@ -102,15 +103,16 @@ suave da câmera. A cena dura aproximadamente 3,8 segundos, além do tempo de le
 Ela preserva vida, posição e dimensões; não causa nem recebe dano e limpa
 projéteis e ataques em andamento. Esc pausa em qualquer trecho, inclusive na fala.
 A retomada restaura o movimento do protagonista e oferece 60 atualizações de
-proteção. SpeedBug se aproxima com velocidade limitada, avisa a investida por 0,6 segundo,
-avança até 160 pixels sem corrigir a direção e recupera por 1,3 segundo.
-Na recuperação não há dano de contato.
+proteção. Nas duas formas, o boss alterna lançamentos e investida. RomerBug
+lança dois aviões separados por 2,3 s. SpeedBug lança duas medalhas separadas
+por 1,5 s e se desloca no máximo 24 pixels para cada lado durante o ciclo.
 
-A substituição de aviões e medalhas por sobrecargas e investidas foi implementada.
-RomerBug marca uma faixa de 96 pixels por 0,8 segundo, executa descarga baixa
-por 0,25 segundo e recupera por 1 segundo. Os padrões e parâmetros estão em
-[PROPOSTA_CHEFE_ROMERBUG.md](PROPOSTA_CHEFE_ROMERBUG.md). A campanha antiga mantém
-a transição curta para regressão.
+Após os lançamentos, há uma pausa e espera pelos projéteis saírem de cena.
+A investida é anunciada, tem direção fixa e respeita paredes. RomerBug prepara
+por 0,8 s e recupera por 1 s; SpeedBug prepara por 0,6 s e recupera por 1,3 s.
+Não há dano corporal passivo nem projéteis simultâneos à investida. Os parâmetros
+estão em [PROPOSTA_CHEFE_ROMERBUG.md](PROPOSTA_CHEFE_ROMERBUG.md). A sobrecarga
+no piso foi retirada nesta revisão.
 
 Ao derrotar o boss, os projéteis dele e do jogador e os bugs restantes são
 removidos. Não há recompensa coletável nem aumento de vida. A conversa posterior
@@ -205,7 +207,7 @@ Capturas anteriores da etapa 4: [reencontro](recursos/fontes_arte/previa_reencon
 python -m unittest discover -s testes -v
 ```
 
-**92 testes passaram**, incluindo o percurso com salto básico para ambos os
+**95 testes passaram**, incluindo o percurso com salto básico para ambos os
 protagonistas, reencontro antes da infecção, transformação a 50%, projéteis,
 pausa, limpeza de ameaças, ausência de recompensas e retorno ao menu. Os novos
 testes também cobrem as seis poses da cena, fala da entidade, câmera visual,

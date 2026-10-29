@@ -142,10 +142,10 @@ class TestesControleCombate(unittest.TestCase):
         self.assertEqual(tela.get_at((330,288))[:3],(235,213,156))
         self.assertNotEqual(tela.get_at((330,320))[:3],(235,213,156))
 
-    def teste_jogador_escapa_descarga_e_salta_investida_sem_invulnerabilidade_artificial(self):
+    def teste_jogador_evade_aviao_e_salta_investida_sem_invulnerabilidade_artificial(self):
         chefe=RomerBug(450,312,arena=pygame.Rect(0,0,1600,500));chefe.activate()
         self.jogador.posicao.x=300;self.jogador.rect.x=300
-        chefe.preparar_ataque(self.jogador,self.piso)
+        chefe.preparar_disparo(self.jogador)
         self.teclas[pygame.K_a]=True
         for _ in range(65):
             self.quadro();chefe.update(self.jogador,self.piso)

@@ -2,9 +2,9 @@
 
 **Título do projeto:** IFVania
 
-**Versão do documento:** 3.0
+**Versão do documento:** 3.1
 
-**Data:** 28/10/2026
+**Data:** 29/10/2026
 
 **Fontes:** `ROTEIRO_HISTORIA.md`, orientações do responsável pelo projeto e referências técnicas do repositório.
 
@@ -16,7 +16,7 @@ O HistoryBoard é a referência narrativa desta versão. As solicitações compl
 
 O HistoryBoard detalha o início da história e a primeira fase. As fases seguintes, suas recompensas e a sequência final de desligamento de energia ainda precisam de definição. Recursos antigos podem ser reaproveitados, mas não definem automaticamente o escopo da nova campanha.
 
-As etapas 1 a 4 do `PLANO_DE_EXECUCAO.md` estão implementadas: menu, seleção, prólogo escolar, percurso virtual com salto básico, reencontro com Romerito humano, infecção, combate RomerBug/SpeedBug e encerramento do conteúdo disponível. A campanha antiga foi isolada, e o fluxo atual não concede recompensas ou anuncia a escola salva. Foram executados 92 testes automatizados e inspeções visuais. A revisão visual de 25/10/2026 acrescenta menus noturnos, HUD de integridade, arena escolar escura e a cena com a entidade. A revisão autorizada implementa chicote carregado, esquiva, controle com aceleração curta, plataformas destacadas e sobrecarga/investida, conforme `PROPOSTA_CHEFE_ROMERBUG.md`. O mapa escolar é uma adaptação sem planta interna homologada; a etapa 5 e a homologação manual permanecem pendentes. Testes controlados de combate não equivalem à validação do equilíbrio de sobrevivência.
+As etapas 1 a 4 do `PLANO_DE_EXECUCAO.md` estão implementadas: menu, seleção, prólogo escolar, percurso virtual com salto básico, reencontro com Romerito humano, infecção, combate RomerBug/SpeedBug e encerramento do conteúdo disponível. A campanha antiga foi isolada, e o fluxo atual não concede recompensas ou anuncia a escola salva. Foram executados 95 testes automatizados e inspeções visuais. A revisão visual de 25/10/2026 acrescenta menus noturnos, HUD de integridade, arena escolar escura e a cena com a entidade. A revisão autorizada implementa chicote carregado, esquiva, controle com aceleração curta, plataformas destacadas e aviões/medalhas alternados com investida, conforme `PROPOSTA_CHEFE_ROMERBUG.md`. O mapa escolar é uma adaptação sem planta interna homologada; a etapa 5 e a homologação manual permanecem pendentes. Testes controlados de combate não equivalem à validação do equilíbrio de sobrevivência.
 
 ## 2. Visão geral do produto
 
@@ -102,11 +102,11 @@ Os critérios abaixo são verificações propostas para aceite, não resultados 
 | RF-17 | Permitir movimento horizontal, salto e colisão com o cenário. | O protagonista percorre o caminho previsto sem atravessar pisos e paredes sólidos. A caminhada possui oito quadros por protagonista e acompanha a distância efetivamente percorrida, sem caminhar parado contra uma parede; a pose inicial é de repouso. |
 | RF-18 | Permitir ataque com mouse-chicote na direção do protagonista. | A animação corresponde à direção do ataque e a área ativa causa dano aos inimigos atingidos. |
 | RF-19 | Controlar vida, dano e derrota do protagonista. | Dano válido reduz a vida e atualiza o HUD; vida igual a zero apresenta derrota e permite retornar ao menu. |
-| RF-20 | Fazer RomerBug provocar sobrecargas sinalizadas no piso. | Uma faixa fixa de 96 pixels é avisada por 0,8 s, seguida de descarga baixa de 0,25 s e recuperação de 1 s. Sair da faixa ou saltar evita o dano. |
+| RF-20 | Fazer RomerBug alternar aviões de papel e investida. | Dois aviões com mira fixa e aviso de 0,5 s, separados por 2,3 s. Depois, pausa mínima de 0,8 s até os projéteis saírem, preparação de investida de 0,8 s, avanço de até 160 pixels e recuperação de 1 s. |
 | RF-21 | Transformar RomerBug em SpeedBug ao atingir metade da vida máxima ou menos. | A primeira redução que deixa a vida em até 50% dispara uma única cena: ajoelhar sobre uma perna, aparição de uma entidade com a fala “Ainda não terminou.”, metamorfose e levantamento como SpeedBug. Suspender o combate, permitir pausa e preservar posição, dimensões e vida restante, sem reiniciar o encontro. |
-| RF-22 | Fazer SpeedBug executar uma investida anunciada e previsível. | Aproximação limitada, aviso de 0,6 s, avanço de até 160 pixels em direção fixa, colisão com paredes e recuperação de 1,3 s sem dano de contato. Não combinar projétil ou salto reativo; salto básico deve bastar para evitar o ataque. |
+| RF-22 | Fazer SpeedBug lançar medalhas com pouco movimento, pausar e investir. | Duas medalhas separadas por 1,5 s, aviso de 0,4 s, movimento a até 0,55 px/quadro limitado a ±24 pixels. Depois, pausa mínima de 0,8 s até os projéteis saírem, aviso de investida de 0,6 s, avanço de até 160 pixels e recuperação de 1,3 s. Direção fixa, sem salto reativo ou dano corporal passivo. |
 | RF-23 | Encerrar o combate quando a vida do boss chegar a zero. | Ataques, projéteis e bugs restantes são encerrados; a saída é liberada, sem recompensa. Alcançá-la apresenta “A jornada continua”, informa que a IFVania permanece ativa e permite voltar ao menu. O conteúdo posterior depende de definição narrativa. |
-| RF-24 | Gerenciar zonas ofensivas e projéteis para evitar dano indevido. | Limpar ataques e zonas na transformação e derrota; suspender temporizadores na pausa e no diálogo. Projéteis antigos continuam isolados da campanha atual. |
+| RF-24 | Gerenciar zonas ofensivas e projéteis para evitar dano indevido. | Limpar ataques e zonas na transformação e derrota; suspender temporizadores na pausa e no diálogo. Aviões e medalhas expiram, colidem com o cenário e são removidos na transformação/derrota; não sobrepor projéteis à investida. |
 
 ### 4.4 Apresentação e sessão
 
@@ -158,8 +158,8 @@ Os critérios abaixo são verificações propostas para aceite, não resultados 
 | Professor Romerito | `referencia/professor_romerito.png`. |
 | Escola | Corredores e laboratório A28; usar a referência geográfica indicada no HistoryBoard como apoio à construção do mapa. |
 | Mundo virtual | Bugs, combate com mouse-chicote e arena de RomerBug / SpeedBug. |
-| RomerBug | Transformação de Romerito; sobrecarga sinalizada no piso. |
-| SpeedBug | Segunda forma do mesmo boss; investida anunciada e recuperação. |
+| RomerBug | Transformação de Romerito; aviões espaçados e investida. |
+| SpeedBug | Segunda forma do mesmo boss; medalhas com pouco movimento, pausa e investida. |
 
 O HistoryBoard fornece o [link de referência da escola no Google Maps](https://maps.app.goo.gl/UVNmd7iyYTM9kr3FA). A consulta não disponibilizou uma planta acessível. A [página oficial dos laboratórios do campus](https://portal.ifrn.edu.br/campus/caico/noticias/horarios-laboratorios-de-informatica/) confirma A28. O corredor implementado é uma adaptação lateral; as portas decorativas A25–A27 e as distâncias não representam localização real validada. A conferência geográfica detalhada permanece pendente, sem impedir a validação do fluxo narrativo.
 
@@ -216,9 +216,9 @@ Não há metas homologadas de hardware mínimo, acessibilidade ou compatibilidad
 1. O protagonista enfrenta bugs até o reencontro com Romerito.
 2. Romerito fala sobre viagens a Brasília, corridas e seu desejo de não repetir a experiência.
 3. Um bug o infecta e ele se transforma em RomerBug.
-4. RomerBug marca uma faixa e executa uma descarga baixa após o aviso.
+4. RomerBug lança aviões espaçados, pausa e prepara uma investida.
 5. Ao atingir até 50% da vida máxima, transforma-se uma única vez em SpeedBug.
-6. SpeedBug prepara uma investida, avança em direção fixa e fica exposto.
+6. SpeedBug lança medalhas com pouco deslocamento, pausa, prepara uma investida e fica exposto.
 7. Ao chegar a zero de vida, o boss é derrotado e para de atacar.
 
 **Resultado esperado:** encontro único, com vida contínua, tamanho uniforme e transição de comportamento no limiar especificado.
@@ -232,7 +232,7 @@ Não há metas homologadas de hardware mínimo, acessibilidade ou compatibilidad
 | CA-03 | Conferir aula, revolta da IA, objetivo, corredores, A28, abdução e obtenção do mouse, na ordem prevista. | RF-07 a RF-12, RN-01 |
 | CA-04 | Exercitar movimento, salto, colisões, chicote, dano e derrota contra bugs. | RF-13, RF-17 a RF-19 |
 | CA-05 | Conferir fala de Romerito e infecção antes de liberar ataques do boss. | RF-14 a RF-16 |
-| CA-06 | Reduzir a vida do boss até acima de 50%, exatamente 50% e abaixo do limiar em execuções controladas; verificar sobrecarga antes e investida depois, sem cura ou transformação repetida. | RF-20 a RF-22, RN-05, RN-09 |
+| CA-06 | Reduzir a vida do boss até acima de 50%, exatamente 50% e abaixo do limiar em execuções controladas; verificar aviões antes e medalhas depois, alternados com investida, sem cura ou transformação repetida. | RF-20 a RF-22, RN-05, RN-09 |
 | CA-07 | Derrotar o boss e conferir encerramento de ataques e projéteis, sem declarar vitória final da campanha. | RF-23, RF-24, RN-11 |
 | CA-08 | Comparar todos os personagens e inimigos lado a lado, na mesma escala de câmera; conferir dimensões lógicas, área dos sprites, escala visível e alinhamento em todos os quadros, incluindo SpeedBug. | RF-28, RN-07 a RN-09, RNF-06 |
 | CA-09 | Revisar a classe e a instanciação de cada boss disponível, comprovando comportamento próprio e ausência de boss representado somente por parâmetros genéricos. | RN-06, RNF-05 |
@@ -272,7 +272,7 @@ A tabela indica áreas de implementação e revisão, sem afirmar que os novos r
 | `entidades/inimigo.py` | Bugs e sua adequação ao tamanho comum. |
 | `entidades/chefe.py` | Infraestrutura comum dos bosses; revisar instanciações genéricas. |
 | `entidades/chefes_professores.py` | Classes concretas dos professores antigos e registro explícito de tipos de boss. |
-| `entidades/romer_bug.py` | Classe própria de RomerBug, transformação em SpeedBug, sobrecarga e investida. |
+| `entidades/romer_bug.py` | Classe própria de RomerBug, transformação em SpeedBug, aviões, medalhas e investida. |
 | `entidades/projetil.py` | Movimento, dano e ciclo de vida dos projéteis. |
 | `mundo/fase.py` e `mundo/dados_fases.py` | Mapa virtual, reencontro, infecção, combate, limpeza após derrota e saída. |
 | `mundo/fases_antigas.py` | Dados isolados dos seis mapas antigos e suas recompensas, fora do fluxo principal. |

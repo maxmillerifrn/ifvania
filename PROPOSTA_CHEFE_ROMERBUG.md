@@ -1,50 +1,54 @@
 # Ataques do primeiro chefe — RomerBug / SpeedBug
 
-**Revisão:** 28/10/2026 — implementada. A homologação humana de dificuldade
-permanece pendente. Esta especificação substitui a proposta inicial de dupla investida.
+**Revisão:** 29/10/2026 — implementada conforme novo pedido do responsável.
+A sobrecarga no piso foi retirada do encontro; aviões e medalhas retornam,
+com ciclos legíveis de lançamento, pausa, investida e recuperação.
 
-## RomerBug: sobrecarga de terminal
+## RomerBug
 
-Patrulha curta, seguida de faixa de 96 pixels marcada no piso por 48 quadros
-(0,8 s). A faixa é fixada na posição do aluno ao começar o aviso. A descarga
-é baixa, dura 15 quadros (0,25 s) e causa 1 de dano. É possível sair da faixa
-ou saltar. Depois, o professor fica exposto por 60 quadros (1 s), sem dano
-de contato. Há uma única zona e ela não acompanha o aluno depois de marcada.
+Patrulha curta seguida de dois aviões. Cada lançamento tem 30 quadros de aviso
+(0,5 s), com mira fixada no começo do aviso. Os lançamentos ficam separados
+por 138 quadros (2,3 s): intervalo de 108 mais preparação de 30. Cada avião
+avança a 4,5 pixels por quadro e não persegue mudanças de posição após lançado.
 
-## Transição a 50%
+Depois do segundo avião, o professor faz uma pausa mínima de 48 quadros
+(0,8 s), estendida até os projéteis anteriores saírem de cena. Prepara a
+investida por 48 quadros, avança até 160 pixels a 6 pixels por quadro em direção
+fixa e fica exposto por 60 quadros (1 s). Respeita paredes e limites da arena.
 
-Preserva a cena de joelho apoiado, entidade, fala “Ainda não terminou.”,
-metamorfose e levantamento. Vida, corpo e posição são preservados. Ataques,
-cargas, projéteis e zona de descarga são removidos. Pausa e fala funcionam
-como antes; a retomada oferece proteção e aproximação antes do próximo aviso.
+## SpeedBug
 
-## SpeedBug: investida de ruptura
+Usa o mesmo ciclo, com duas medalhas e deslocamento discreto: no máximo
+0,55 pixel por quadro, limitado a 24 pixels para cada lado da posição inicial
+do ciclo. Não há perseguição contínua ou salto reativo.
 
-Aproximação a até 2,6 pixels por quadro, seguida de preparação de 36 quadros
-(0,6 s), com direção fixada e seta no chão. A investida percorre até 160 pixels
-a 6 pixels por quadro, respeitando paredes e os limites da arena. Não corrige
-a direção, não dispara medalhas e não salta para perseguir o aluno. O salto
-básico permite evitá-la, sem exigir esquiva.
+Cada lançamento tem aviso de 24 quadros (0,4 s). As medalhas são separadas
+por 90 quadros (1,5 s): intervalo de 66 mais aviso de 24. A velocidade é
+5 pixels por quadro, menor que os 6,5 da versão antiga. A mira também fica
+fixada antes do disparo.
 
-Depois há 78 quadros (1,3 s) de recuperação, com a indicação “EXPOSTO” e sem
-dano de contato. Essa abertura permite aproximar e escolher golpe rápido ou
-carregado. Não há dupla investida nesta revisão.
+Depois das medalhas, pausa por pelo menos 48 quadros e espera a arena ficar
+livre de projéteis. Prepara uma investida por 36 quadros (0,6 s), avança até
+160 pixels sem corrigir a direção e recupera por 78 quadros (1,3 s).
 
-## Arma e defesa
+## Leitura e justiça do encontro
 
-O mouse com cabo reforçado mantém o vínculo com a bolsa e o ambiente escolar.
-Toque/soltura de X causa 1 de dano; carga de 36 quadros e soltura causa 2.
-A carga reduz deslocamento a 75% e pode ser cancelada por dano ou esquiva.
-O golpe tem arco tolerante, respeita paredes e acerta uma vez por alvo.
+Os avisos identificam o lançamento e marcam a mira. A pausa indica a preparação
+do avanço, e a seta mostra a direção da investida. Não há dano corporal passivo:
+o corpo só causa dano durante a investida. Na recuperação, a indicação
+“EXPOSTO” oferece abertura para chicote rápido ou carregado. Projéteis causam
+dano enquanto existem, mas nenhum permanece ao começar o aviso de investida.
 
-Shift permite passo evasivo de 15 quadros, protegido nos oito quadros centrais,
-com recarga de 54 quadros. A esquiva é uma defesa básica disponível com o mouse,
-sem conceder habilidades ou recompensas da campanha antiga.
+O ciclo privilegia aprendizado do padrão, como solicitado na referência a
+Mega Man X. Os parâmetros são iniciais; avaliação humana do ritmo continua pendente.
 
-## Validação
+## Transição e validação
 
-Testes cobrem aviso sem dano, alvo e direção fixos, limite da investida, parede,
-recuperação, transição, carga e cancelamento. Cenários sem invulnerabilidade
-artificial verificam saída da descarga e salto sobre a investida. A avaliação
-de ritmo e dificuldade com jogadores permanece pendente, conforme
-[ANALISE_JOGABILIDADE_COMBATE.md](ANALISE_JOGABILIDADE_COMBATE.md).
+Mantidos a transformação única a 50%, joelho apoiado, entidade e fala, vida
+compartilhada, pausa e proteção na retomada. Transformação e derrota limpam
+projéteis e reiniciam o ciclo. Os controles do aluno e as plataformas destacadas
+permanecem como na revisão anterior.
+
+95 testes automatizados cobrem ciclos completos em ambas as formas, cadência,
+mira fixa, movimento curto, pausa até expirar os projéteis, colisões, investida,
+recuperação, transição e controles do aluno.

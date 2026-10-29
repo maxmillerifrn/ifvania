@@ -225,3 +225,11 @@ sintetizados localmente em `sons.py`, sem dependência de arquivos ou rede.
 Capturas renderizadas e inspecionadas: `previa_plataformas_legiveis.png`,
 `previa_ataque_carregado.png`, `previa_mouse_reforcado.png`,
 `previa_aviso_descarga.png` e `previa_aviso_investida.png`.
+
+
+## Retorno dos projéteis e ciclo de investida — 29/10/2026
+
+Reutilizadas as artes existentes de avião e medalha. Capturas atuais:
+`previa_romerbug_aviao.png`, `previa_speedbug_medalha.png` e
+`previa_ciclo_investida.png`. Não houve geração de novas artes nesta revisão.
+As capturas anteriores da descarga documentam a mecânica substituída.

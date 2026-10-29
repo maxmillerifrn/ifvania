@@ -107,27 +107,24 @@ class TestesMovimentoChefe(unittest.TestCase):
     def tearDownClass(cls):
         pygame.quit()
 
-    def test_running_accelerates_preserves_fractions_and_uses_full_cycle(self):
-        chefe = RomerBug(600, 384, arena=pygame.Rect(0, 0, 2000, 600))
-        jogador = Jogador(100, 408)
-        chefe.activate()
-        chefe.take_damage(8)
-        for _ in range(45):
-            chefe.update(jogador, [])
-        piso = [pygame.Rect(0, 448, 2000, 100)]
-        quadros = set()
-        fracoes = []
-        velocidade_anterior = 0
-        for i in range(90):
-            chefe.update(jogador, piso)
-            if i < 12:
-                self.assertLessEqual(abs(chefe.velocidade.x - velocidade_anterior), chefe.FRENAGEM + 1e-6)
-            velocidade_anterior = chefe.velocidade.x
-            quadros.add(chefe.quadro_movimento)
-            fracoes.append(abs(chefe.posicao.x - round(chefe.posicao.x)))
-        self.assertEqual(quadros, set(range(6)))
-        self.assertGreater(max(fracoes), 0.1)
-        self.assertEqual(chefe.rect.bottom, 448)
+    def test_deslocamento_curto_preserva_fracoes_e_investida_usa_ciclo_completo(self):
+        chefe=RomerBug(600,408,arena=pygame.Rect(0,0,2000,600))
+        jogador=Jogador(100,408);chefe.activate();chefe.take_damage(8)
+        chefe.temporizador_transformacao=0
+        piso=[pygame.Rect(0,448,2000,100)]
+        origem=chefe.rect.x
+        fracoes=[]
+        for _ in range(100):
+            chefe.update(jogador,piso)
+            fracoes.append(abs(chefe.posicao.x-round(chefe.posicao.x)))
+        self.assertLessEqual(abs(chefe.rect.x-origem),24)
+        self.assertGreater(max(fracoes),0.1)
+        chefe.projeteis.empty();chefe.preparar_ataque(jogador,piso)
+        quadros=set()
+        for _ in range(63):
+            chefe.update(jogador,piso);quadros.add(chefe.quadro_movimento)
+        self.assertEqual(quadros,set(range(6)))
+        self.assertEqual(chefe.rect.bottom,448)
 
     def test_blocked_runner_does_not_cycle_feet_without_displacement(self):
         chefe = RomerBug(400, 384)
