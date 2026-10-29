@@ -1,8 +1,8 @@
 # Plano de execução — IFVania
 
-**Data:** 27/10/2026
+**Data:** 28/10/2026
 
-Referências: `DOCUMENTO_DE_REQUISITOS.md` versão 2.7 e `HISTORYBOARD.MD`.
+Referências: `DOCUMENTO_DE_REQUISITOS.md` versão 3.0 e `ROTEIRO_HISTORIA.md`.
 
 ## Estratégia
 
@@ -10,7 +10,7 @@ Implementar por etapas verificáveis. Preservar as alterações existentes no Hi
 
 ## Etapa 1 — Dimensões e arquitetura dos bosses
 
-- [x] Definir dimensões corporais comuns em `settings.py`, 40 × 40 pixels, mantendo a altura corporal e aproximando a escala visual de humanos e bugs.
+- [x] Definir dimensões corporais comuns em `configuracoes.py`, 40 × 40 pixels, mantendo a altura corporal e aproximando a escala visual de humanos e bugs.
 - [x] Aplicar as dimensões ao jogador, bugs, bosses e às duas formas de RomerBug.
 - [x] Carregar sequências de sprites com escala proporcional compartilhada, alinhamento dos pés e filtro sem suavização; tratar poses de ataque como exceção visual, sem alterar colisão corporal.
 - [x] Adequar pontos de surgimento para manter os pés no piso e evitar sobreposição com blocos.
@@ -21,7 +21,7 @@ Implementar por etapas verificáveis. Preservar as alterações existentes no Hi
 
 ## Etapa 2 — Menu e seleção do protagonista
 
-- [x] Criar fachada em pixel art baseada em `referencia/img.png`.
+- [x] Criar fachada em pixel art baseada em `referencia/fachada_escola.png`.
 - [x] Implementar Jogar e Sair com clique e navegação por teclado.
 - [x] Implementar tela de escolha Menino / Menina e persistência da seleção na campanha.
 - [x] Criar e integrar spritesheet completo da Menina, cobrindo os mesmos estados do Menino e as dimensões comuns.
@@ -63,28 +63,28 @@ As fases após RomerBug, recompensas, quantidade final de bosses e sequência de
 ## Registro de execução
 
 - Etapa 1 implementada: dimensão lógica comum de 40 × 40 pixels, normalização proporcional das sequências, alinhamento dos pés, surgimento em piso livre e classes concretas com estratégias próprias para os seis bosses existentes.
-- `Boss` passou a ser abstrata para a escolha de ataques; tipos desconhecidos são rejeitados, sem substituição por um boss genérico.
+- `Chefe` passou a ser abstrata para a escolha de ataques; tipos desconhecidos são rejeitados, sem substituição por um boss genérico.
 - Inspeção visual feita com todas as entidades disponíveis lado a lado, incluindo SpeedBug. As silhuetas preservam suas proporções naturais dentro da mesma área; Max, Romerito humano e Menina serão verificados após a criação de suas artes.
-- Validação: 31 testes passaram com Python 3.9.6 e Pygame 2.6.1, incluindo seis novos testes de dimensões, normalização, surgimento e estratégias. Comando: `python -m unittest discover -s tests -v`.
+- Validação: 31 testes passaram com Python 3.9.6 e Pygame 2.6.1, incluindo seis novos testes de dimensões, normalização, surgimento e estratégias. Comando: `python -m unittest discover -s testes -v`.
 - O Python 3.15 instalado no sistema não compilou Pygame 2.6.1; a validação usou ambiente temporário com Python 3.9.6, sem mudar as dependências do projeto.
 - Etapa 2 implementada: fachada baseada na fotografia, Jogar/Sair com mouse e teclado, seleção com prévia animada e confirmação, onze quadros da Menina e persistência da escolha entre fases e reaparecimentos.
 - Introdução textual da etapa 3 atualizada: aula de Max, nome completo da IFVania, anúncio de desligamento, revolta, hipnose/alucinações e objetivo de cortar a energia. O percurso escolar e o combate virtual foram concluídos nas etapas 3 e 4 descritas abaixo.
-- Artes geradas com a ferramenta integrada `image_gen`; fontes, prompts e PNG de execução estão no repositório. Exportação reproduzível: `python prepare_menu_assets.py`.
+- Artes geradas com a ferramenta integrada `image_gen`; fontes, prompts e PNG de execução estão no repositório. Exportação reproduzível: `python preparar_recursos_menu.py`.
 - Validação ao concluir a etapa 2: 42 testes passaram com Python 3.9.6 e Pygame 2.6.1. Onze novos testes cobrem menu, ambas as opções, preservação da escolha, reinício de progresso, pausa da simulação e isolamento de eventos entre telas.
 - Inspeção visual feita nas capturas de menu, seleção, introdução, primeira fase com Menina e todos os seus quadros nas duas direções. Também foram atualizadas e desenhadas as doze combinações entre dois protagonistas e seis mapas por 60 quadros cada, sem abrir janela.
 - Etapa 3 implementada em 22/10/2026: aula com Max e mudança visual dos monitores na revolta da IA; corredor navegável com placas e acesso ao A28; encontro com Romerito por E; investida, recuo do protagonista e abdução animada; transporte para o mapa virtual e descoberta do mouse na bolsa antes de liberar o chicote.
-- `SchoolLevel` mantém cenários sem inimigos/boss antecipado e gatilhos únicos. O mesmo protagonista atravessa as cenas. A arma fica bloqueada na escola e durante a descoberta; diálogos e pausa suspendem a simulação, inclusive o transporte.
-- Max e Romerito possuem dois quadros cada, derivados das fotos de `referencia/`, com transparência e corpo comum de 40 × 40. Fontes e prompts salvos no projeto; exportação: `python prepare_school_assets.py`.
+- `FaseEscolar` mantém cenários sem inimigos/boss antecipado e gatilhos únicos. O mesmo protagonista atravessa as cenas. A arma fica bloqueada na escola e durante a descoberta; diálogos e pausa suspendem a simulação, inclusive o transporte.
+- Max e Romerito possuem dois quadros cada, derivados das fotos de `referencia/`, com transparência e corpo comum de 40 × 40. Fontes e prompts salvos no projeto; exportação: `python preparar_recursos_escola.py`.
 - Referência geográfica: o link curto do Maps não abriu uma planta consultável. A página oficial sobre horários dos laboratórios confirma A28: https://portal.ifrn.edu.br/campus/caico/noticias/horarios-laboratorios-de-informatica/ . As portas A25–A27 e as distâncias do corredor são composição de cenário, sem afirmação de posição real.
 - Validação ao concluir a etapa 3: 51 testes passaram com Python 3.9.6 e Pygame 2.6.1. Os nove testes novos percorrem a rota com movimento real para Menino/Menina, conferem a ordem dos eventos, proximidade e tecla E, gatilhos únicos, ataque narrativo, arma bloqueada, pausa, dimensões, câmera e texto.
 - Inspeção visual: aula, corredor, A28, abdução e descoberta do mouse; cenas escolares e transporte também renderizados sem janela com os dois protagonistas.
-- Etapa 4 implementada em 23/10/2026: a campanha principal contém somente o mapa virtual previsto no HistoryBoard. Os seis mapas antigos, seus diálogos e poderes foram isolados em `world/legacy_levels.py`, fora do menu.
+- Etapa 4 implementada em 23/10/2026: a campanha principal contém somente o mapa virtual previsto no HistoryBoard. Os seis mapas antigos, seus diálogos e poderes foram isolados em `mundo/fases_antigas.py`, fora do menu.
 - O mapa fixo tem piso contínuo, degraus de 32/64 pixels, quatro bugs e arena plana. O piso mantém os personagens visíveis acima do diálogo. Foi percorrido com movimento e salto básicos, sem poderes, com ambos os protagonistas.
 - Romerito aparece humano, fala de Brasília e corridas e é infectado por um bug em uma sequência de 60 atualizações. Ataques ficam bloqueados até seu término; a pausa suspende a infecção. O corpo e a vida são preservados.
 - RomerBug/SpeedBug conservam a transformação única a 50%, os aviões, as medalhas e a perseguição. Após a derrota, ameaças e projéteis são removidos, sem item ou bônus de vida.
 - A saída permanece bloqueada até a derrota. O fim do conteúdo apresenta “A jornada continua”, informa que a IFVania segue ativa e permite voltar ao menu e reiniciar a campanha.
 - Validação ao concluir a etapa 4: 61 testes passaram com Python 3.9.6/Pygame 2.6.1. Os dez novos testes cobrem a campanha isolada, percurso básico, diálogo/infecção, pausa, dimensões, duas formas, limpeza, ausência de recompensa e encerramento/reinício. O combate por teclado foi verificado para Menino e Menina em condições controladas, sem representar homologação do balanceamento de sobrevivência.
-- Inspeção visual: percurso, Romerito humano, infecção, SpeedBug, derrota e tela de continuação; capturas em `assets/art_sources/virtual_*_preview.png` e `content_end_preview.png`.
+- Inspeção visual: percurso, Romerito humano, infecção, SpeedBug, derrota e tela de continuação; capturas em `recursos/fontes_arte/virtual_*_preview.png` e `previa_fim_conteudo.png`.
 - Próxima etapa: integração e homologação (etapa 5), incluindo teste manual, revisão integrada e balanceamento. O conteúdo narrativo posterior continua sem definição.
 
 ## Ajustes solicitados em 25/10/2026
@@ -97,15 +97,15 @@ As fases após RomerBug, recompensas, quantidade final de bosses e sequência de
 - [x] Apresentar proposta para substituir aviões/medalhas, sem aplicar mudança mecânica ainda não escolhida.
 
 Artes feitas com a ferramenta integrada image_gen, fontes preservadas em
-`assets/art_sources/`, prompts em `dark_prompts.json` e exportação reproduzível
-com `python prepare_dark_assets.py`. A entidade permanece de origem indefinida.
+`recursos/fontes_arte/`, prompts em `instrucoes_artes_sombrias.json` e exportação reproduzível
+com `python preparar_recursos_sombrios.py`. A entidade permanece de origem indefinida.
 
 Validação da revisão de 25/10: 68 testes passaram. Os sete novos testes cobrem transição,
 pausa e fala, vida/corpo, retomada, zoom visual, poses e legibilidade das dicas.
 Foram inspecionadas capturas do menu, seleção, arena e etapas da transformação;
-prévia animada em `assets/art_sources/boss_transformation_preview.gif`.
+prévia animada em `recursos/fontes_arte/previa_transformacao_chefe.gif`.
 
-A proposta está em `PROPOSTA_BOSS_ROMERBUG.md`. A etapa 5 ainda requer homologação
+A proposta está em `PROPOSTA_CHEFE_ROMERBUG.md`. A etapa 5 ainda requer homologação
 manual e balanceamento; esta revisão não a declara concluída.
 
 ## Ajuste de proporção — 26/10/2026
@@ -114,7 +114,7 @@ Conforme a delimitação do responsável, somente o protagonista (Menino/Menina)
 os bosses recebem escala visual de 110%, durante toda a partida, incluindo
 exploração, combate e transformação. São desenhados em 44 × 44 com apoio dos pés
 preservado. Professores enquanto NPCs, bugs e entidade permanecem em 40 × 40. Colisões, velocidades, alcance e geometria do mapa permanecem iguais.
-A escala fica centralizada em `settings.CHARACTER_VISUAL_SCALE`.
+A escala fica centralizada em `configuracoes.ESCALA_VISUAL_PERSONAGEM`.
 
 ## Escala e arte escolar — 27/10/2026
 
@@ -130,10 +130,10 @@ gráficos e estados dentro da tela, acompanham a câmera e refletem a corrupçã
 Seu relógio é visual: funciona em diálogos sem atualizar física/combate e congela
 na pausa. A arena usa o mesmo sistema de monitores.
 
-Artes novas feitas com image_gen e preservadas em `assets/art_sources/`;
-prompts em `detailed_school_prompts.json`. Exportação:
-`python prepare_detailed_school.py`. Prévia animada:
-`assets/art_sources/animated_monitors_preview.gif`.
+Artes novas feitas com image_gen e preservadas em `recursos/fontes_arte/`;
+prompts em `instrucoes_escola_detalhada.json`. Exportação:
+`python preparar_escola_detalhada.py`. Prévia animada:
+`recursos/fontes_arte/previa_monitores_animados.gif`.
 
 Validação atual: 74 testes passaram; seis novos testes cobrem escala, recorte
 dos monitores, câmera, animação em diálogos/pausa e alcance da ponta do chicote.
@@ -150,6 +150,52 @@ A homologação manual e o balanceamento da etapa 5 continuam pendentes.
 - [x] Aplicar o nome nas falas do aluno e nas respostas dos professores, preservando-o nas transições.
 - [x] Validar 81 testes automatizados e inspecionar capturas da entrada de nome e dos diálogos.
 
-Prévias em `assets/art_sources/player_name_preview.png`,
-`student_intro_preview.png`, `named_reply_preview.png` e
-`player_walk_preview.gif`. A homologação manual da etapa 5 permanece pendente.
+Prévias em `recursos/fontes_arte/previa_nome_jogador.png`,
+`previa_introducao_aluno.png`, `previa_resposta_com_nome.png` e
+`previa_caminhada_jogador.gif`. A homologação manual da etapa 5 permanece pendente.
+
+
+## Nomenclatura em português e orientações — 28/10/2026
+
+- [x] Renomear classes, variáveis, atributos, parâmetros e constantes próprios
+  no jogo, testes e exportadores, preservando interfaces externas.
+- [x] Atualizar importações, herança, callbacks, argumentos nomeados e acessos
+  dinâmicos, sem modificar os caminhos dos módulos e imagens.
+- [x] Criar `AGENTS.md` com convenções e contratos do projeto.
+- [x] Atualizar referências técnicas na documentação.
+- [x] Executar os 81 testes e os oito exportadores em pasta temporária (74 PNGs).
+
+`gerar_recursos.py` passou por conferência estática de sintaxe e referências;
+sua execução não foi realizada porque Pillow não está instalado no ambiente.
+A homologação manual da etapa 5 continua pendente.
+
+
+## Arquivos e pastas em português — 28/10/2026
+
+- [x] Renomear código, testes, exportadores, documentação, imagens e pastas
+  próprias: 224 caminhos atualizados.
+- [x] Atualizar importações, carregamento de imagens, nomes de quadros gerados,
+  comandos e links locais. Preservar nomes técnicos de descoberta.
+- [x] Conferir os 81 testes, os oito exportadores e a entrada `principal.py`.
+- [x] Conferir todos os links locais e preservar os bytes das 160 imagens/GIFs.
+
+Os comandos atuais são `python principal.py` e
+`python -m unittest discover -s testes -v`; dependências em `dependencias.txt`.
+As fontes de arte ficam em `recursos/fontes_arte/`. A homologação manual
+da etapa 5 continua pendente.
+
+
+## Revisão de controle, combate e plataformas — 28/10/2026
+
+- [x] Movimento a 3,2 px/quadro, aceleração/frenagem curtas, tolerância de borda e memória de salto.
+- [x] Corrigir direção e persistência do recuo de dano.
+- [x] Chicote tolerante com alcance 100, carga de 0,6 s/dano 2, cancelamento e efeitos de peso.
+- [x] Esquiva básica com recarga e proteção curta, tutorial e HUD.
+- [x] Sobrecarga anunciada e investida de direção fixa, com recuperação e sem dano de contato passivo.
+- [x] Contorno e faixa nas superfícies de apoio expostas, sem alterar colisões.
+- [x] Atualizar regressões dos ataques substituídos e validar 92 testes.
+- [x] Renderizar e inspecionar carga, mouse reforçado, plataformas e avisos dos ataques.
+
+Cenários determinísticos sem invulnerabilidade artificial cobrem fuga da descarga
+e salto sobre a investida. Isso não substitui homologação humana de sobrevivência,
+ritmo e dificuldade; a etapa 5 permanece pendente.

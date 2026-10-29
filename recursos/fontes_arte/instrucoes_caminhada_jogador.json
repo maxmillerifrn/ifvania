@@ -1,0 +1,11 @@
+{
+  "tool": "built-in image_gen.imagegen",
+  "source": "recursos/fontes_arte/ciclo_caminhada_jogador.png",
+  "references": [
+    "recursos/fontes_arte/aluno_ifrn_caico.png",
+    "recursos/fontes_arte/aluna.png"
+  ],
+  "transparent_background": true,
+  "prompt": "Use case: stylized-concept. Asset type: transparent production spritesheet, new walking animation for IFVania. Reference image 1 is the BOY student identity; reference image 2 is the GIRL student identity. Preserve exactly each character's face, brown skin, black glasses, black curly hair (boy afro, girl curly ponytail), green school polo with white collar and cuffs, navy trousers, black backpack, green LEFT shoe and red RIGHT shoe. Create exactly SIXTEEN isolated full-body sprites on a genuine transparent background, arranged in exactly 8 columns and 2 rows. Top row is BOY eight-frame walk cycle, bottom row GIRL eight-frame walk cycle. All figures FACE RIGHT in a true side-on platformer profile, NOT toward camera. For EACH row the eight consecutive poses are: 1 right foot contact forward/left leg back, 2 weight down onto right foot with left heel lifting, 3 left leg passing under hips with right planted, 4 rising as left swings forward, 5 left foot contact forward/right leg back, 6 weight down onto left foot with right heel lifting, 7 right leg passing under hips with left planted, 8 rising as right swings forward toward pose 1. Natural ordinary walking, NOT running, NO high knees, NO crouching, NO jumping, NO lunging. Gentle arm counter-swing. Keep head, shoulders and torso size and horizontal center consistent in each cell, only subtle head bob. Consistent leg lengths and feet baseline in all eight cells; shoes maintain their color on the SAME anatomical leg across the cycle. Each full figure inside its own cell, large transparent gutters separating all sixteen figures. Crisp readable pixel art matching references. No labels, no text, no numbers, no borders, no gridlines, no floor, no shadow, no effects, no accessories beyond original uniform and backpack. Deliver the complete sixteen-frame atlas only.",
+  "export_command": "python preparar_caminhada_jogador.py"
+}

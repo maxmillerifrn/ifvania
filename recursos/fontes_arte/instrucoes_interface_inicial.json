@@ -1,0 +1,27 @@
+{
+  "tool": "built-in image_gen.imagegen",
+  "recursos": [
+    {
+      "source": "recursos/fontes_arte/fachada_escola.png",
+      "references": [
+        "referencia/fachada_escola.png"
+      ],
+      "transparent_background": false,
+      "prompt": "Use case: style-transfer. Asset type: actual jogo principal menu background, landscape 16:9. Create a detailed crisp pixel art rendering of the school facade in the reference photograph, recognizable IFRN Campus Caicó architecture: broad white entrance canopy, yellow tiled walls, red handrails and stairs, blue sky and clouds. Keep the architectural arrangement and perspective from the photograph, fit the entire entrance and stairs in a widescreen composition. Retro 2D adventure jogo environment, limited palette, clean pixel clusters, daylight. The background will sit behind a small top-left IFVania title and a bottom-left menu panel; keep the building visible mostly center/right. No people, no user interface, no buttons, no title overlay, no watermark. Architectural signage may be simplified into pixels. Deliver only the artwork."
+    },
+    {
+      "source": "recursos/fontes_arte/aluna.png",
+      "references": [
+        "recursos/fontes_arte/aluno_ifrn_caico.png",
+        "recursos/fontes_arte/aluno_chicote.png"
+      ],
+      "transparent_background": true,
+      "prompt": "Use case: stylized-concept. Asset type: production transparent spritesheet for 2D platformer IFVania. Image 1 is the male student reference for exact visual style, uniform, scale and character proportions. Image 2 is the reference for the three attack poses. Create the FEMALE STUDENT counterpart: brown skin, black curly hair in a ponytail with recognizable feminine appearance, black glasses, green IFRN polo with white collar and cuff stripes and tiny red/white school emblem, navy trousers, backpack, one green sneaker and one red sneaker. Youthful student, practical uniform, no skirt. SAME character across all frames, same body size and facing RIGHT throughout. Pixel art with crisp edges and clustered shading matching references. Layout MUST be exactly a spacious regular 4 columns x 3 rows grid on genuine transparent background. Every cell contains exactly one full body character, no overlap, ample transparent padding. Exactly TWELVE figures. Row 1 left to right: idle relaxed, idle breathing slight shift, walk contact left leg forward, walk passing right leg forward. Row 2: walk opposite contact, walk opposite passing, jump knees tucked, forward dash leaning forward. Row 3: attack windup arm bent back like reference 2 first pose, attack extension arm pointing forward like reference 2 second pose, attack recovery like reference 2 third pose, idle relaxed portrait duplicate. Attack poses should have NO weapon and NO cord because mouse whip is drawn by jogo code. Keep feet on consistent cell baseline for standing poses. Each figure entirely within own cell. No captions, no labels, no numbers, no gridlines, no shadows, no floor, no opaque background. Deliver the sprite atlas only."
+    }
+  ],
+  "export_command": "python preparar_recursos_menu.py",
+  "outputs": [
+    "recursos/imagens/menu/fachada_escola.png",
+    "recursos/imagens/jogador/menina/*.png"
+  ]
+}
