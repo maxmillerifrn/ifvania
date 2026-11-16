@@ -1,5 +1,18 @@
 # Plano de execução — IFVania
 
+## Evolução planejada — hack and slash e campus virtual (16/11/2026)
+
+A [proposta de design](PROPOSTA_HACK_AND_SLASH.md) e o [plano de implementação H0–H9](PLANO_HACK_AND_SLASH.md) registram a evolução para combate de combos e exploração controlável do campus entre todas as fases. O plano novo orienta o próximo trabalho: campus/progresso, combate mínimo e protótipo biblioteca → ginásio → Elias → campus transformado → M1, antes de expandir as fases 4–6.
+
+O conteúdo futuro das etapas 7–10 abaixo passa a ter como referência os novos avatares docentes e percursos. Os registros existentes permanecem como histórico e estado da versão atual; nenhum item de implementação foi concluído por esta atualização. As pendências de abertura, biblioteca e homologação continuam abertas. H9 corresponde à validação final da etapa 11, sem antecipar seu aceite.
+
+- [x] Documentar proposta com mapa, fatos/fontes docentes, ficção, combate e quatro fases.
+- [x] Documentar etapas, dependências, componentes, retomadas, riscos e critérios de aceite.
+- [x] Tornar obrigatórios Factory, State Machine, Command, Strategy e Observer nos sistemas definidos pelo plano H0–H9, com introdução incremental e critérios de aceite. Uso em código permanece pendente; registrar evidências na matriz de arquitetura a cada marco.
+- [ ] Iniciar H0 e implementar primeiro protótipo conforme H1–H3.
+
+Entrega desta revisão exclusivamente documental; sem mudanças de código, arte ou controles em execução. Os contratos atuais continuam descrevendo o jogo disponível; roteiro e requisitos serão sincronizados a cada incremento implementado. Não houve nova partida manual nem execução da suíte nesta revisão documental.
+
 **Reorganizado em:** 02/11/2026, após revisão das lacunas do início da história.
 
 Referências: [AGENTS.md](../AGENTS.md), [documentacao/ROTEIRO_HISTORIA.md](ROTEIRO_HISTORIA.md), [documentacao/DOCUMENTO_DE_REQUISITOS.md](DOCUMENTO_DE_REQUISITOS.md) e as seis imagens de `referencia/ifrn/`. O registro anterior foi preservado integralmente em [documentacao/HISTORICO_DE_EXECUCAO.md](HISTORICO_DE_EXECUCAO.md).
