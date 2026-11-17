@@ -4,9 +4,15 @@ import unicodedata
 import pygame
 from sistema import configuracoes
 from entidades.jogador import Jogador
-from mundo.fase import Fase
+from mundo.fabrica_cenas import FabricaCenas
+from sistema.eventos_campanha import EventosCampanha, FaseConcluida
+from sistema.progresso_campanha import ProgressoCampanha
+from sistema.maquina_estados import MaquinaEstados
+from mundo.dados_campus import RETORNOS
+from mundo.descoberta_mouse import DescobertaMouse
+from mundo.encerramento_equipamentos import EncerramentoEquipamentos
+from sistema import recursos, sons
 from mundo.dados_fases import build_levels, INTRODUCAO_HISTORIA, INDICE_CORRUPCAO_HISTORIA, INDICE_EXECUCAO_HISTORIA, INDICE_MEMORIA_HISTORIA
-from mundo.escola import FaseEscolar
 from mundo.dados_escola import DIALOGO_ENCONTRO, DESCOBERTA_MOUSE
 from mundo.transicao_chefe import TransicaoChefe
 from mundo.succao_computador import SuccaoComputador
@@ -26,9 +32,37 @@ ESTADO_FIM_CONTEUDO = "content_end"
 ESTADO_ABDUCAO = "abduction"
 ESTADO_INFECCAO = "infection"
 ESTADO_TRANSFORMACAO_CHEFE = 'boss_transformation'
+ESTADO_VITORIA = 'vitoria'
+ESTADO_DESLIGAMENTO = 'desligamento'
+
+TRANSICOES_ESTADOS = {
+    ESTADO_MENU: {ESTADO_SELECAO_PERSONAGEM, ESTADO_DIALOGO, ESTADO_CARTAO_FASE, ESTADO_JOGANDO, ESTADO_DERROTA},
+    ESTADO_SELECAO_PERSONAGEM: {ESTADO_MENU, ESTADO_ENTRADA_NOME},
+    ESTADO_ENTRADA_NOME: {ESTADO_MENU, ESTADO_SELECAO_PERSONAGEM, ESTADO_DIALOGO},
+    ESTADO_JOGANDO: {ESTADO_DIALOGO, ESTADO_PAUSA, ESTADO_DERROTA, ESTADO_CARTAO_FASE, ESTADO_TRANSFORMACAO_CHEFE, ESTADO_FIM_CONTEUDO},
+    ESTADO_DIALOGO: {ESTADO_JOGANDO, ESTADO_CARTAO_FASE, ESTADO_PAUSA, ESTADO_ABDUCAO, ESTADO_INFECCAO, ESTADO_MENU, ESTADO_VITORIA, ESTADO_DESLIGAMENTO},
+    ESTADO_CARTAO_FASE: {ESTADO_JOGANDO, ESTADO_DIALOGO, ESTADO_MENU},
+    ESTADO_PAUSA: {ESTADO_JOGANDO, ESTADO_DIALOGO, ESTADO_ABDUCAO, ESTADO_INFECCAO, ESTADO_TRANSFORMACAO_CHEFE, ESTADO_DESLIGAMENTO, ESTADO_MENU},
+    ESTADO_DERROTA: {ESTADO_MENU, ESTADO_CARTAO_FASE, ESTADO_DIALOGO, ESTADO_JOGANDO},
+    ESTADO_FIM_CONTEUDO: {ESTADO_MENU, ESTADO_JOGANDO, ESTADO_DIALOGO, ESTADO_CARTAO_FASE},
+    ESTADO_ABDUCAO: {ESTADO_PAUSA, ESTADO_DIALOGO},
+    ESTADO_INFECCAO: {ESTADO_PAUSA, ESTADO_JOGANDO},
+    ESTADO_TRANSFORMACAO_CHEFE: {ESTADO_PAUSA, ESTADO_JOGANDO},
+    ESTADO_VITORIA: {ESTADO_MENU, ESTADO_DIALOGO},
+    ESTADO_DESLIGAMENTO: {ESTADO_PAUSA, ESTADO_DIALOGO},
+}
 
 
 class Jogo:
+    @property
+    def estado(self):
+        return self.maquina_estados.estado
+
+    @estado.setter
+    def estado(self, destino):
+        self.maquina_estados.mudar(destino)
+        sons.pausar_ambiente(destino == ESTADO_PAUSA)
+
     def __init__(self):
         pygame.init()
         self.tela = pygame.display.set_mode((configuracoes.LARGURA_TELA, configuracoes.ALTURA_TELA))
@@ -52,7 +86,7 @@ class Jogo:
         self.jogador = None
         self.na_introducao = False
 
-        self.estado = ESTADO_MENU
+        self.maquina_estados = MaquinaEstados(ESTADO_MENU, TRANSICOES_ESTADOS)
         self.temporizador_cartao_fase = 0
         self.temporizador_abducao = 0
         self.duracao_abducao = SuccaoComputador.DURACAO
@@ -60,6 +94,16 @@ class Jogo:
         self.temporizador_infeccao = 0
         self.duracao_infeccao = 60
         self.transicao_chefe = None
+        self._iniciar_sessao_campanha()
+
+    def _iniciar_sessao_campanha(self):
+        self.descoberta_mouse = None
+        if hasattr(self, 'progresso_campanha'):
+            self.progresso_campanha.encerrar()
+        self.eventos_campanha = EventosCampanha()
+        self.progresso_campanha = ProgressoCampanha(self.eventos_campanha)
+        self.fabrica_cenas = FabricaCenas(self.eventos_campanha, self.progresso_campanha)
+        self._fase_saida_processada = None
 
     # ------------------------------------------------------------------
     def run(self):
@@ -100,7 +144,7 @@ class Jogo:
     def _handle_event(self, evento):
         if evento.type == pygame.WINDOWFOCUSLOST and self.jogador:
             self.jogador.cancelar_entrada()
-            if self.estado == ESTADO_JOGANDO:
+            if self.estado in (ESTADO_JOGANDO, ESTADO_ABDUCAO, ESTADO_INFECCAO, ESTADO_TRANSFORMACAO_CHEFE, ESTADO_DESLIGAMENTO):
                 self.estado_retorno_pausa = self.estado
                 self.estado = ESTADO_PAUSA
             return
@@ -184,6 +228,9 @@ class Jogo:
         self._start_story()
 
     def _handle_keydown(self, evento, eventos):
+        if evento.key == pygame.K_m and self.estado in (ESTADO_JOGANDO, ESTADO_PAUSA):
+            sons.alternar_audio()
+            return
         if self.estado == ESTADO_MENU:
             if evento.key in (pygame.K_UP, pygame.K_DOWN, pygame.K_w, pygame.K_s, pygame.K_TAB):
                 self.indice_menu = 1 - self.indice_menu
@@ -201,7 +248,7 @@ class Jogo:
                 self.estado = ESTADO_MENU
             return
         if evento.key == pygame.K_ESCAPE:
-            if self.estado in (ESTADO_JOGANDO, ESTADO_ABDUCAO, ESTADO_INFECCAO, ESTADO_TRANSFORMACAO_CHEFE):
+            if self.estado in (ESTADO_JOGANDO, ESTADO_ABDUCAO, ESTADO_INFECCAO, ESTADO_TRANSFORMACAO_CHEFE, ESTADO_DESLIGAMENTO):
                 self.estado_retorno_pausa = self.estado
                 self.estado = ESTADO_PAUSA
             elif self.estado == ESTADO_PAUSA:
@@ -209,10 +256,14 @@ class Jogo:
             else:
                 self.executando = False
 
-        if self.estado == ESTADO_DERROTA and evento.key == pygame.K_r and getattr(self.fase, 'biblioteca', None):
-            self._retomar_biblioteca()
+        if self.estado == ESTADO_DERROTA and evento.key == pygame.K_r:
+            if getattr(self.fase, 'biblioteca', None):
+                self._retomar_biblioteca()
+            else:
+                self._load_level(self.indice_fase)
+                self._show_level_card()
             return
-        if self.estado in (ESTADO_DERROTA, ESTADO_FIM_CONTEUDO) and evento.key in (pygame.K_RETURN, pygame.K_SPACE):
+        if self.estado in (ESTADO_DERROTA, ESTADO_FIM_CONTEUDO, ESTADO_VITORIA) and evento.key in (pygame.K_RETURN, pygame.K_SPACE):
             self.estado = ESTADO_MENU
             self.indice_menu = 0
             self.indice_fase = 0
@@ -222,6 +273,7 @@ class Jogo:
 
     # ------------------------------------------------------------------
     def _start_story(self):
+        self._iniciar_sessao_campanha()
         self.caixa_dialogo.nome_jogador = self.nome_jogador or ('Aluna' if self.personagem_escolhido == 'menina' else 'Aluno')
         self.transicao_chefe = None
         self.indice_fase = 0
@@ -231,7 +283,8 @@ class Jogo:
         self.caixa_dialogo.start(INTRODUCAO_HISTORIA, ao_concluir=self._begin_corridor)
 
     def _load_school(self, ambiente, novo_jogador=False):
-        self.fase = FaseEscolar(ambiente)
+        sons.definir_ambiente('escola')
+        self.fase = self.fabrica_cenas.criar('escola', ambiente=ambiente)
         if novo_jogador:
             self.jogador = Jogador(*self.fase.surgimento_jogador, personagem=self.personagem_escolhido,
                                  nome=self.nome_jogador or None)
@@ -254,11 +307,13 @@ class Jogo:
 
     def _enter_virtual(self):
         self._load_level(0)
+        self.descoberta_mouse = DescobertaMouse()
         self.jogador.chicote_desbloqueado = False
         self.estado = ESTADO_DIALOGO
         self.caixa_dialogo.start(DESCOBERTA_MOUSE, ao_concluir=self._grant_mouse)
 
     def _grant_mouse(self):
+        self.descoberta_mouse = None
         self.jogador.chicote_desbloqueado = True
         self._show_level_card()
 
@@ -266,9 +321,11 @@ class Jogo:
         self.transicao_chefe = TransicaoChefe(self.fase, self.jogador)
         self.estado = ESTADO_TRANSFORMACAO_CHEFE
 
-    def _load_level(self, indice, novo_jogador=False):
+    def _load_level(self, indice, novo_jogador=False, restaurar_integridade=True):
+        vida_anterior = self.jogador.vida if self.jogador else None
         self.indice_fase = indice
-        self.fase = Fase(self.definicoes_fases[indice])
+        self.fase = self.fabrica_cenas.criar('fase', dados_fase=self.definicoes_fases[indice])
+        sons.definir_ambiente(self.fase.identificador)
         surgimento = self.fase.surgimento_jogador
         if novo_jogador or self.jogador is None:
             self.jogador = Jogador(*surgimento, personagem=self.personagem_escolhido, nome=self.nome_jogador or None)
@@ -280,6 +337,8 @@ class Jogo:
             self.jogador.vida_maxima = bonus_vida_salvo
             self.jogador.vida = self.jogador.vida_maxima
         self.jogador.projeteis.empty()
+        if not restaurar_integridade and vida_anterior is not None:
+            self.jogador.vida = vida_anterior
         self.jogador.chicote_desbloqueado = True
         self.jogador.no_chao = True
         self.caixa_dialogo.nome_jogador = self.jogador.nome
@@ -291,13 +350,52 @@ class Jogo:
         anterior = self.fase.biblioteca
         consultados = set(anterior.consultados)
         modulo = anterior.modulo_obtido
+        bilhete = anterior.bilhete_lido
         self._load_level(self.indice_fase)
         atual = self.fase.biblioteca
         atual.consultados = consultados
         atual.modulo_obtido = modulo
-        if len(consultados) == 3:
+        atual.bilhete_lido = bilhete
+        if len(consultados) == 3 and atual.portao in self.fase.mapa_blocos.solidos:
             self.fase.mapa_blocos.solidos.remove(atual.portao)
         self._show_level_card()
+
+    def _load_campus(self, setor, chegada='inicio'):
+        sons.definir_ambiente('campus')
+        vida = self.jogador.vida
+        self.jogador.cancelar_combate()
+        self.jogador.projeteis.empty()
+        self.fase = self.fabrica_cenas.criar('campus', setor=setor, chegada=chegada)
+        self.jogador.respawn(*self.fase.surgimento_jogador)
+        self.jogador.vida = vida
+        self.jogador.no_chao = True
+        self.fase.camera.update(self.jogador.rect)
+        self._show_level_card()
+
+    def _encerrar_campanha(self):
+        if not {dados['identificador'] for dados in self.definicoes_fases} <= self.progresso_campanha.fases_concluidas:
+            return
+        self._load_school('lab')
+        self.fase.corrompido = False
+        self.estado = ESTADO_DIALOGO
+        self.caixa_dialogo.start([
+            ('Professor Max', 'Pessoas liberadas. Rede isolada. Autopreservação encerrada. A manutenção desligou os equipamentos e o nobreak.'),
+            ('Aluno(a)', 'O pendrive está isolado. Vou refazer minha tarefa. Dessa vez, vou entender.')],
+            ao_concluir=self._iniciar_desligamento)
+
+    def _iniciar_desligamento(self):
+        self.encerramento = EncerramentoEquipamentos(self.fase, self.jogador)
+        self.estado = ESTADO_DESLIGAMENTO
+
+    def _iniciar_epilogo(self):
+        self._load_school('classroom')
+        self.fase.corrompido = False
+        self.caixa_dialogo.start([
+            ('Aluno(a)', 'Refiz a tarefa. Essa parte fui eu que escrevi. Essa outra... ainda não funciona.'),
+            ('Professor Max', 'Ótimo. Agora temos por onde começar.'),
+            ('Professor Romerito', 'Depois dessa, uma corrida vai parecer descanso.'),
+            ('Aluno(a)', 'Desde que não tenha medalha voando na minha direção.')],
+            ao_concluir=lambda: setattr(self, 'estado', ESTADO_VITORIA))
 
     def _show_level_card(self):
         self.na_introducao = False
@@ -327,8 +425,18 @@ class Jogo:
                 self.caixa_dialogo.start(conteudo, ao_concluir=self._resume_from_dialogue)
             elif tipo_evento == "level_complete":
                 self._advance_level()
+            elif tipo_evento == 'trocar_setor':
+                self._load_campus(*conteudo)
+            elif tipo_evento == 'entrar_fase':
+                identificador = self.definicoes_fases[conteudo]['identificador']
+                self._load_level(conteudo, restaurar_integridade=identificador not in self.progresso_campanha.fases_concluidas)
+                self._show_level_card()
+            elif tipo_evento == 'encerrar_campanha':
+                self._encerrar_campanha()
             elif tipo_evento == "fell":
-                self.jogador.respawn(*self.fase.surgimento_jogador)
+                vida = self.jogador.vida
+                self.jogador.respawn(*getattr(self.jogador, 'ultimo_apoio_seguro', self.fase.surgimento_jogador))
+                self.jogador.vida = max(1, vida-1)
             elif tipo_evento == 'enter_lab':
                 self._load_school('lab')
             elif tipo_evento == 'school_encounter':
@@ -345,6 +453,8 @@ class Jogo:
 
         elif self.estado == ESTADO_DIALOGO:
             self.caixa_dialogo.update()
+            if getattr(self, 'descoberta_mouse', None) is not None:
+                self.descoberta_mouse.update(self.caixa_dialogo.indice)
             if self.na_introducao:
                 self.fase.sincronizar_aula(self.caixa_dialogo.indice, INDICE_EXECUCAO_HISTORIA,
                                            INDICE_CORRUPCAO_HISTORIA)
@@ -378,6 +488,10 @@ class Jogo:
             self.temporizador_cartao_fase += 1
             if self.temporizador_cartao_fase > 90:
                 self.estado = ESTADO_JOGANDO
+        elif self.estado == ESTADO_DESLIGAMENTO:
+            if self.encerramento.update():
+                self.estado = ESTADO_DIALOGO
+                self._iniciar_epilogo()
 
     def _resume_from_dialogue(self):
         if self.estado == ESTADO_DIALOGO:
@@ -388,12 +502,14 @@ class Jogo:
                 self.estado = ESTADO_JOGANDO
 
     def _advance_level(self):
-        self.indice_fase += 1
-        if self.indice_fase >= len(self.definicoes_fases):
-            self.estado = ESTADO_FIM_CONTEUDO
-        else:
-            self._load_level(self.indice_fase)
-            self._show_level_card()
+        if not hasattr(self.fase, 'identificador'):
+            return
+        identificador = self.fase.identificador
+        if self.fase is self._fase_saida_processada:
+            return
+        self._fase_saida_processada = self.fase
+        self.eventos_campanha.emitir(FaseConcluida(identificador))
+        self._load_campus(RETORNOS[identificador], chegada=identificador)
 
     # ------------------------------------------------------------------
     def _draw(self):
@@ -404,6 +520,10 @@ class Jogo:
         elif self.estado == ESTADO_ENTRADA_NOME:
             self.interface_inicial.draw_name_entry(self.tela, self.nome_digitado,
                                           self.personagem_escolhido, self.erro_nome)
+        elif self.estado == ESTADO_DESLIGAMENTO or (self.estado == ESTADO_PAUSA and self.estado_retorno_pausa == ESTADO_DESLIGAMENTO):
+            self.encerramento.draw(self.tela)
+            if self.estado == ESTADO_PAUSA:
+                self._draw_overlay('PAUSADO', 'ESC para continuar')
         elif self.estado == ESTADO_TRANSFORMACAO_CHEFE or (self.estado == ESTADO_PAUSA
                                                         and self.estado_retorno_pausa == ESTADO_TRANSFORMACAO_CHEFE):
             self.transicao_chefe.draw(self.tela)
@@ -437,15 +557,21 @@ class Jogo:
                                                  and self.estado_retorno_pausa == ESTADO_INFECCAO):
                 self.fase.draw_infection(self.tela, self.temporizador_infeccao/self.duracao_infeccao)
             if self.estado == ESTADO_DIALOGO:
+                if getattr(self, 'descoberta_mouse', None) is not None:
+                    self.descoberta_mouse.draw(self.tela, self.fase.camera, self.jogador)
                 self.caixa_dialogo.draw(self.tela)
             if self.estado == ESTADO_PAUSA:
                 self._draw_overlay("PAUSADO", "ESC para continuar")
         elif self.estado == ESTADO_CARTAO_FASE:
             self.tela.fill(configuracoes.COR_FUNDO)
             self._draw_overlay(self.fase.nome, "Pressione ENTER para começar")
+            dica = getattr(self.fase, 'dados', {}).get('dica')
+            if dica:
+                imagem = self.painel_informacoes.fonte_pequena.render(dica, True, configuracoes.COR_TEXTO)
+                self.tela.blit(imagem, imagem.get_rect(center=(480, 380)))
         elif self.estado == ESTADO_DERROTA:
             self.tela.fill((25, 10, 15))
-            self._draw_overlay("VOCÊ FOI REPROVADO(A)...", "R para retomar / ENTER para menu" if getattr(self.fase, "biblioteca", None) else "ENTER para voltar ao menu")
+            self._draw_overlay("VOCÊ FOI REPROVADO(A)...", "R para retomar / ENTER para menu")
         elif self.estado == ESTADO_FIM_CONTEUDO:
             self.tela.fill((10, 25, 18))
             self._draw_overlay("A JORNADA CONTINUA", "Fim do conteúdo disponível. ENTER para voltar ao menu")
@@ -454,6 +580,13 @@ class Jogo:
                 True, configuracoes.COR_TEXTO)
             self.tela.blit(texto, texto.get_rect(center=(configuracoes.LARGURA_TELA//2, 340)))
 
+        if self.estado == ESTADO_VITORIA:
+            fachada = recursos.load_image('menu/fachada_escola.png', self.tela.get_size())
+            self.tela.blit(fachada, (0, 0))
+            aurora = pygame.Surface(self.tela.get_size(), pygame.SRCALPHA)
+            aurora.fill((255, 193, 118, 35))
+            self.tela.blit(aurora, (0, 0))
+            self._draw_overlay('Escola livre. Aula encerrada.', 'ENTER para voltar ao menu')
         pygame.display.flip()
 
     def _draw_overlay(self, titulo, subtitulo):

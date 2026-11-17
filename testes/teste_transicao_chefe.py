@@ -18,7 +18,7 @@ class TestesTransicaoChefe(unittest.TestCase):
     def setUp(self):
         self.jogo = Jogo()
         self.jogo._load_level(0, novo_jogador=True)
-        self.jogo.estado = ESTADO_JOGANDO
+        self.jogo.maquina_estados.estado = ESTADO_JOGANDO
         self.fase = self.jogo.fase
         self.fase.dialogo_exibido = True
         self.fase.infectado = True

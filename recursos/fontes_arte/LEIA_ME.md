@@ -289,3 +289,12 @@ sprites de 40 × 40. Atlas e artes anteriores foram preservados.
 
 Prévias reais: [conversa](../../avaliacao/dialogos_hd/abertura_menina_1.png) e
 [entidade](../../avaliacao/dialogos_hd/ifvania.png).
+# Revisão de combate, turma e guardiões — 16/11/2026
+
+Novas fontes: `turma_laboratorio/turma_costas.png` (dois alunos sentados de costas) e `guardioes_campus/avatares.png` (avatares ficcionais de esporte, computação e eletroeletrônica, sem retratar pessoas reais). Max conserva sua arte anterior. Ferramenta: `image_gen` integrada, com geração e edição de transparência. Prompts completos e proveniência em [instrucoes_revisao_hack_and_slash.json](instrucoes_revisao_hack_and_slash.json).
+
+Exportadores: `python -m ferramentas.preparar_turma_laboratorio`, `python -m ferramentas.preparar_apresentacao_personagens` e `python -m ferramentas.preparar_guardioes_campus`. Todos foram conferidos em destinos temporários antes de integrar. A apresentação HD é exportada dos atlas já aprovados, sem sobrescrever os PNGs lógicos ou fontes anteriores. O gerador original continua podendo sobrescrever recursos; reaplicar exportadores quando necessário.
+
+## Poses de combate dos guardiões — 16/11/2026
+
+Fonte preservada em `guardioes_campus/poses_combate.png`; prompt e referências em `instrucoes_poses_guardioes.json`. `python -m ferramentas.preparar_poses_guardioes` exporta quatro poses de cada guardião em 40 e 80 px. Retratos separados são derivados da fonte original pelo exportador de guardiões. O verificador executou os 15 exportadores em temporário, com 203 PNGs distintos; recursos aprovados anteriores preservados.

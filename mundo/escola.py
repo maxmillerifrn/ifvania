@@ -156,8 +156,10 @@ class FaseEscolar:
             titulo = ('IFVania — inteligência artificial' if self.arte.etapa_aula in ('execucao', 'revolta')
                       else 'Apresentação da atividade / POO') if self.ambiente == 'classroom' else 'LABORATÓRIO A28'
             self._text(superficie, titulo, 454, 170)
-            self._text(superficie, 'Programação orientada a objetos' if self.ambiente == 'classroom'
-                       else 'Sistema sob controle da IFVania.', 454, 200, pequeno=True)
+            subtitulo = ('Programação orientada a objetos' if self.ambiente == 'classroom'
+                         else 'Rede isolada. Encerramento seguro.' if self.arte.etapa_aula == 'desligado'
+                         else 'Sistema sob controle da IFVania.')
+            self._text(superficie, subtitulo, 454, 200, pequeno=True)
         for professor in ([] if ocultar_professores else self.professores):
             professor.draw(superficie, self.camera)
             imagem = professor.get_draw_image()

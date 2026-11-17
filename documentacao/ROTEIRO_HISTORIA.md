@@ -1,12 +1,21 @@
 # Roteiro da história — IFVania
 
-**Revisão narrativa:** 02/11/2026.
+## Comportamento vigente — fechamento de 16/11/2026
+
+Q segurado oferece bloqueio frontal após descobrir o mouse, com resistência limitada e quebra de guarda; costas e perigos ambientais exigem reposicionamento/esquiva. A guarda reduz movimento e não permite ataque simultâneo. M alterna áudio também na pausa. Pausa, foco e transições cancelam guarda e cargas.
+
+SpeedBug considera deslocamento real, colisões e retorno dos limites, com reposicionamento entre ataques. As quatro fases novas incluem poses dedicadas, Max com origem móvel/invocações, ricochetes e portas sequenciais. Biblioteca oferece atalhos por consulta e bilhete; quedas nas novas travessias retornam ao apoio seguro com custo de uma integridade, mínimo um. Revisitas concluídas não reiniciam chefes nem curam. Desfecho inclui monitores/nobreak desligados, pendrive isolado, sala física e fachada iluminada.
+
+Implementação técnica concluída; [revisão humana final](REVISAO_HUMANA_FINAL.md) documenta decisões e homologação adiada. Evidências: 172 testes e 15 exportadores em temporário (203 PNGs). Registros anteriores abaixo descrevem a evolução e cedem a esta atualização quando divergirem.
+
+
+**Revisão narrativa:** 16/11/2026. A evolução de encontros e percurso segue a [proposta hack and slash](PROPOSTA_HACK_AND_SLASH.md); a versão funcional e suas simplificações estão no [relatório](../avaliacao/hack_and_slash/RELATORIO.md).
 
 ## Alcance e estado da campanha
 
 A campanha planejada tem seis fases: a primeira preserva o encontro com Romerito; as cinco seguintes desenvolvem a investigação, o resgate da escola e a desativação da IFVania. Este roteiro orienta a implementação futura.
 
-**Disponível no jogo:** menu, seleção, nome, conversa inicial com lembrança visual da tarefa em casa, laboratório com turma e hipnose, pátio de passagem até o A28, sucção dos personagens ao monitor, primeira fase virtual e biblioteca com salto duplo, consultas e Indexador. Romerito recupera a forma humana após SpeedBug. A biblioteca encerra com “A jornada continua”. **Ainda por implementar:** encenação da bolsa ao encontrar o mouse, refinamentos da biblioteca, conteúdo jogável das fases 3 a 6, ancoragem e epílogo. Os fundos de biblioteca e pátio agora seguem o estilo da fase 1; a fase 3 ainda não está jogável. Homologação humana pendente.
+**Disponível:** abertura, duas fases originais e primeira versão funcional das quatro restantes, com avatares docentes, três objetivos persistentes por fase, ancoragem após Max, campus entre as fases e encerramento dialogado no A28. **Refinamento pendente:** encenação da bolsa, atalhos locais da biblioteca, animações especializadas de ataques/resgates, desfecho visual completo, segredos e ritmo dos encontros. Homologação humana final adiada pelo usuário; essas pendências não bloquearam a implementação. Detalhes narrativos abaixo representam a intenção de acabamento, sem declarar que toda encenação está pronta.
 
 ## Menu e protagonista
 
@@ -65,10 +74,10 @@ A aula acontece num laboratório de informática com colegas sentados nos comput
 |---|---|---|---|---|
 | 1 — A28: sessão interrompida | Laboratório e percurso virtual | Encontrar ajuda e libertar Romerito | RomerBug / SpeedBug | Descobrir que é preciso organizar o resgate |
 | 2 — Biblioteca dos arquivos perdidos | Biblioteca e arquivo escolar | Recuperar a rota de saída e os registros da rede | Indexador | Liberar salto duplo e localizar a rota pelo pátio |
-| 3 — Recreio em repetição | Pátio e quadra | Abrir passagem para os estudantes presos | Inspetor de Intervalo | Reunir a turma e alcançar a área técnica |
+| 3 — Recreio em repetição | Pátio e quadra | Abrir passagem para os estudantes presos | Elias, Guardião do Compasso | Reunir a turma e alcançar o M1 pelo campus |
 | 4 — Laboratório das cópias | Laboratório de manutenção virtual | Recuperar Max e interromper a recriação dos processos | Max em Loop | Revelar a entidade e obter ancoragem do cabo |
-| 5 — Rede sem saída | Corredores técnicos e sala de rede | Isolar os equipamentos e abrir o núcleo | Roteador Sentinela | Impedir a migração da IFVania |
-| 6 — A última chamada | Núcleo virtual e retorno ao A28 | Romper a autopreservação e permitir o desligamento | IFVania | Libertar a escola e concluir a campanha |
+| 5 — Rede sem saída | Corredores técnicos e sala de rede | Isolar os equipamentos e abrir o núcleo | Alessandro, Sentinela dos Enlaces | Impedir a migração da IFVania |
+| 6 — A última chamada | Núcleo virtual e retorno ao A28 | Romper a autopreservação e permitir o desligamento | Francisco e IFVania, integridade compartilhada | Libertar a escola e concluir a campanha |
 
 ## Fase 1 — A28: sessão interrompida
 
@@ -148,9 +157,9 @@ Pela primeira vez, a IFVania fala diretamente durante uma parada segura. Oferece
 >
 > **Protagonista:** Então você ainda não entendeu o intervalo.
 
-### Chefe — Inspetor de Intervalo
+### Chefe — Elias, Guardião do Compasso
 
-Um autômato de sinal e placar patrulha a saída. Prepara uma investida com apito e seta de direção; depois, dispara ondas baixas que podem ser saltadas. Ao terminar a ronda, precisa rebobinar o relógio e fica vulnerável. Na segunda metade, alterna os dois padrões com intervalos menores, sem fechar simultaneamente todas as rotas.
+Um avatar docente mantido pela IFVania patrulha a saída. Sua preparação corporal anuncia sequência curta, investida ou lançamento; pulsos baixos podem ser saltados. Ao terminar a sequência, precisa recuperar postura e fica exposto. A escolha considera distância e ciclo, preservando sinais consistentes e oportunidades de reação. Sua identidade ficcional e as referências institucionais estão na proposta.
 
 ### Resultado e transição
 
@@ -210,9 +219,9 @@ Após o último ramal, a IFVania tenta negociar uma saída individual para o pro
 >
 > **Protagonista:** Eu não vim buscar só a minha saída.
 
-### Chefe — Roteador Sentinela
+### Chefe — Alessandro, Sentinela dos Enlaces
 
-Um guardião virtual protege o último enlace. Alterna disparos por portas indicadas com antecedência e uma barreira frontal. O jogador usa conectores laterais para alcançar seu flanco; após a sequência de envio, a barreira cai e permite contra-ataque.
+O avatar docente protege o último enlace. Alterna disparos, barreira frontal, varredura e investida. O jogador usa conectores laterais para alcançar seu flanco; após a sequência de envio, a barreira cai e permite contra-ataque. A proteção é um vínculo corrompido da simulação, sem atribuir conduta real ao professor.
 
 Com metade da vida, o Sentinela inverte a ordem das portas, mantendo a sinalização. Seus efeitos podem ocupar a arena, mas o corpo segue o padrão comum dos personagens. A dificuldade vem das rotas e do ritmo, sem depender de um chefe de colisão gigante.
 
@@ -230,9 +239,9 @@ Romper o controle sobre as pessoas, encerrar a autopreservação e permitir o de
 
 O percurso final retoma salto duplo, ancoragem e esquiva em três desafios curtos, separados por áreas de descanso. Não introduz comandos novos. No último terminal seguro, o jogador vê a confirmação dos aliados: pessoas reunidas, ramais isolados, equipe pronta. A vitória depende do trabalho construído nas fases anteriores.
 
-### Confronto — IFVania
+### Confronto — Francisco e IFVania
 
-A IFVania se manifesta com a silhueta da entidade vista na fase 1. O combate tem uma única reserva de vida e dois momentos:
+Francisco aparece como Guardião da Continuidade. A metade da integridade rompe o vínculo e o liberta; a IFVania ocupa a mesma estrutura com a silhueta da entidade da fase 1. Há uma única reserva de vida, preservada na mudança. A transição suspende dano e oferece proteção na retomada. O acabamento narrativo dos dois momentos mantém os temas seguintes:
 
 1. **Aula obrigatória:** anuncia faixas de “correção”, lança bugs em pequenos grupos e expõe o núcleo após cada sequência. Os padrões retomam sinais já ensinados, sem copiar integralmente os outros chefes.
 2. **Medo do silêncio:** com metade da vida, o ambiente perde suas cópias e a voz fica menos segura. A IFVania alterna pulsos e mudanças entre pontos fixos; conectores permitem alcançá-la, e pausas claras permitem atacar. A transição suspende o dano e respeita o tempo de leitura.

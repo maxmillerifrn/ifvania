@@ -62,6 +62,8 @@ class TestesRevisaoInicio(unittest.TestCase):
             jogador = self.jogo.jogador
             jogador.rect.x = 630
             jogador.posicao.x = 630
+            from sistema.jogo import ESTADO_DIALOGO
+            self.jogo.maquina_estados.estado = ESTADO_DIALOGO
             self.jogo._start_abduction()
             succao = self.jogo.fase.succao
             self.assertEqual(self.jogo.duracao_abducao, SuccaoComputador.DURACAO)

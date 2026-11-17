@@ -209,7 +209,7 @@ class TestesHistoriaEscolar(unittest.TestCase):
         from mundo.dados_escola import DIALOGO_ENCONTRO
         for _, texto in INTRODUCAO_HISTORIA + DIALOGO_ENCONTRO + DESCOBERTA_MOUSE:
             self.assertLessEqual(len(self.jogo.caixa_dialogo._wrap(texto, 810)), 3)
-        self.jogo.estado = ESTADO_ABDUCAO
+        self.jogo.maquina_estados.estado = ESTADO_ABDUCAO
         self.jogo._process_events([pygame.event.Event(pygame.QUIT)])
         self.assertFalse(self.jogo.executando)
 

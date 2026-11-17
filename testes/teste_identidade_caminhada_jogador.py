@@ -84,7 +84,7 @@ class TestesIdentidadeECaminhada(unittest.TestCase):
         self.assertEqual(jogador.nome, 'Ana Luiza')
         self.jogo.caixa_dialogo.start(DIALOGO_REENCONTRO)
         self.assertTrue(any('Ana Luiza' in texto for falante, texto in self.jogo.caixa_dialogo.linhas if falante == 'Professor Romerito'))
-        self.jogo.estado = ESTADO_DERROTA
+        self.jogo.maquina_estados.estado = ESTADO_DERROTA
         self.key(pygame.K_RETURN)
         self.assertEqual(self.jogo.estado, ESTADO_MENU)
         self.name_screen()

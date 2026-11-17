@@ -1,0 +1,26 @@
+{
+  "data": "2026-11-16",
+  "ferramenta": "image_gen integrada (não CLI)",
+  "natureza": "avatares ficcionais e ilustrações de alunos, sem retratos de pessoas reais",
+  "fontes_anteriores": "preservadas; apresentação HD reexportada diretamente dos atlas existentes",
+  "geracoes": [
+    {
+      "arquivo": "turma_costas.png",
+      "diretorio": "turma_laboratorio",
+      "modo": "geração e edição para transparência",
+      "prompt_geracao": "Use case: stylized-concept. Asset: transparent sprite sheet for a Brazilian school side scrolling game IFVania. Exactly TWO full body students seated with their BACKS towards viewer at computers, NO COMPUTERS OR TABLES drawn, only each student seated in a dark blue wheeled chair with hands reaching forward to invisible desk. One boy with short dark hair, one girl with long dark hair, both green school polo shirts, dark navy trousers and dark sneakers. Clean polished hand-painted 2D game illustration with smooth outlines, natural anatomy, subtle shadows and folds, not pixel art, not chibi. Straight rear view with slight view down onto shoulders, all chair wheels and feet visible. Two equal isolated sprites side by side, boy centered in left half, girl centered in right half, same baseline and scale, generous transparent margins, no overlap. Transparent background, no text, no logos, no shadows outside sprite. Each sprite should remain legible reduced to roughly 80x100 pixels. Deliver wide 1536x1024 sheet.",
+      "prompt_edicao": "Edit this sprite sheet: remove ALL background and all glow completely, leaving exactly these two students and chairs as two clean isolated cutouts on actual alpha transparency. Keep the people, chairs, hands, feet, clothing, colors and exact position/scale identical. No floor, no shadow outside cutouts, no black or colored backdrop. Transparent pixels between and around both figures are required."
+    },
+    {
+      "arquivo": "avatares.png",
+      "diretorio": "guardioes_campus",
+      "modo": "geração",
+      "prompt": "Create a transparent sprite sheet for IFVania, polished hand drawn 2D platform game. Exactly THREE isolated adult Brazilian male FICTIONAL school guardian avatars, full body, all facing LEFT in a slight three-quarter side view, equal height and consistent proportions. Each in its own equal column of a 1536x1024 image, baseline at 92 percent height, generous margins, absolutely no overlap, no labels or text. LEFT: sports teacher guardian in green and navy athletic tracksuit and trainers, short dark hair, holding a small glowing virtual ball. CENTER: computing guardian in navy shirt and trousers with turquoise circuit panels on sleeves, short hair, glasses, carrying a compact virtual router at waist. RIGHT: electrical engineering guardian in blue gray workshop coat, tan trousers, compact copper relay and circuit gauntlet, dark hair and beard. Respectful warm expressive human faces, adventurous poses, human adults, heads modestly enlarged for game legibility, not monsters, not robots, not a book or block, no weapons that resemble real firearms. Clean smooth dark outlines, detailed clothing folds, highlights, cohesive cool teal/amber palette, avoid blocky pixel art. Fully transparent background with clean alpha, no scenery, floor, cast shadow or glow outside silhouettes. Each must look clear at height 80 pixels. These are imaginary avatars, not portraits of actual people."
+    }
+  ],
+  "exportadores": [
+    "python -m ferramentas.preparar_turma_laboratorio --destino /tmp/ifvania-turma-previa",
+    "python -m ferramentas.preparar_apresentacao_personagens --destino /tmp/ifvania-apresentacao-previa",
+    "python -m ferramentas.preparar_guardioes_campus --destino /tmp/ifvania-guardioes-previa"
+  ]
+}

@@ -2,6 +2,7 @@
 from entidades.chefe import DEFINICOES_CHEFES
 from sistema.configuracoes import TAMANHO_BLOCO
 from mundo.dados_biblioteca import criar_biblioteca
+from mundo.dados_guardioes import criar_fases_guardioes
 
 
 FALA_CORRUPCAO_INTRODUCAO = ('Aluno(a)', 'Espere, professor! A tela diz que ela não vai permitir ser desligada!')
@@ -73,6 +74,7 @@ def build_levels():
     grade[chao-1][54] = 'X'
     chefe = dict(DEFINICOES_CHEFES[0], subject='Mundo virtual')
     return [{
+        'identificador': 'a28',
         'index': 0,
         'name': 'Fase 1: Mundo virtual',
         'ascii_map': [''.join(fileira) for fileira in grade],
@@ -85,4 +87,4 @@ def build_levels():
         'cinematic_transform': True,
         'clear_encounter_on_defeat': True,
         'arena_left': 38 * TAMANHO_BLOCO,
-    }, criar_biblioteca()]
+    }, criar_biblioteca()] + criar_fases_guardioes()

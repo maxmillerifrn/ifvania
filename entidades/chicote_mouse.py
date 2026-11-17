@@ -17,6 +17,8 @@ class ChicoteMouse:
         self.direcao_olhar = 1
         self.alvos_atingidos = set()
         self.dano = 1
+        self.etapa_combo = 1
+        self.tipo_golpe = 'normal'
         self.limpar_trajetoria()
 
     def limpar_trajetoria(self):
@@ -67,13 +69,18 @@ class ChicoteMouse:
             flexao = -16
         elif idade < self.FIM_GOLPE:
             t = self._smooth((idade - self.PREPARACAO) / (self.FIM_GOLPE - self.PREPARACAO - 1))
-            fim = pygame.Vector2(-8 + (self.ALCANCE + 8) * t, -34 + 37 * t)
+            alcance = self.ALCANCE + (12 if self.etapa_combo == 2 else 22 if self.etapa_combo == 3 else 0)
+            fim = pygame.Vector2(-8 + (alcance + 8) * t, -34 + 37 * t)
             flexao = -25 * (1 - t)
         else:
             t = self._smooth((idade - self.FIM_GOLPE) / (self.DURACAO - self.FIM_GOLPE))
             fim = pygame.Vector2(self.ALCANCE * (1 - t) + 7 * t, 6 + 12 * t)
             flexao = 18 * math.sin(t * math.pi)
         fim.x *= self.direcao_olhar
+        if self.tipo_golpe == 'ascendente':
+            fim.y -= 48
+        elif self.tipo_golpe == 'descendente':
+            fim.y += 48
         # A mão acompanha o sprite maior, mas a trajetória da ponta mantém o alcance.
         ponta = mao_logica + fim
         controle = (mao + ponta) / 2 + pygame.Vector2(0, flexao)
@@ -129,7 +136,8 @@ class ChicoteMouse:
         segmentos += list(zip(self.trajetoria_anterior, self.trajetoria_atual))
         if any(area.clipline(a, b) for a, b in segmentos):
             vida = alvo.vida
-            alvo.take_damage(self.dano)
+            empurrao = 9 if self.etapa_combo == 3 else 5 if self.dano == 1 else 8
+            alvo.take_damage(self.dano, recuo=(self.direcao_olhar*empurrao, -8 if self.tipo_golpe == 'ascendente' else -2))
             if alvo.vida < vida:
                 from sistema.sons import tocar
                 tocar('impacto')

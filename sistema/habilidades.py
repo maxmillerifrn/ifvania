@@ -9,9 +9,11 @@ class Habilidade(Enum):
     ESCALADA_PAREDE = auto()
     DISPARO_DISTANCIA = auto()
     ESCUDO = auto()
+    ANCORAGEM = auto()
 
 
 NOMES_HABILIDADES = {
+    Habilidade.ANCORAGEM: 'Cabo de ancoragem',
     Habilidade.SALTO_DUPLO: "Salto duplo",
     Habilidade.ARRANCADA: "Dash Veloz (Python)",
     Habilidade.ESCALADA_PAREDE: "Escalada de Parede (Java)",
@@ -20,6 +22,7 @@ NOMES_HABILIDADES = {
 }
 
 TECLAS_HABILIDADES = {
+    Habilidade.ANCORAGEM: 'E junto a conector',
     Habilidade.SALTO_DUPLO: "Espaço (2x no ar)",
     Habilidade.ARRANCADA: "SHIFT",
     Habilidade.ESCALADA_PAREDE: "Segure na parede",

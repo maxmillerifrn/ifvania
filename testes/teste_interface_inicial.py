@@ -50,7 +50,7 @@ class TestesInterfaceInicial(unittest.TestCase):
     def test_mouse_can_choose_either_character_and_confirm(self):
         for i, personagem in enumerate(('boy', 'menina')):
             with self.subTest(character=personagem):
-                self.jogo.estado = ESTADO_MENU
+                self.jogo.maquina_estados.estado = ESTADO_MENU
                 self.click(self.jogo.interface_inicial.retangulos_menu[0])
                 self.click(self.jogo.interface_inicial.retangulos_personagens[i])
                 self.assertEqual(self.jogo.estado, ESTADO_SELECAO_PERSONAGEM)
@@ -101,7 +101,7 @@ class TestesInterfaceInicial(unittest.TestCase):
         self.assertIs(self.jogo.jogador, jogador)
         self.assertEqual(jogador.personagem, 'menina')
         self.assertTrue(jogador.has(Habilidade.SALTO_DUPLO))
-        self.jogo.estado = ESTADO_DERROTA
+        self.jogo.maquina_estados.estado = ESTADO_DERROTA
         self.key(pygame.K_RETURN)
         self.key(pygame.K_RETURN)
         self.key(pygame.K_RETURN)
@@ -123,7 +123,7 @@ class TestesInterfaceInicial(unittest.TestCase):
 
     def test_dialogue_input_does_not_leak_into_resumed_combat(self):
         self.jogo._load_level(0, novo_jogador=True)
-        self.jogo.estado = ESTADO_DIALOGO
+        self.jogo.maquina_estados.estado = ESTADO_DIALOGO
         self.jogo.caixa_dialogo.start([('Aluno(a)', 'Continuar')],
                                      ao_concluir=self.jogo._resume_from_dialogue)
         self.jogo.caixa_dialogo._caracteres_exibidos = 1000
@@ -136,7 +136,7 @@ class TestesInterfaceInicial(unittest.TestCase):
         escola = self.jogo.fase
         inicial = (escola.instantes, self.jogo.jogador.rect.copy())
         for estado in (ESTADO_MENU, ESTADO_SELECAO_PERSONAGEM, ESTADO_DIALOGO):
-            self.jogo.estado = estado
+            self.jogo.maquina_estados.estado = estado
             for _ in range(100):
                 self.jogo._update(pygame.key.get_pressed(), [])
             self.assertEqual((escola.instantes, self.jogo.jogador.rect), inicial)
@@ -146,7 +146,7 @@ class TestesInterfaceInicial(unittest.TestCase):
         for estado in (ESTADO_MENU, ESTADO_SELECAO_PERSONAGEM, ESTADO_ENTRADA_NOME, ESTADO_DIALOGO,
                       ESTADO_CARTAO_FASE, ESTADO_JOGANDO, ESTADO_PAUSA,
                       ESTADO_DERROTA, ESTADO_FIM_CONTEUDO, ESTADO_ENTRADA_NOME):
-            self.jogo.estado = estado
+            self.jogo.maquina_estados.estado = estado
             self.jogo.executando = True
             self.jogo._process_events([pygame.event.Event(pygame.QUIT)])
             self.assertFalse(self.jogo.executando)

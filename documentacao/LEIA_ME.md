@@ -1,14 +1,28 @@
 # IFVania
 
+## Comportamento vigente — fechamento de 16/11/2026
+
+Q segurado oferece bloqueio frontal após descobrir o mouse, com resistência limitada e quebra de guarda; costas e perigos ambientais exigem reposicionamento/esquiva. A guarda reduz movimento e não permite ataque simultâneo. M alterna áudio também na pausa. Pausa, foco e transições cancelam guarda e cargas.
+
+SpeedBug considera deslocamento real, colisões e retorno dos limites, com reposicionamento entre ataques. As quatro fases novas incluem poses dedicadas, Max com origem móvel/invocações, ricochetes e portas sequenciais. Biblioteca oferece atalhos por consulta e bilhete; quedas nas novas travessias retornam ao apoio seguro com custo de uma integridade, mínimo um. Revisitas concluídas não reiniciam chefes nem curam. Desfecho inclui monitores/nobreak desligados, pendrive isolado, sala física e fachada iluminada.
+
+Implementação técnica concluída; [revisão humana final](REVISAO_HUMANA_FINAL.md) documenta decisões e homologação adiada. Evidências: 172 testes e 15 exportadores em temporário (203 PNGs). Registros anteriores abaixo descrevem a evolução e cedem a esta atualização quando divergirem.
+
+
+## Evolução em andamento — campus virtual e hack and slash
+
+Design em [PROPOSTA_HACK_AND_SLASH.md](PROPOSTA_HACK_AND_SLASH.md), etapas em [PLANO_HACK_AND_SLASH.md](PLANO_HACK_AND_SLASH.md) e estado técnico em [ARQUITETURA_HACK_AND_SLASH.md](ARQUITETURA_HACK_AND_SLASH.md). A primeira versão integrada oferece seis fases, campus controlável entre elas, combo de três golpes, ataques direcionais, ancoragem, quatro novos guardiões e desfecho. Factory, State Machine, Command, Strategy e Observer estão em uso. O registro de progresso é em memória, sem salvamento em disco. Trata-se de uma base funcional para refinamento; avaliação humana final foi adiada pelo usuário, sem bloquear implementação.
+
 Jogo de plataforma 2D em **Python + Pygame**, com arquitetura orientada a objetos.
 Escolha Menino ou Menina e acompanhe a revolta da IFVania, uma inteligência artificial
 que assume o controle dos computadores da escola.
 
-O fluxo principal inclui a aula, o percurso pelo A28 e duas fases virtuais:
-RomerBug/SpeedBug e a Biblioteca dos arquivos perdidos, com salto duplo,
-consultas e Indexador. O [roteiro](ROTEIRO_HISTORIA.md) planeja seis fases;
-as fases 3 a 6 e o desfecho ainda não estão implementados. A saída da biblioteca
-apresenta **A jornada continua**; a IFVania permanece ativa.
+O fluxo inclui aula, A28, RomerBug/SpeedBug, biblioteca/Indexador e quatro novas
+fases: Recreio em repetição, Laboratório das cópias, Rede sem saída e A última
+chamada. Saídas retornam ao campus; o jogador caminha até as próximas entradas.
+Depois do núcleo, retorna ao A28 pelo jardim e confirma o encerramento. O
+[relatório da revisão](../avaliacao/hack_and_slash/RELATORIO.md) distingue implementação,
+testes, capturas e limitações de conteúdo/apresentação.
 
 ## Como executar
 
@@ -45,12 +59,18 @@ anteriores usaram Python 3.9.6 e Pygame 2.6.1.
 9. RomerBug alterna dois aviões espaçados, pausa e investida; com até 50% da
    vida, vira SpeedBug, que lança duas medalhas com pouco deslocamento e depois
    faz uma pausa, investida anunciada e recuperação.
-10. A derrota encerra as ameaças e libera a saída, sem conceder poderes. Alcançar
-    a saída leva à biblioteca.
+10. A derrota encerra ameaças e libera a saída, sem conceder poderes. Voltar ao
+    campus e usar E na porta da biblioteca permite continuar.
 11. Três terminais fornecem o mapa e os registros da rede. E examina o módulo
     que libera salto duplo e consulta os arquivos; o portão exige as três consultas.
-12. Indexador alterna faixas de ataque e fichas, com pausas para contra-atacar.
-    A saída após sua derrota encerra o conteúdo disponível.
+12. Indexador alterna faixas de ataque e fichas. Sua saída retorna à convivência;
+    caminhar até o ginásio e usar E abre Recreio em repetição.
+13. Três travas e Elias abrem caminho pelo jardim, ponto seguro A28 e bloco M1.
+14. Comparar registros e libertar Max revela a autopreservação e libera ancoragem.
+15. Três ramais e Alessandro permitem isolar a rede e seguir ao LIT.
+16. Francisco e IFVania compartilham a integridade do último encontro. Após a
+    vitória, percorrer o campus até o ponto A28 no jardim e confirmar com E.
+17. Confirmações, desligamento pelos aliados e epílogo dialogado encerram a campanha.
 
 O prólogo e a fase virtual funcionam com os dois protagonistas, com os mesmos
 atributos e corpo lógico de 40 × 40 pixels. Protagonista, bosses, professores
@@ -74,7 +94,12 @@ A referência oficial de A28 está no [documento de requisitos](DOCUMENTO_DE_REQ
 | Shift | Esquiva curta, após encontrar o mouse; recarga de 0,9 s |
 | E | Entrar no A28 / falar com Romerito / consultar terminais e módulo na biblioteca |
 | Salto novamente no ar | Salto duplo após examinar o módulo na biblioteca |
-| R na derrota da biblioteca | Retomar mantendo módulo e consultas; Enter volta ao menu |
+| Toques consecutivos no ataque | Combo de três golpes: rápido, alcance e empurrão |
+| Cima ao soltar ataque | Laçada ascendente |
+| Baixo ao soltar ataque no ar | Finalização descendente |
+| E junto aos anéis luminosos | Ancoragem após libertar Max; interações têm prioridade |
+| E nas bordas dos setores do campus | Seguir ou voltar pelo campus |
+| R na derrota | Retomar fase; biblioteca conserva módulo/consultas, expansão conserva objetivos; Enter volta ao menu |
 | E / Enter / Espaço | Revelar ou avançar diálogo |
 | Esc | Pausar e retomar exploração, combate, abdução e infecção |
 | Enter / Espaço | Confirmar seleção, dispensar cartão ou voltar ao menu no encerramento |
@@ -82,14 +107,14 @@ A referência oficial de A28 está no [documento de requisitos](DOCUMENTO_DE_REQ
 | Sair no menu / fechar janela | Encerrar a aplicação |
 
 Salto duplo é obtido no módulo da biblioteca, sem cura ou aumento de vida.
-Dash, escalada, tiro, escudo e ancoragem ainda não são liberados na campanha atual.
+Ancoragem é obtida após Max; dash antigo, escalada, tiro e escudo continuam fora da progressão principal.
 Entrada em fase e retomada restauram a integridade atual, sem aumentar sua capacidade.
 
 ## Combate
 
 O mouse mantém sua identidade de arma improvisada: carcaça gasta, cinta metálica
 e cabo reforçado, com rastro discreto, som seco e pausa de impacto de 2–3 quadros.
-O chicote tem alcance nominal de 100 pixels e tolerância em torno da curva;
+O chicote tem alcance básico de 100 pixels, ampliado em 12/22 nos golpes 2/3 do combo, e tolerância em torno da curva;
 paredes bloqueiam os golpes. Cada alvo recebe no máximo um acerto por golpe.
 A direção fica fixada ao soltar o comando que iniciou a carga. Durante a carga, é possível andar a 75% da
 velocidade, saltar e virar. Dano, diálogos e transformação cancelam a carga;

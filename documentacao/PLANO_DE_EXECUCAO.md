@@ -1,5 +1,31 @@
 # Plano de execução — IFVania
 
+## Entrega corrente — fechamento técnico do plano (16/11/2026)
+
+H0–H9 implementados tecnicamente conforme [plano detalhado](PLANO_HACK_AND_SLASH.md). Foram concluídos os refinamentos que o registro anterior listava como pendentes: bloqueio Q, deslocamento de SpeedBug nos limites/paredes e reposicionamento, poses próprias, troca da origem de Max/invocações, bola com ricochete, portas sequenciais, perigos e resgates animados, atalhos/bilhete da biblioteca, bolsa, ambiência/M e desligamento com epílogo visual. Revisitas e retomadas preservam objetivos; queda retorna ao apoio seguro. Sem novos commits nesta entrega.
+
+**Validação:** 172 testes aprovados; 15 exportadores em temporário, 203 PNGs; capturas controladas e inspeção visual. Não houve partida humana integral. Etapa 5 e homologação H9 não são encerradas por aprovação automática. Decisões e roteiro humano consolidado em [REVISAO_HUMANA_FINAL.md](REVISAO_HUMANA_FINAL.md); não bloqueiam a implementação autorizada. Seções abaixo são registros históricos e não substituem este estado corrente.
+
+## Registro anterior — primeira expansão integrada (16/11/2026)
+
+**Orientação atual do usuário:** implementar correções e seguir o plano; novos retornos de avaliação manual podem ser adiados para as considerações finais. Critérios humanos não foram marcados como realizados e não bloqueiam esta implementação.
+
+- [x] Feedback de dano: clarão/recuo, barra temporária renovada no acerto e impacto independente de golpe fatal. Pausa/diálogo não avançam efeitos.
+- [x] Fluidez inicial de RomerBug/SpeedBug: reposicionamento entre lançamentos, escolha por distância/ciclo após recuperação, inclinação visual, levantar interpolado e retomada mais curta, preservando corpo/vida/janelas.
+- [x] Nova turma ilustrada e apresentação dos personagens em 80 px direto das fontes, com caminhada mais rápida/interpolada; recursos antigos preservados.
+- [x] Factory de cenas/entidades, máquinas de estados da aplicação/combate/encontros, Command de entradas, Strategy dos inimigos e Observer do progresso em uso real. [Matriz](ARQUITETURA_HACK_AND_SLASH.md).
+- [x] Campus controlável após cada fase, portas/rotas condicionadas, pontos de retorno, A28 seguro, orientações dos aliados e apoios/conectores no percurso.
+- [x] Combo de três golpes, ascendente/descendente, esquiva e ancoragem após Max. Bugs corpo a corpo, lançadores, guardas e retransmissores têm funções distintas.
+- [x] Primeira versão jogável das quatro fases restantes: geometrias/temas distintos, três objetivos persistentes por fase, quatro classes concretas e artes próprias de guardiões. Francisco/IFVania conservam uma vida e transição protegida.
+- [x] Retorno final pelo campus, confirmação no A28, encerramento pelos aliados e epílogo dialogado na sala. Nova campanha limpa progresso.
+- [x] Ferramenta de experimentação fora do menu: `python -m ferramentas.experimentar_campus --campus` ou `--fase 3` até `--fase 6`; prepara progresso anterior apenas para desenvolvimento.
+- [ ] Refinar atlas de ataques, troca de origem/invocações de Max, ricochetes, encontros opcionais, atalhos da biblioteca, bolsa e desfecho visual completo. Essas simplificações estão discriminadas no [relatório](../avaliacao/hack_and_slash/RELATORIO.md), sem considerar H4–H9 integralmente encerrados.
+- [ ] Homologação humana final de diversão, dificuldade, áudio e conforto: adiada explicitamente, não bloqueante nesta etapa.
+
+**Verificação:** 154 testes aprovados em Python 3.14.4 / pygame-ce 2.5.8 com SDL dummy; 14 exportadores aprovados em cópia temporária, 168 PNGs distintos. Capturas de laboratório, campus, seis entradas e quatro arenas em `avaliacao/hack_and_slash/`, inspecionadas offscreen. Não houve nova partida humana. As medições detalhadas e limites ficam no relatório. Branch `feature/hack-and-slash-campus`; commit documental inicial `d3493df`; nenhum commit adicional/publicação nesta implementação.
+
+As seções seguintes preservam planejamento e registros anteriores; descrições de duas fases/encerramento provisório pertencem ao histórico e são substituídas pelo estado corrente acima.
+
 ## Evolução planejada — hack and slash e campus virtual (16/11/2026)
 
 A [proposta de design](PROPOSTA_HACK_AND_SLASH.md) e o [plano de implementação H0–H9](PLANO_HACK_AND_SLASH.md) registram a evolução para combate de combos e exploração controlável do campus entre todas as fases. O plano novo orienta o próximo trabalho: campus/progresso, combate mínimo e protótipo biblioteca → ginásio → Elias → campus transformado → M1, antes de expandir as fases 4–6.
@@ -12,6 +38,23 @@ O conteúdo futuro das etapas 7–10 abaixo passa a ter como referência os novo
 - [ ] Iniciar H0 e implementar primeiro protótipo conforme H1–H3.
 
 Entrega desta revisão exclusivamente documental; sem mudanças de código, arte ou controles em execução. Os contratos atuais continuam descrevendo o jogo disponível; roteiro e requisitos serão sincronizados a cada incremento implementado. Não houve nova partida manual nem execução da suíte nesta revisão documental.
+
+### Implementação iniciada — H0 e primeiro recorte de H1 (16/11/2026)
+
+- Branch `feature/hack-and-slash-campus`, criada a pedido; commit inicial da proposta e plano: `d3493df` (`Documenta proposta e plano do hack and slash com campus virtual`). Código deste incremento permanece separado desse commit.
+- Referência H0: **127 testes aprovados** em 10,467 s, Python 3.14.4 / pygame-ce 2.5.8 com SDL dummy. Levantamento de padrões, estados e responsabilidades em [ARQUITETURA_HACK_AND_SLASH.md](ARQUITETURA_HACK_AND_SLASH.md).
+- H1 parcial: `FabricaCenas` cria cenas escolares/fases por registro validado; `Jogo` fornece dependências. `EventosCampanha` entrega eventos locais em ordem e permite remover inscrições; `ProgressoCampanha` registra derrota e conclusão em conjuntos idempotentes. Nova história desliga o progresso anterior e inicia sessão vazia.
+- Fases atuais têm identificadores estáveis; derrota do chefe registra progresso antes da saída, e conclusão é registrada antes da navegação. Proteção contra saída duplicada usa a instância de fase, permitindo reconstrução local sem bloqueio por histórico anterior. Contratos dos mapas antigos preservados.
+- Verificação final: **135 testes aprovados** em 10,542 s pelo comando `SDL_VIDEODRIVER=dummy SDL_AUDIODRIVER=dummy PYGAME_HIDE_SUPPORT_PROMPT=1 .venv/bin/python -m unittest discover -s testes -v`. Oito regressões novas cobrem criação, inscrições, ordem, repetição, limpeza da sessão e integração com derrota/saída. `git diff --check` sem erros.
+- Limites: sem partida manual ou novas artes; não há campus navegável, combos ou novos chefes neste incremento. State Machine explícita e conclusão de H1 pendentes. O fim provisório da biblioteca continua, conforme regra de só removê-lo com continuação utilizável. Não marcar H0/H1 integralmente concluídos.
+- Próximo incremento: setores convivência/caminho esportivo, portas e pontos de retorno, ferramenta de experimentação e migração explícita de estados globais; depois H2 e protótipo H3.
+
+### Avaliação humana e prioridade do próximo ciclo — 16/11/2026
+
+- Avaliação fornecida pelo usuário: controles razoáveis; câmera/cenário decentes, salvo alunos do laboratório; áudio razoável; diálogos/travessias bons; continuidade funcionando. Combate descrito como previsível, fácil e sem graça. Personagens muito pixelados e caminhada pouco fluida.
+- Pendências concretas: feedback visual de dano; barras de vida nos inimigos apenas após dano; fluidez dos ataques de RomerBug; investigar trecho aparentemente travado na transformação/retomada de SpeedBug; melhorar arte da turma e personagens e fluidez da caminhada.
+- Antecipar ciclo de feedback/reação de H2 e refinamento de H4 antes de ampliar conteúdo visual. Detalhes e critérios em [PLANO_HACK_AND_SLASH.md](PLANO_HACK_AND_SLASH.md). Melhorar decisões e variedade do combate, sem reduzir a revisão a aumento de atributos ou aleatoriedade.
+- Este relato constitui avaliação humana, não partida do agente. Não informa cobertura das duas aparências; não encerra H0/H9 nem homologa as lutas. Nenhuma correção de combate/arte foi implementada neste registro e nenhum teste novo foi executado; os 135 testes referem-se ao incremento de infraestrutura anterior.
 
 **Reorganizado em:** 02/11/2026, após revisão das lacunas do início da história.
 

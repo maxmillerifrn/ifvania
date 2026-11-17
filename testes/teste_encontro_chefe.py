@@ -70,7 +70,7 @@ class TestesEncontroChefe(unittest.TestCase):
         jogo = Jogo()
         jogo.definicoes_fases = build_legacy_levels()
         jogo._load_level(0, novo_jogador=True)
-        jogo.estado = ESTADO_JOGANDO
+        jogo.maquina_estados.estado = ESTADO_JOGANDO
         chefe = jogo.fase.chefe
         jogador = jogo.jogador
         jogador.posicao.update(chefe.rect.left - 75, 408)

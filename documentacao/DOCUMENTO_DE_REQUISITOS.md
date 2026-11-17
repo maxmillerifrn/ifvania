@@ -1,5 +1,28 @@
 # Documento de Requisitos — IFVania
 
+## Comportamento vigente — fechamento de 16/11/2026
+
+Q segurado oferece bloqueio frontal após descobrir o mouse, com resistência limitada e quebra de guarda; costas e perigos ambientais exigem reposicionamento/esquiva. A guarda reduz movimento e não permite ataque simultâneo. M alterna áudio também na pausa. Pausa, foco e transições cancelam guarda e cargas.
+
+SpeedBug considera deslocamento real, colisões e retorno dos limites, com reposicionamento entre ataques. As quatro fases novas incluem poses dedicadas, Max com origem móvel/invocações, ricochetes e portas sequenciais. Biblioteca oferece atalhos por consulta e bilhete; quedas nas novas travessias retornam ao apoio seguro com custo de uma integridade, mínimo um. Revisitas concluídas não reiniciam chefes nem curam. Desfecho inclui monitores/nobreak desligados, pendrive isolado, sala física e fachada iluminada.
+
+Implementação técnica concluída; [revisão humana final](REVISAO_HUMANA_FINAL.md) documenta decisões e homologação adiada. Evidências: 172 testes e 15 exportadores em temporário (203 PNGs). Registros anteriores abaixo descrevem a evolução e cedem a esta atualização quando divergirem.
+
+
+## Expansão integrada e correções — 16/11/2026
+
+Esta revisão prevalece sobre descrições antigas de campanha limitada a duas fases. Há seis fases e campus controlável após cada uma, portas condicionadas, objetivos intermediários preservados na retomada e final que exige conclusão da campanha. Nova história limpa progresso e habilidades; não há salvamento em disco. Entrada em fase/retomada restaura integridade, troca de setor não; A28 é ponto seguro explícito.
+
+Ataque continua na soltura: três golpes encadeados variam alcance/empurrão, carregado causa 2 de dano, cima modifica para ascendente e baixo no ar para descendente. Shift mantém esquiva; E prioriza interação e usa ancoragem em conectores elegíveis após Max. R retoma também as novas fases. Barras dos bugs surgem apenas após dano efetivo, duram 100 atualizações e renovam a cada acerto; clarão/recuo e impacto fatal comunicam o resultado. Pausa/diálogo congelam os efeitos.
+
+Factory, State Machine, Command, Strategy e Observer são usados conforme a [matriz atual](ARQUITETURA_HACK_AND_SLASH.md). Novas artes são versões separadas; colisões comuns de 40 × 40 preservadas. Detalhes de escopo, testes e simplificações da primeira versão estão no [relatório](../avaliacao/hack_and_slash/RELATORIO.md). Novos retornos de avaliação humana foram adiados pelo usuário, sem bloquear implementação; isso não homologa balanceamento ou diversão.
+
+## Incremento de infraestrutura — 16/11/2026
+
+O jogo utiliza fábrica de cenas escolares/fases e registra, em memória, identificadores de chefes derrotados e fases concluídas por eventos locais síncronos. Conclusão é registrada antes de navegar; eventos repetidos não duplicam registros. Uma nova história inicia progresso vazio e remove as inscrições do progresso anterior. A criação de tipo de cena ou ambiente escolar desconhecido falha explicitamente.
+
+Esse incremento não implementa salvamento em disco, campus navegável, combos ou novas recompensas. A campanha disponível e o encerramento após a biblioteca permanecem. Design futuro e critérios de migração estão em [PROPOSTA_HACK_AND_SLASH.md](PROPOSTA_HACK_AND_SLASH.md), [PLANO_HACK_AND_SLASH.md](PLANO_HACK_AND_SLASH.md) e [ARQUITETURA_HACK_AND_SLASH.md](ARQUITETURA_HACK_AND_SLASH.md). Os padrões ainda pendentes não são considerados implementados por esta atualização.
+
 **Título do projeto:** IFVania
 
 **Versão do documento:** 3.4

@@ -28,6 +28,7 @@ def criar_biblioteca():
     for x in (51, 56):
         grade[13][x] = 'E'
     return {
+        'identificador': 'biblioteca',
         'index': 1, 'name': 'Fase 2: Biblioteca dos arquivos perdidos',
         'ascii_map': [''.join(linha) for linha in grade],
         'boss': dict(name='Indexador', subject='Arquivo central', color=(119, 153, 162),

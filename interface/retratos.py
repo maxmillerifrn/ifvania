@@ -12,6 +12,10 @@ class RetratosDialogo:
         if identidade in self.cache:
             return self.cache[identidade]
         nomes_hd = {'Professor Max': 'max', 'Professor Romerito': 'romerito',
+                    'Max em Loop': 'max',
+                    'Elias · Guardião do Compasso': 'guardiao_elias',
+                    'Alessandro · Sentinela dos Enlaces': 'guardiao_alessandro',
+                    'Francisco · Guardião da Continuidade': 'guardiao_francisco',
                     'Entidade': 'entidade', 'IFVania': 'entidade',
                     'Indexador': 'indexador', 'Sistema': 'sistema'}
         nome_hd = ('menina' if personagem == 'menina' else 'menino') if identidade[0] == 'protagonista' else nomes_hd.get(falante)

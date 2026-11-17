@@ -9,6 +9,9 @@ class TelaTerminal:
 
     def draw(self, superficie, retangulo, instante, semente=0, corrompido=False, etapa_aula=None):
         retangulo = pygame.Rect(retangulo)
+        if etapa_aula == 'desligado':
+            pygame.draw.rect(superficie, (3, 8, 12), retangulo)
+            return
         if retangulo.width < 6 or retangulo.height < 6:
             return
         area_interna = pygame.Surface(retangulo.size)

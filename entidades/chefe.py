@@ -23,7 +23,7 @@ class Chefe(Personagem):
         self.cor = cor
         arquivo_figura = arquivo_figura or "chefes/prof_scratch.png"
         self.figura_direita = recursos.load_character_frames([arquivo_figura], cor)[0]
-        self.figura_esquerda = pygame.transform.flip(self.figura_direita, True, False)
+        self.figura_esquerda = recursos.espelhar_quadro(self.figura_direita)
         self.image = self.figura_esquerda
         self.x_inicial = x
         self.arena = arena or pygame.Rect(x - 220, y - 200, 440, 260)
@@ -44,6 +44,10 @@ class Chefe(Personagem):
 
     def activate(self):
         self.ativo = True
+
+    def reagir_bloqueio(self, area):
+        """Projéteis são consumidos pela fase; encontros especializam impacto corporal."""
+        return None
 
     def take_damage(self, quantidade, recuo=(0, 0)):
         if not self.ativo or not self.vivo:

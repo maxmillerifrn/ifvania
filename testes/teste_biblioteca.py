@@ -15,7 +15,7 @@ class TestesBiblioteca(unittest.TestCase):
         self.jogo = Jogo()
         self.jogo.indice_fase = 1
         self.jogo._load_level(1, novo_jogador=True)
-        self.jogo.estado = ESTADO_JOGANDO
+        self.jogo.maquina_estados.estado = ESTADO_JOGANDO
         self.teclas = defaultdict(bool)
 
     def tearDown(self):
@@ -54,7 +54,7 @@ class TestesBiblioteca(unittest.TestCase):
         for painel in biblioteca.paineis:
             self.assertEqual(self.consultar(painel)[0], 'dialogue')
         self.assertNotIn(biblioteca.portao, fase.mapa_blocos.solidos)
-        self.jogo.estado = ESTADO_DERROTA
+        self.jogo.maquina_estados.estado = ESTADO_DERROTA
         self.jogo._process_events([pygame.event.Event(pygame.KEYDOWN, key=pygame.K_r)])
         self.assertEqual(self.jogo.fase.biblioteca.consultados, {0, 1, 2})
         self.assertTrue(self.jogo.fase.biblioteca.modulo_obtido)
@@ -119,6 +119,7 @@ class TestesBiblioteca(unittest.TestCase):
         # Exercita física real para subir ao primeiro arquivo elevado (160 px).
         for personagem in ('boy', 'menina'):
             self.jogo.personagem_escolhido = personagem
+            self.jogo._iniciar_sessao_campanha()
             self.jogo._load_level(1, novo_jogador=True)
             jogador = self.jogo.jogador
             jogador.rect.topleft = (24*32-40, 14*32-40)
@@ -139,9 +140,10 @@ class TestesBiblioteca(unittest.TestCase):
     def test_combater_indexador_pelo_chicote_e_encerrar_conteudo(self):
         from sistema.jogo import ESTADO_FIM_CONTEUDO
         for personagem in ('boy', 'menina'):
+            self.jogo._iniciar_sessao_campanha()
             self.jogo.personagem_escolhido = personagem
             self.jogo._load_level(1, novo_jogador=True)
-            self.jogo.estado = ESTADO_JOGANDO
+            self.jogo.maquina_estados.estado = ESTADO_JOGANDO
             fase, jogador = self.jogo.fase, self.jogo.jogador
             fase.dialogo_exibido = True
             fase.chefe.activate()
@@ -172,4 +174,6 @@ class TestesBiblioteca(unittest.TestCase):
             jogador.rect.bottom = 14*32
             jogador.posicao.update(jogador.rect.topleft)
             self.jogo._update(self.teclas, [])
-            self.assertEqual(self.jogo.estado, ESTADO_FIM_CONTEUDO)
+            from sistema.jogo import ESTADO_CARTAO_FASE
+            self.assertEqual(self.jogo.estado, ESTADO_CARTAO_FASE)
+            self.assertEqual(self.jogo.fase.setor, 'convivencia')

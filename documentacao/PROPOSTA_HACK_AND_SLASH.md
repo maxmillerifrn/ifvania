@@ -40,6 +40,8 @@ A base já oferece impacto breve, arma de alcance intermediário, defesa ativa e
 
 ## 3. Sistema de combate
 
+**Prioridade após avaliação humana de 16/11/2026:** usuário considera as lutas atuais fáceis, previsíveis e sem graça. Antes de expandir encontros, adicionar resposta visual ao dano e barras temporárias nos bugs, revisar fluidez dos ataques e investigar o trecho aparentemente parado na transformação/retomada de SpeedBug. Personagens e alunos do laboratório também precisam de revisão de qualidade e animação. Critérios e ordem do ciclo corretivo estão no [plano](PLANO_HACK_AND_SLASH.md). Controles, câmera, áudio, diálogos, travessias e continuidade tiveram avaliação geral favorável ou razoável; preservar essa base.
+
 ### Ciclo e comandos
 
 **Aproximar → escolher alvo e abertura → encadear ataques → reagir → reposicionar → aproveitar recuperação.** Bugs leves permitem domínio ofensivo; guardas e chefes exigem leitura e escolha da abertura.

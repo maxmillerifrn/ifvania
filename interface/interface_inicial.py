@@ -23,7 +23,7 @@ class InterfaceInicial:
         self.personagens = tuple(Jogador.PERSONAGENS)
         self.previas = {}
         for personagem in self.personagens:
-            self.previas[personagem] = [pygame.transform.scale(quadro, (136, 136))
+            self.previas[personagem] = [recursos.imagem_apresentacao(quadro, (136, 136))
                                         for quadro in Jogador._load_sprites(personagem)['idle_r']]
         self.instante_animacao = 0
         self.veu = pygame.Surface(self.fundo.get_size(), pygame.SRCALPHA)

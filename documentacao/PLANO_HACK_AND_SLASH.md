@@ -1,16 +1,55 @@
 # IFVania — Plano de implementação do hack and slash
 
-**Data:** 16/11/2026. **Estado:** planejamento; nenhuma etapa de implementação concluída por este documento.
+**Data:** 16/11/2026. **Estado:** implementação técnica H0–H9 integrada; homologação humana final adiada. Pendências humanas em [REVISAO_HUMANA_FINAL.md](REVISAO_HUMANA_FINAL.md).
 
 Design: [PROPOSTA_HACK_AND_SLASH.md](PROPOSTA_HACK_AND_SLASH.md). Registro geral: [PLANO_DE_EXECUCAO.md](PLANO_DE_EXECUCAO.md).
+
+## Prioridade vigente e entrega implementada
+
+O usuário autorizou implementar as correções e continuar o plano sem aguardar novos retornos manuais; considerações de ajuste ficam para a avaliação final. Critérios humanos continuam registrados, mas estão adiados e não bloqueiam os incrementos. Não marcar uma experiência humana como realizada por causa dessa dispensa.
+
+Implementados: barras temporárias/clarão/recuo/impacto fatal, revisão da fluidez de RomerBug/SpeedBug, nova arte da turma, apresentação HD e caminhada interpolada, campus após cada fase, portas/retornos/requisitos, progresso de objetivos em memória, combo/direcionais, quatro tipos de bug, ancoragem, quatro guardiões concretos e desfecho dialogado. Os cinco padrões obrigatórios estão em uso. Ver [matriz de arquitetura](ARQUITETURA_HACK_AND_SLASH.md) e [relatório com evidências e limites](../avaliacao/hack_and_slash/RELATORIO.md).
+
+Estado por marco:
+
+| Marco | Estado real |
+|---|---|
+| H0 | Base técnica e relato humano registrados; nova avaliação adiada |
+| H1 | Campus, progresso, portas/retornos, Factory, State Machine e eventos integrados |
+| H2 | Combate terrestre/direcional, Command, Strategy, tipos de inimigos e reações integrados |
+| H3 | Ciclo biblioteca → campus → Elias → campus → M1 funcional e coberto por testes; duração alvo/diversão não homologadas |
+| H4 | Três travas, resgate animado, bola com ricochete e poses integrados |
+| H5 | Max troca origem real entre cópias e invoca bugs; registros, atalhos, guarda, aéreo e ancoragem integrados |
+| H6 | Ramais, perigos temporizados, conectores, guardas/retransmissores e portas sequenciais integrados |
+| H7 | Francisco/IFVania na mesma vida, retorno A28, desligamento, sala e fachada integrados |
+| H8 | Duas fases originais conectadas, bolsa animada, atalhos/bilhete da biblioteca, turma e poses integrados |
+| H9 | Suíte e exportadores verificados; homologação humana final adiada, sem bloquear implementação |
+
+As listas abaixo distinguem entrega técnica concluída e avaliação humana adiada. A marca técnica não representa homologação de diversão.
 
 ## 1. Objetivo e organização
 
 Entregar uma campanha de seis fases conectada por um campus virtual controlável, com combate de combos, inimigos reativos e quatro novos chefes docentes. Prioridade: validar cedo o ciclo campus → entrada → fase → chefe → campus transformado → próxima entrada.
 
-Este plano orienta o novo trabalho de evolução. As etapas antigas e seus registros continuam documentando o que existe; não devem ser marcadas retroativamente como concluídas por equivalência. As pendências de abertura, biblioteca e homologação continuam abertas. O novo plano altera o conteúdo futuro das antigas etapas 7–10 e amplia a infraestrutura prevista na etapa 5; a validação final continua sendo a última entrega.
+Este plano orienta o novo trabalho de evolução. As etapas antigas e seus registros continuam documentando o que existe; não devem ser marcadas retroativamente como concluídas por equivalência. Abertura e biblioteca foram integradas; homologação humana permanece aberta. O novo plano altera o conteúdo futuro das antigas etapas 7–10 e amplia a infraestrutura prevista na etapa 5; a validação final continua sendo a última entrega.
 
 Não há estimativa de calendário sem medir o primeiro protótipo. Executar em incrementos jogáveis, registrar evidências e só ampliar arte/conteúdo após verificar a base.
+
+### Avaliação manual fornecida pelo usuário — 16/11/2026
+
+O responsável experimentou o jogo e relatou: controles razoáveis; câmera e cenários decentes, com exceção da qualidade dos alunos do laboratório; áudio razoável; diálogos e travessias bons; continuidade funcionando. Combate reprovado: previsível, fácil e sem graça. Faltam feedback visual de dano e barras temporárias nos bugs. Ataques de RomerBug precisam de fluidez; há um trecho aparentemente travado na passagem para SpeedBug. Personagens precisam de apresentação menos pixelada e caminhada mais fluida.
+
+Esse relato conta como avaliação humana da base, sem atribuir ao agente uma partida que não realizou. Não foi informado se ambos os protagonistas foram experimentados. Conforto geral razoável não homologa balanceamento, arte ou todos os casos de pausa/foco.
+
+**Prioridade revista:** antes de ampliar conteúdo, executar o ciclo de correção abaixo, antecipando feedback/reação de H2 e refinamento de H4. H1 pode continuar na infraestrutura, mas não deve consumir o próximo ciclo visual com expansão de cenários enquanto o combate segue reprovado. Os demais marcos e padrões obrigatórios permanecem.
+
+1. **Resposta de dano:** clarão/silhueta breve e reação legível no bug; barra de vida surge após dano efetivamente recebido e some depois de intervalo sem novos acertos. Novo acerto renova visibilidade; inimigos intactos não exibem barra. Incluir impacto perceptível no golpe fatal, sem manter colisão de inimigo morto. Temporizadores congelam na pausa/diálogo; desenho não avança estado.
+2. **Fluidez do encontro:** reproduzir o instante relatado e distinguir preparação intencional, pose estática na cena e atraso após retomada. Revisar poses, transições e recuperação sem eliminar pausas úteis ou alterar corpos lógicos. A cena contém poses mantidas e `finish_cinematic()` reinicia uma aproximação de 60 atualizações; são pontos de investigação, não diagnóstico confirmado do travamento.
+3. **Diversão e desafio:** experimentar variantes de sequência e decisões por distância/posição, com sinais consistentes e limites contra repetição. Criar escolhas de alvo, pressão e contra-ataque; não tentar resolver apenas aumentando vida, dano ou velocidade, nem tornando os ataques aleatórios e ilegíveis. Integrar State Machine/Strategy na evolução dos padrões, preservando vida compartilhada das formas.
+4. **Personagens e turma:** revisar fontes, resolução, recorte, escala e poses dos alunos; melhorar arte dos personagens e transições da caminhada mantendo identidade e pés. Não substituir essa revisão por simples desfoque da arte atual. Preservar fontes aprovadas e experimentar variações separadas; validar duas aparências e alunos sentados.
+5. **Nova avaliação:** comparar o encontro anterior e revisado, incluindo bugs, RomerBug e SpeedBug. Registrar compreensão do dano, necessidade de defesa, decisões ofensivas e variedade percebida. Passar nos testes não encerra essa pendência: a luta precisa ser reavaliada por quem joga.
+
+**Aceite deste ciclo:** jogador reconhece acertos e vida restante sem barras permanentes; golpe fatal comunica resultado; transformação não parece defeito ou congelamento; a luta exige decisões e mantém oportunidades justas. Colisões, pausa, entradas e continuidade preservadas. Câmera, diálogos e áudio recebem apenas ajustes necessários à revisão, sem reconstrução geral.
 
 ## 2. Contratos a preservar
 
@@ -80,12 +119,13 @@ Começar com combo terrestre e recuo/interrupção. Acrescentar lançamento, ar 
 
 **Dependências:** nenhuma. **Entrega:** critérios reproduzíveis e base preservada.
 
-- [ ] Executar suíte completa e registrar ambiente/resultado atual, sem reutilizar contagem histórica como resultado novo.
+- [x] Executar suíte completa e registrar referência H0 em 16/11/2026: 127 testes aprovados, Python 3.14.4 / pygame-ce 2.5.8, SDL dummy. Experiência manual permanece pendente.
 - [ ] Percorrer abertura, RomerBug e biblioteca quando houver ambiente de jogo; registrar separadamente o que não pôde ser experimentado.
-- [ ] Confirmar pontos de alteração de progressão, morte, entradas, dano e carregamento de habilidades.
-- [ ] Mapear fábricas, estratégias e estados já existentes; definir evolução incremental para os padrões obrigatórios, reaproveitando estruturas adequadas.
-- [ ] Registrar matriz inicial de arquitetura, transições globais/locais e responsabilidades de comandos/eventos, com cobertura prevista por marco.
-- [ ] Registrar casos obrigatórios de regressão e alinhar roteiro/requisitos com a migração futura, identificando o que ainda não existe.
+- [x] Incorporar avaliação manual relatada pelo usuário em 16/11/2026; combate e arte reprovados, demais aspectos avaliados conforme registro acima. Cobertura das duas aparências e nova homologação após correções pendentes.
+- [x] Confirmar pontos de alteração de progressão, morte, entradas, dano e carregamento de habilidades.
+- [x] Mapear fábricas, estratégias e estados já existentes; definir evolução incremental para os padrões obrigatórios, reaproveitando estruturas adequadas.
+- [x] Registrar levantamento e matriz inicial de arquitetura, estados e responsabilidades em [ARQUITETURA_HACK_AND_SLASH.md](ARQUITETURA_HACK_AND_SLASH.md); tabela formal e estados integrados.
+- [x] Registrar casos obrigatórios de regressão e alinhar roteiro/requisitos com a migração futura, identificando o que ainda não existe.
 
 **Aceite:** base técnica conhecida; limitações manuais explícitas; campanha antiga continua isolada. Não bloquear protótipo por falta de arte final ou por pendências visuais independentes.
 
@@ -93,13 +133,15 @@ Começar com combo terrestre e recuo/interrupção. Acrescentar lançamento, ar 
 
 **Dependências:** H0. **Entrega:** biblioteca → convivência → portão do ginásio; saída de fase com retorno espacial.
 
-- [ ] Implementar `ProgressoCampanha`, setores, portas, requisitos e pontos de retorno.
-- [ ] Introduzir fábrica de cenas/setores, State Machine explícita da aplicação e eventos locais de objetivo; garantir entrega/remoção de observadores e progresso antes da navegação.
-- [ ] Fazer saída da biblioteca retornar ao campus, removendo fim provisório apenas quando houver continuação utilizável no incremento.
-- [ ] Criar dois setores com colisões simples e arte reutilizada, sem acionar gatilhos escolares do prólogo.
-- [ ] Separar troca de setor, entrada em fase e retomada; conservar identidade e limpar entradas/ameaças.
-- [ ] Mostrar destino fechado, requisito e indicação espacial de forma compreensível.
-- [ ] Criar acesso de desenvolvimento ao ponto inicial do protótipo por ferramenta de teste, sem adicionar atalhos de campanha ao menu final.
+- [x] Implementar `ProgressoCampanha`, setores, portas, requisitos e pontos de retorno.
+- [x] Primeiro recorte de progresso integrado: chefes derrotados e fases concluídas, eventos locais e nova sessão sem herança. Setores/portas/retomadas integrados.
+- [x] Fábrica de cenas escolares e fases utilizada por `Jogo`; validação de tipos/ambientes e registro extensível. Setores integrados.
+- [x] Introduzir fábrica de cenas/setores, State Machine explícita da aplicação e eventos locais de objetivo; garantir entrega/remoção de observadores e progresso antes da navegação.
+- [x] Fazer saída da biblioteca retornar ao campus, removendo fim provisório apenas quando houver continuação utilizável no incremento.
+- [x] Criar dois setores com colisões simples e arte reutilizada, sem acionar gatilhos escolares do prólogo.
+- [x] Separar troca de setor, entrada em fase e retomada; conservar identidade e limpar entradas/ameaças.
+- [x] Mostrar destino fechado, requisito e indicação espacial de forma compreensível.
+- [x] Criar acesso de desenvolvimento ao ponto inicial do protótipo por ferramenta de teste, sem adicionar atalhos de campanha ao menu final.
 
 **Verificação automática:** portas condicionadas, surgimento seguro, ausência de transição dupla, identidade/habilidades, conclusão idempotente e nova campanha limpa.
 
@@ -109,16 +151,17 @@ Começar com combo terrestre e recuo/interrupção. Acrescentar lançamento, ar 
 
 **Dependências:** H0; integrar em H1 antes de H3. **Entrega:** combo de três golpes, esquiva e inimigos que reagem.
 
-- [ ] Implementar janela de continuação, memória de ataque e escolha entre toque/carga.
-- [ ] Implementar Command para intenções de entrada e State Machine de combate, preservando soltura, origem e prioridades dos comandos.
-- [ ] Criar inimigos pela Factory e separar escolha de ação por Strategy de execução dos estados; validar tipos/configurações desconhecidos.
-- [ ] Diferenciar rápido, alcance e varredura; terceiro golpe empurra em vez de apenas inflar dano.
-- [ ] Preservar entrada proprietária da carga, bloqueio por parede e acerto único por golpe/alvo.
-- [ ] Aplicar recuo/interrupção nos leves, respeitando paredes e bordas.
-- [ ] Criar leve corpo a corpo e lançador com preparação, janela ativa e recuperação.
-- [ ] Remover dano de contato passivo desses tipos apenas quando seus ataques estiverem funcionais.
-- [ ] Definir prioridade de dano, esquiva, carga e recuperação; limpar sequência em pausa/foco/transição.
-- [ ] Usar animação provisória legível e sons existentes antes de produzir atlas final.
+- [x] Implementar janela de continuação, memória de ataque e escolha entre toque/carga.
+- [x] Implementar Command para intenções de entrada e State Machine de combate, preservando soltura, origem e prioridades dos comandos.
+- [x] Criar inimigos pela Factory e separar escolha de ação por Strategy de execução dos estados; validar tipos/configurações desconhecidos.
+- [x] Diferenciar rápido, alcance e varredura; terceiro golpe empurra em vez de apenas inflar dano.
+- [x] Preservar entrada proprietária da carga, bloqueio por parede e acerto único por golpe/alvo.
+- [x] Aplicar recuo/interrupção nos leves, respeitando paredes e bordas.
+- [x] Criar leve corpo a corpo e lançador com preparação, janela ativa e recuperação.
+- [x] Remover dano de contato passivo desses tipos apenas quando seus ataques estiverem funcionais.
+- [x] Definir prioridade de dano, esquiva, carga e recuperação; limpar sequência em pausa/foco/transição.
+- [x] Usar animação provisória legível e sons existentes antes de produzir atlas final.
+- [x] Antecipar feedback visual de dano, barras temporárias dos inimigos e impacto de derrota, conforme avaliação do usuário; corrigir fluidez do encontro atual antes de aumentar conteúdo.
 
 **Verificação automática:** sequência/expiração, carregado fora do combo, teclas alternativas e simultâneas, acerto por golpe, colisões no recuo, interrupção do inimigo e congelamento de temporizadores.
 
@@ -128,15 +171,16 @@ Começar com combo terrestre e recuo/interrupção. Acrescentar lançamento, ar 
 
 **Dependências:** H1 e H2. **Entrega:** sessão de 10–15 minutos do pós-biblioteca à entrada M1.
 
-- [ ] Criar recorte do ginásio com uma trava persistente, trecho de salto duplo e dois tipos de bug.
-- [ ] Implementar `EliasGuardiaoCompasso` em módulo próprio e registrar o novo tipo de chefe.
-- [ ] Instanciar Elias pela Factory e modelar preparação/ataque/recuperação/derrota como estados; integrar eventos de vitória sem callbacks duplicados ao revisitar.
-- [ ] Atualizar matriz de arquitetura com módulos, símbolos e evidências dos cinco padrões no protótipo; verificar dependências explícitas das cenas.
-- [ ] Implementar sequência de dois ataques, investida e bola, com poses antecipatórias e recuperações diferentes.
-- [ ] Vitória limpa ameaças, restaura Elias, registra progresso e devolve à soleira do ginásio.
-- [ ] Campus interrompe sinal repetido, mostra estudantes em segurança e abre caminho ao M1.
-- [ ] Disponibilizar retomada no ginásio conservando trava; permitir caminhar até M1 e encerrar protótipo com mensagem clara de conteúdo disponível.
-- [ ] Produzir capturas dos estados antes/depois e registrar partida manual.
+- [x] Criar recorte do ginásio com uma trava persistente, trecho de salto duplo e dois tipos de bug.
+- [x] Implementar `EliasGuardiaoCompasso` como classe concreta no módulo compartilhado de guardiões e registrar o novo tipo de chefe.
+- [x] Instanciar Elias pela Factory e modelar preparação/ataque/recuperação/derrota como estados; integrar eventos de vitória sem callbacks duplicados ao revisitar.
+- [x] Atualizar matriz de arquitetura com módulos, símbolos e evidências dos cinco padrões no protótipo; verificar dependências explícitas das cenas.
+- [x] Implementar sequência de dois ataques, investida e bola, com poses antecipatórias e recuperações diferentes.
+- [x] Vitória limpa ameaças, restaura Elias, registra progresso e devolve à soleira do ginásio.
+- [x] Campus interrompe sinal repetido, mostra estudantes em segurança e abre caminho ao M1.
+- [x] Disponibilizar retomada no ginásio conservando trava; permitir caminhar até M1 e continuar a campanha integrada.
+- [x] Produzir capturas dos estados antes/depois.
+- [ ] Registrar partida manual completa — adiada para a revisão humana final.
 
 **Verificação automática:** chefe concreto, preparação sem dano precoce, derrota/vitória sem projéteis residuais, trava preservada, mudança do campus, bloqueio pré-vitória e caminho pós-vitória.
 
@@ -146,11 +190,11 @@ Começar com combo terrestre e recuo/interrupção. Acrescentar lançamento, ar 
 
 **Dependências:** H3. **Entrega:** fase 3 completa e base de combate pronta para expansão.
 
-- [ ] Ajustar janelas, quantidade de inimigos, alcance, recarga e duração do chefe conforme evidências.
-- [ ] Completar três travas, arquibancadas, circuito de treino e rota segura dos estudantes.
-- [ ] Integrar fala da IFVania em ponto seguro e contato de Max ao sair.
-- [ ] Completar jardim, reunião e atalho A28; dar resposta visual a cada trava.
-- [ ] Refinar poses e sons do encontro, preservando leitura mesmo sem áudio.
+- [x] Ajustar janelas, quantidade de inimigos, alcance, recarga e duração do chefe conforme evidências.
+- [x] Completar três travas, arquibancadas, circuito de treino e rota segura dos estudantes.
+- [x] Integrar fala da IFVania em ponto seguro e contato de Max ao sair.
+- [x] Completar jardim, reunião e atalho A28; dar resposta visual a cada trava.
+- [x] Refinar poses e sons do encontro, preservando leitura mesmo sem áudio.
 - [ ] Experimentar ambos os protagonistas e reprovar o marco se controles/orientação ainda falharem, mesmo com testes aprovados.
 
 **Aceite:** combo, defesa e travessia compreensíveis; resgate sem escolta frágil; retorno repetido não recria bloqueios; arte final somente após validação da geometria.
@@ -159,15 +203,15 @@ Começar com combo terrestre e recuo/interrupção. Acrescentar lançamento, ar 
 
 **Dependências:** H4. **Entrega:** fase 4 e caminho controlável M1 → M5.
 
-- [ ] Implementar laçada, golpe aéreo e descendente com pouso comprometido.
-- [ ] Resolver modificadores de direção/salto no input e atualizar tutorial; impedir restauração infinita de salto e sequências aéreas.
-- [ ] Estender comandos e estados para combate aéreo/ancoragem, mantendo arbitragem única entre interação e conector; não criar caminhos de entrada paralelos.
-- [ ] Criar guarda frontal e cópias repetidoras com respostas distintas.
-- [ ] Construir comparação de arquivos e atalhos por sala estabilizada.
-- [ ] Implementar `MaxEmLoop`, cópia verdadeira conectada, varredura, bugs e recompilação vulnerável.
-- [ ] Integrar revelações de autoria/autopreservação e confissão, sem monólogo longo.
-- [ ] Liberar ancoragem depois da vitória, ensinar em piso seguro e construir travessia até M5.
-- [ ] Preservar arquivos comparados na retomada; remover duplicações do campus e isolar pendrive com Max.
+- [x] Implementar laçada, golpe aéreo e descendente com pouso comprometido.
+- [x] Resolver modificadores de direção/salto no input e atualizar tutorial; impedir restauração infinita de salto e sequências aéreas.
+- [x] Estender comandos e estados para combate aéreo/ancoragem, mantendo arbitragem única entre interação e conector; não criar caminhos de entrada paralelos.
+- [x] Criar guarda frontal e cópias repetidoras com respostas distintas.
+- [x] Construir comparação de arquivos e atalhos por sala estabilizada.
+- [x] Implementar `MaxEmLoop`, cópia verdadeira conectada, varredura, bugs e recompilação vulnerável.
+- [x] Integrar revelações de autoria/autopreservação e confissão, sem monólogo longo.
+- [x] Liberar ancoragem depois da vitória, ensinar em piso seguro e construir travessia até M5.
+- [x] Preservar arquivos comparados na retomada; remover duplicações do campus e isolar pendrive com Max.
 
 **Verificação automática:** limite de lançamento, não restauração de salto, guarda/flanco/carregado, origem verdadeira, tutorial antes do bloqueio obrigatório, prioridade E, conectores elegíveis e retorno seguro de queda.
 
@@ -177,12 +221,12 @@ Começar com combo terrestre e recuo/interrupção. Acrescentar lançamento, ar 
 
 **Dependências:** H5. **Entrega:** fase 5 e percurso M5 → LIT.
 
-- [ ] Construir três ramais, conectores, esperas seguras e retornos curtos.
-- [ ] Implementar retransmissor e composição guarda/atirador sem sobrepor ameaças inevitáveis.
-- [ ] Cada isolamento apaga monitores e persiste em queda, morte e revisita.
-- [ ] Implementar `AlessandroSentinelaEnlaces`, barreira, portas sequenciais, varredura e oportunidades frontais/laterais.
-- [ ] Permitir solução por espera ou flanco; não exigir ancoragem em uma janela única de precisão.
-- [ ] Mostrar aliados reunidos, rede isolada e nobreak ativo; abrir caminho controlável ao LIT.
+- [x] Construir três ramais, conectores, esperas seguras e retornos curtos.
+- [x] Implementar retransmissor e composição guarda/atirador sem sobrepor ameaças inevitáveis.
+- [x] Cada isolamento apaga monitores e persiste em queda, morte e revisita.
+- [x] Implementar `AlessandroSentinelaEnlaces`, barreira, portas sequenciais, varredura e oportunidades frontais/laterais.
+- [x] Permitir solução por espera ou flanco; não exigir ancoragem em uma janela única de precisão.
+- [x] Mostrar aliados reunidos, rede isolada e nobreak ativo; abrir caminho controlável ao LIT.
 
 **Verificação automática:** três isolamentos independentes, não migração narrativa prematura, barreira/janelas, seleção de conector, invariantes da retomada e porta final condicionada.
 
@@ -192,13 +236,13 @@ Começar com combo terrestre e recuo/interrupção. Acrescentar lançamento, ar 
 
 **Dependências:** H6. **Entrega:** fase 6, retorno final pelo campus e conclusão definitiva.
 
-- [ ] Construir oficina, memória e núcleo com três desafios curtos de síntese.
-- [ ] Implementar `FranciscoGuardiaoContinuidade` com vida compartilhada entre proteção automática e ocupação da estrutura pela IFVania.
-- [ ] Transição liberta Francisco e o move à função de aliado sem duplicar vida, dano ou chefe.
-- [ ] Usar padrões já ensinados, alternando grupo, pulso e abertura; preservar rota segura.
-- [ ] Encerrar ameaças, devolver jogador à soleira LIT e liberar caminhada tranquila até A28.
-- [ ] Terminal final exige resgate concluído, rede isolada e autopreservação encerrada.
-- [ ] Encenação de desligamento incluindo nobreak, pendrive isolado, escola física e epílogo da tarefa refeita.
+- [x] Construir oficina, memória e núcleo com três desafios curtos de síntese.
+- [x] Implementar `FranciscoGuardiaoContinuidade` com vida compartilhada entre proteção automática e ocupação da estrutura pela IFVania.
+- [x] Transição liberta Francisco e o move à função de aliado sem duplicar vida, dano ou chefe.
+- [x] Usar padrões já ensinados, alternando grupo, pulso e abertura; preservar rota segura.
+- [x] Encerrar ameaças, devolver jogador à soleira LIT e liberar caminhada tranquila até A28.
+- [x] Terminal final exige resgate concluído, rede isolada e autopreservação encerrada.
+- [x] Encenação de desligamento incluindo nobreak, pendrive isolado, escola física e epílogo da tarefa refeita.
 
 **Verificação automática:** transição única, reserva compartilhada, pausa/diálogo sem dano, condições finais, confirmação idempotente, preservação de nome/aparência e nova partida sem herança.
 
@@ -208,14 +252,14 @@ Começar com combo terrestre e recuo/interrupção. Acrescentar lançamento, ar 
 
 **Dependências:** H7 para integração final; melhorias independentes podem ocorrer após H4. **Entrega:** campanha completa sem costuras de tutorial ou progressão.
 
-- [ ] Ensinar combo básico na descoberta do mouse, sem exigir todas as técnicas avançadas imediatamente.
-- [ ] Integrar retorno fase 1 → campus → biblioteca e preservar recompensa nula de RomerBug.
-- [ ] Ajustar vida/invulnerabilidade de alvos iniciais ao combo sem descaracterizar os padrões de RomerBug/SpeedBug.
-- [ ] Completar bugs de arquivo, atalhos por consulta e bilhete opcional da biblioteca.
-- [ ] Revisar animação da bolsa e continuidade do reencontro; manter demais pendências antigas rastreáveis.
-- [ ] Produzir recursos finais, variações corrompida/restaurada, retratos e áudio; preservar fontes e exportar em temporário.
-- [ ] Revisar câmera, contraste, interações E, placas, escala e limites das áreas de combate.
-- [ ] Sincronizar LEIA_ME, requisitos, roteiro, fontes e plano com o comportamento realmente entregue.
+- [x] Ensinar combo básico na descoberta do mouse, sem exigir todas as técnicas avançadas imediatamente.
+- [x] Integrar retorno fase 1 → campus → biblioteca e preservar recompensa nula de RomerBug.
+- [x] Ajustar vida/invulnerabilidade de alvos iniciais ao combo sem descaracterizar os padrões de RomerBug/SpeedBug.
+- [x] Completar bugs de arquivo, atalhos por consulta e bilhete opcional da biblioteca.
+- [x] Revisar animação da bolsa e continuidade do reencontro; manter demais pendências antigas rastreáveis.
+- [x] Produzir recursos finais, variações corrompida/restaurada, retratos e áudio; preservar fontes e exportar em temporário.
+- [x] Revisar câmera, contraste, interações E, placas, escala e limites das áreas de combate.
+- [x] Sincronizar LEIA_ME, requisitos, roteiro, fontes e plano com o comportamento realmente entregue.
 
 **Aceite:** primeira partida apresenta controles em ordem compreensível; campus conecta todas as seis fases; nova apresentação não muda colisões acidentalmente.
 
@@ -223,16 +267,16 @@ Começar com combo terrestre e recuo/interrupção. Acrescentar lançamento, ar 
 
 **Dependências:** H0–H8 entregues. **Entrega:** evidências técnicas e experiência manual homologada; corresponde à validação final da etapa 11 do plano geral.
 
-- [ ] Executar suíte completa e critérios integrados, incluindo campanha antiga isolada.
-- [ ] Auditar Factory, State Machine, Command, Strategy e Observer conforme matriz de arquitetura: uso real, responsabilidades, transições, cancelamento de entrada e ciclo de vida dos observadores.
-- [ ] Executar exportadores pertinentes em temporário e conferir transparência, pés, quadros e tamanho.
+- [x] Executar suíte completa e critérios integrados, incluindo campanha antiga isolada.
+- [x] Auditar Factory, State Machine, Command, Strategy e Observer conforme matriz de arquitetura: uso real, responsabilidades, transições, cancelamento de entrada e ciclo de vida dos observadores.
+- [x] Executar exportadores pertinentes em temporário e conferir transparência, pés, quadros e tamanho.
 - [ ] Percorrer seis fases e todas as travessias com ambos os protagonistas.
 - [ ] Experimentar morte, queda, revisita, pausa, foco, diálogo e transição em cada sistema novo.
 - [ ] Avaliar áudio, resposta dos controles, ritmo, orientação, sobrevivência, desempenho e leitura das arenas.
-- [ ] Registrar problemas restantes com reprodução e prioridade; corrigir bloqueadores e repetir somente verificações afetadas.
-- [ ] Confirmar desfecho e limpeza de progresso ao iniciar outra campanha.
+- [x] Registrar problemas restantes com reprodução e prioridade; corrigir bloqueadores e repetir somente verificações afetadas.
+- [x] Confirmar desfecho e limpeza de progresso ao iniciar outra campanha.
 
-**Aceite:** suíte aprovada e percurso manual completo sem bloqueadores; evidências automáticas, capturas e experiência humana identificadas separadamente. Capturas offscreen não homologam diversão, dificuldade ou áudio.
+**Aceite de homologação, ainda pendente:** suíte aprovada e percurso manual completo sem bloqueadores; evidências automáticas, capturas e experiência humana identificadas separadamente. Capturas offscreen não homologam diversão, dificuldade ou áudio.
 
 ## 5. Riscos e decisões a validar no protótipo
 
@@ -269,9 +313,14 @@ Registrar por marco em `PLANO_DE_EXECUCAO.md`: data, arquivos/sistemas alterados
 
 - [x] Proposta registrada com diagnóstico, mapa, combate, fases, docentes e fontes.
 - [x] Plano de implementação registrado com dependências e critérios de aceite.
-- [x] Padrões obrigatórios definidos com aplicação, marcos de introdução e critérios comportamentais de aceite; implementação pendente.
-- [ ] H0 iniciado.
-- [ ] Primeiro protótipo entregue e experimentado.
-- [ ] Campanha completa e homologada.
+- [x] Padrões obrigatórios definidos, implementados e exercitados; ver matriz de arquitetura.
+- [x] H0 iniciado: base automática e levantamento de arquitetura registrados; partida manual pendente.
+- [x] H1 integrado com campus, Factory, Observer, progresso de sessão e State Machine explícita; ver matriz corrente no início do documento.
+- [x] Primeiro protótipo entregue e exercitado automaticamente; avaliação humana de diversão/duração adiada.
+- [ ] Homologação humana da campanha completa — adiada.
 
-**Próxima ação de implementação:** H0, seguido de H1 e H2 para construir H3. Este pedido entrega somente documentação e plano, sem iniciar alterações no jogo, gerar artes, criar commits ou publicar.
+**Próxima ação humana:** experimentar a campanha conforme [roteiro final](REVISAO_HUMANA_FINAL.md) e registrar ajustes com reprodução. Não há incremento técnico do plano aguardando autorização rotineira.
+
+## 8. Fechamento técnico — 16/11/2026
+
+172 testes aprovados; 15 exportadores executados em cópia temporária, 203 PNGs distintos. Capturas controladas incluem guarda, descoberta do mouse, campus antes/depois, arenas e encerramento. Bloqueio Q, correções de deslocamento real de SpeedBug, novos projéteis, repertório dos guardiões, atalhos/checkpoints, perigos, resgates, ambiência e epílogo visual integrados. Evidências em [RELATORIO.md](../avaliacao/hack_and_slash/RELATORIO.md). Somente a homologação humana permanece aberta.

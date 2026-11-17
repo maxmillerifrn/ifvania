@@ -76,7 +76,7 @@ class TestesContratoPersonagem(unittest.TestCase):
     def test_unknown_boss_type_is_rejected_instead_of_using_generic(self):
         dados = build_legacy_levels()[0]
         dados['boss'] = dict(dados['boss'], boss_type='unknown')
-        with self.assertRaises(KeyError):
+        with self.assertRaisesRegex(ValueError, 'Tipo de chefe desconhecido'):
             Fase(dados)
 
     def test_legacy_strategies_respond_to_distance_phase_and_cycles(self):

@@ -7,7 +7,7 @@ from interface import tema
 
 
 class TransicaoChefe:
-    DURACOES = {'kneel': 42, 'arrival': 48, 'morph': 72, 'rise': 42, 'release': 24}
+    DURACOES = {'kneel': 42, 'arrival': 48, 'morph': 42, 'rise': 30, 'release': 18}
     ORDEM = ('kneel', 'arrival', 'speech', 'morph', 'rise', 'release', 'complete')
 
     def __init__(self, fase, jogador):
@@ -62,9 +62,19 @@ class TransicaoChefe:
             if fracao >= 0.5:
                 self.chefe.nome = 'SpeedBug'
         elif self.etapa == 'rise':
-            self._pose(3 if fracao < 0.25 else 4 if fracao < 0.7 else 5)
+            # Interpolação das poses mantém o levantar em movimento contínuo.
+            trecho = min(1, int(fracao*2))
+            mistura = min(1, fracao*2-trecho)
+            combinado = self.quadros[3+trecho].copy()
+            seguinte = self.quadros[4+trecho].copy()
+            seguinte.set_alpha(round(255*mistura))
+            combinado.blit(seguinte, (0, 0))
+            self.chefe.image = pygame.transform.flip(combinado, self.direcao_olhar < 0, False)
         else:
+            # Pequena oscilação na liberação, sem deslocar corpo ou colisões.
             self._pose(5)
+            imagem = self.chefe.image.copy()
+            self.chefe.image = pygame.transform.rotozoom(imagem, math.sin(fracao*math.pi)*2, 1)
         if self.instante >= self.DURACOES[self.etapa]:
             self.etapa = self.ORDEM[self.ORDEM.index(self.etapa)+1]
             self.instante = 0

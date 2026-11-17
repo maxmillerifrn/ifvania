@@ -90,9 +90,9 @@ class TestesControleCombate(unittest.TestCase):
         self.assertEqual(self.jogador.temporizador_golpe,0)
 
     def teste_carga_cancelada_por_dano_pausa_foco_e_reaparecimento(self):
-        jogo=Jogo();jogo._load_level(0,novo_jogador=True);jogo.estado=ESTADO_JOGANDO
+        jogo=Jogo();jogo._load_level(0,novo_jogador=True);jogo.maquina_estados.estado=ESTADO_JOGANDO
         for interrupcao in ('pausa','foco','dano','reaparecimento'):
-            jogo.estado=ESTADO_JOGANDO
+            jogo.maquina_estados.estado=ESTADO_JOGANDO
             jogador=jogo.jogador
             jogador.handle_input(self.teclas,[self.evento(pygame.KEYDOWN,pygame.K_x)])
             jogador.carga=36
@@ -180,7 +180,7 @@ class TestesControleCombate(unittest.TestCase):
         self.assertEqual(self.jogador.temporizador_golpe,0)
 
     def teste_impacto_preserva_comando_e_pausa_remove_eventos_antigos(self):
-        jogo=Jogo();jogo._load_level(0,novo_jogador=True);jogo.estado=ESTADO_JOGANDO
+        jogo=Jogo();jogo._load_level(0,novo_jogador=True);jogo.maquina_estados.estado=ESTADO_JOGANDO
         jogador=jogo.jogador;chefe=jogo.fase.chefe
         jogador.pausa_impacto=2;jogador.espera_ataque=2
         posicao=jogador.rect.copy();temporizador=chefe.temporizador_ataque

@@ -89,7 +89,7 @@ class TestesVisualEscolar(unittest.TestCase):
     def test_battle_monitors_change_during_dialogue_and_pause_holds_frame(self):
         self.jogo._load_level(0, novo_jogador=True)
         fase = self.jogo.fase
-        self.jogo.estado = ESTADO_DIALOGO
+        self.jogo.maquina_estados.estado = ESTADO_DIALOGO
         self.jogo.caixa_dialogo.start([('Sistema', 'Acesso ao laboratório.')])
         inicial = (fase.chefe.rect.copy(), fase.chefe.temporizador_ataque)
         for _ in range(70): self.jogo._update(self.teclas, [])

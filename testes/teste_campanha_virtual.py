@@ -22,7 +22,7 @@ class TestesCampanhaVirtual(unittest.TestCase):
         self.jogo = Jogo()
         self.teclas = defaultdict(bool)
         self.jogo._load_level(0, novo_jogador=True)
-        self.jogo.estado = ESTADO_JOGANDO
+        self.jogo.maquina_estados.estado = ESTADO_JOGANDO
 
     def tearDown(self):
         pygame.quit()
@@ -75,7 +75,7 @@ class TestesCampanhaVirtual(unittest.TestCase):
         self.fail('Transição do boss não terminou')
 
     def test_main_campaign_has_only_defined_content_and_legacy_remains_separate(self):
-        self.assertEqual(len(self.jogo.definicoes_fases), 2)
+        self.assertEqual(len(self.jogo.definicoes_fases), 6)
         self.assertEqual(self.jogo.definicoes_fases[0]['name'], 'Fase 1: Mundo virtual')
         self.assertIsNone(self.jogo.definicoes_fases[0]['ability_reward'])
         self.assertEqual(len(build_legacy_levels()), 6)
@@ -215,13 +215,16 @@ class TestesCampanhaVirtual(unittest.TestCase):
         self.assertEqual(self.jogo.estado, ESTADO_JOGANDO)
         self.jogo._update(self.teclas, [])
         self.assertEqual(self.jogo.estado, ESTADO_CARTAO_FASE)
-        self.assertEqual(self.jogo.indice_fase, 1)
-        self.assertIsNotNone(self.jogo.fase.biblioteca)
+        self.assertEqual(self.jogo.fase.setor, 'convivencia')
+        self.assertIn('a28', self.jogo.progresso_campanha.fases_concluidas)
         self.assertTrue(fase.concluido)
         self.assertEqual(fase.update(jogador, []), (None, None))
+        self.jogo._load_level(1)
         self.jogo._advance_level()
-        self.assertEqual(self.jogo.estado, ESTADO_FIM_CONTEUDO)
+        self.assertEqual(self.jogo.estado, ESTADO_CARTAO_FASE)
+        self.assertEqual(self.jogo.fase.setor, 'convivencia')
         self.jogo._draw()
+        self.jogo.maquina_estados.estado = ESTADO_FIM_CONTEUDO
         self.key(pygame.K_RETURN)
         self.assertEqual(self.jogo.estado, ESTADO_MENU)
         self.key(pygame.K_RETURN)
@@ -242,7 +245,7 @@ class TestesCampanhaVirtual(unittest.TestCase):
             with self.subTest(character=personagem):
                 self.jogo.personagem_escolhido = personagem
                 self.jogo._load_level(0, novo_jogador=True)
-                self.jogo.estado = ESTADO_JOGANDO
+                self.jogo.maquina_estados.estado = ESTADO_JOGANDO
                 fase, jogador, chefe = self.start_fight()
                 # Isola o funcionamento da arma do balanceamento de sobrevivência.
                 jogador.temporizador_invulnerabilidade = 10000

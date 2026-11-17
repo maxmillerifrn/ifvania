@@ -115,7 +115,8 @@ class Personagem(pygame.sprite.Sprite, ABC):
         tamanho = tuple(round(lado * self.ESCALA_VISUAL) for lado in self.image.get_size())
         if tamanho == self.image.get_size():
             return self.image
-        return pygame.transform.scale(self.image, tamanho)
+        from sistema import recursos
+        return recursos.imagem_apresentacao(self.image, tamanho)
 
     def draw(self, superficie, camera):
         imagem = self.get_draw_image()

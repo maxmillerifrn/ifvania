@@ -18,4 +18,6 @@ DESCOBERTA_MOUSE = [
     ('Sistema', 'Mouse com cabo reforçado disponível. Use os golpes para se defender dos bugs.'),
     ('Sistema', 'Use X, K ou botão esquerdo do mouse. Toque e solte para golpear; segure e solte para causar o dobro de dano.'),
     ('Sistema', 'Use SHIFT para um passo evasivo. Ele protege por um instante e precisa de tempo para recuperar.'),
+    ('Sistema', 'Segure Q para tensionar o cabo e bloquear pela frente. A resistência amarela cai nos impactos; solte para recuperar. Costas e perigos do cenário exigem esquiva ou salto.'),
+    ('Sistema', 'Encadeie três toques para variar alcance e empurrar os bugs. Cima ao soltar ataca para o alto; baixo no ar finaliza para o chão.'),
 ]

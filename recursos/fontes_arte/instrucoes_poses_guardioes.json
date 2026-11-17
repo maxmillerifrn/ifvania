@@ -1,0 +1,26 @@
+{
+  "data": "2026-11-16",
+  "ferramenta": "image_gen integrada",
+  "fonte": "guardioes_campus/poses_combate.png",
+  "referencias": [
+    "guardioes_campus/avatares.png",
+    "professores.png"
+  ],
+  "prompt": "Create a production transparent SPRITE SHEET with exactly 4 rows and 4 columns, 16 separate full body figures, equal cells, no labels or text. Use the supplied images strictly as CHARACTER IDENTITY references, not layout. All figures face RIGHT in a side/three quarter view, same height and baseline within each cell, no cropped limbs and no overlap. Row 1 is sports guardian from reference 1 left (green navy tracksuit, dark hair, virtual ball). Row 2 is Max from reference 2 TOP row (curly dark hair, glasses, beard, brown orange jacket and gray shirt; NOT the yellow shirt professor). Row 3 is computing guardian from reference 1 center (navy shirt, glasses, turquoise circuit sleeves, small router). Row 4 is electrical guardian from reference 1 right (blue workshop coat, beard, relay gauntlet). Each row shows an animation sequence: column 1 ready neutral stance, column 2 clear wind-up with arm pulled back and bent knees, column 3 active forward sweeping strike with extended arm and weight forward, column 4 recovery crouch with lowered arm. The differences must be clear but same body proportions/identity across all four poses. Use refined smooth hand drawn 2D game art, readable at 80px tall, consistent lighting and green teal amber palette. Genuine transparent alpha around each silhouette, NO background or floor or text, no outside glow/shadows, no motion trails, no photorealism. Wide enough spacing to crop cleanly in equal cells. Square 1536x1536 atlas.",
+  "organizacao": {
+    "fileiras": [
+      "elias",
+      "max",
+      "alessandro",
+      "francisco"
+    ],
+    "colunas": [
+      "repouso",
+      "preparacao",
+      "golpe",
+      "recuperacao"
+    ]
+  },
+  "exportador": "python -m ferramentas.preparar_poses_guardioes --destino /tmp/ifvania-poses-previa",
+  "saidas": "16 quadros logicos de 40x40 e 16 apresentacoes de 80x80; fontes anteriores preservadas"
+}

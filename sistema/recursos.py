@@ -17,6 +17,21 @@ DIRETORIO_IMAGENS = os.path.join(DIRETORIO_BASE, 'recursos', 'imagens')
 
 _cache = {}
 _avisos_ausentes = set()
+_apresentacoes = {}
+
+
+def espelhar_quadro(quadro):
+    espelhado = pygame.transform.flip(quadro, True, False)
+    if quadro in _apresentacoes:
+        _apresentacoes[espelhado] = pygame.transform.flip(_apresentacoes[quadro], True, False)
+    return espelhado
+
+
+def imagem_apresentacao(quadro, tamanho):
+    original = _apresentacoes.get(quadro, quadro)
+    if original.get_size() == tamanho:
+        return original
+    return pygame.transform.smoothscale(original, tamanho)
 
 
 def _placeholder(tamanho, cor=(255, 0, 255)):
@@ -87,8 +102,10 @@ def load_character_frames(caminhos, cor_alternativa=(255, 0, 255)):
     altura = max((retangulo.height for retangulo in limites), default=1) or 1
     escala = min(tamanho[0] / largura, tamanho[1] / altura)
     quadros = []
-    for original, retangulo in zip(originais, limites):
+    for caminho, original, retangulo in zip(caminhos, originais, limites):
         quadro = pygame.Surface(tamanho, pygame.SRCALPHA)
+        tamanho_visual = tuple(round(lado*configuracoes.ESCALA_VISUAL_PERSONAGEM) for lado in tamanho)
+        apresentacao = pygame.Surface(tamanho_visual, pygame.SRCALPHA)
         if retangulo.width and retangulo.height:
             recortado = original.subsurface(retangulo)
             redimensionado = pygame.transform.scale(recortado, (
@@ -96,6 +113,16 @@ def load_character_frames(caminhos, cor_alternativa=(255, 0, 255)):
                 max(1, round(retangulo.height * escala)),
             ))
             quadro.blit(redimensionado, redimensionado.get_rect(midbottom=(tamanho[0] // 2, tamanho[1])))
+            # Normalização física continua em 40 px; renderização vem da fonte,
+            # sem reduzir a 40 e ampliar novamente para 80, perdendo detalhes.
+            visual = pygame.transform.smoothscale(recortado, (
+                max(1, round(retangulo.width*escala*configuracoes.ESCALA_VISUAL_PERSONAGEM)),
+                max(1, round(retangulo.height*escala*configuracoes.ESCALA_VISUAL_PERSONAGEM))))
+            apresentacao.blit(visual, visual.get_rect(midbottom=(tamanho_visual[0]//2, tamanho_visual[1])))
+        _apresentacoes[quadro] = apresentacao
+        caminho_visual = os.path.join(DIRETORIO_IMAGENS, 'apresentacao', caminho)
+        if os.path.isfile(caminho_visual):
+            _apresentacoes[quadro] = load_image('apresentacao/'+caminho, tamanho_visual)
         quadros.append(quadro)
     _cache[tecla] = quadros
     return quadros

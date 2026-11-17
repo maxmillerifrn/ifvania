@@ -38,20 +38,23 @@ class PainelInformacoes:
         if jogador.chicote_desbloqueado:
             tema.panel(superficie, (18, 91, 204, 45))
             pronto = jogador.espera_esquiva == 0
-            rotulo = ('CARGA PRONTA / SOLTE' if jogador.carga >= configuracoes.TEMPO_CARGA else 'CARREGANDO') if jogador.carregando else ('ESQUIVA PRONTA' if pronto else 'ESQUIVA RECUPERANDO')
+            rotulo = ('GUARDA QUEBRADA' if jogador.defesa.quebra else 'BLOQUEANDO · Q') if jogador.defesa.ativa or jogador.defesa.quebra else ('CARGA PRONTA / SOLTE' if jogador.carga >= configuracoes.TEMPO_CARGA else 'CARREGANDO') if jogador.carregando else ('ESQUIVA PRONTA' if pronto else 'ESQUIVA RECUPERANDO')
             tema.text(superficie, self.fonte_pequena, rotulo, (30, 99), tema.CIANO if pronto else tema.ATENUADO)
             fracao = (jogador.carga/configuracoes.TEMPO_CARGA if jogador.carregando
                       else 1-jogador.espera_esquiva/configuracoes.ESPERA_ESQUIVA)
             pygame.draw.rect(superficie, (43, 50, 54), (30, 122, 178, 4))
             pygame.draw.rect(superficie, tema.AMBAR if jogador.carregando else tema.CIANO,
                              (30, 122, round(178*fracao), 4))
+            pygame.draw.rect(superficie, (43, 50, 54), (30, 129, 178, 3))
+            pygame.draw.rect(superficie, tema.PERIGO if jogador.defesa.quebra else tema.AMBAR,
+                             (30, 129, round(178*jogador.defesa.resistencia/100), 3))
         if chefe is not None and chefe.ativo and chefe.vivo:
             self.draw_boss(superficie, chefe)
 
     def draw_boss(self, superficie, chefe):
         retangulo = pygame.Rect(248, 91, configuracoes.LARGURA_TELA-496, 57)
         tema.panel(superficie, retangulo, tema.PERIGO)
-        tema.text(superficie, self.fonte, chefe.nome.upper(), (retangulo.x+14, retangulo.y+10))
+        tema.text(superficie, self.fonte, tema.fit_text(self.fonte, chefe.nome.upper(), retangulo.width-100), (retangulo.x+14, retangulo.y+10))
         etapa = 'FASE II' if chefe.etapa >= 2 else 'FASE I'
         tema.text(superficie, self.fonte_pequena, etapa, (retangulo.right-66, retangulo.y+12), tema.PERIGO)
         barra = pygame.Rect(retangulo.x+14, retangulo.y+36, retangulo.width-28, 7)
@@ -62,10 +65,13 @@ class PainelInformacoes:
 
     def draw_controls_hint(self, superficie, jogador):
         dicas = ['A/D ou SETAS  mover', 'ESPAÇO  saltar',
-                 'X / K / CLIQUE  golpe / segurar  carga' if jogador.chicote_desbloqueado else 'E  interagir']
+                 'X / K / CLIQUE  combo / segurar  carga' if jogador.chicote_desbloqueado else 'E  interagir']
         if jogador.chicote_desbloqueado and not jogador.has(Habilidade.ARRANCADA):
             dicas.append('SHIFT  esquiva')
+        if jogador.chicote_desbloqueado and not jogador.has(Habilidade.ESCUDO):
+            dicas.append('Q segurar  bloqueio frontal')
         for habilidade, dica in ((Habilidade.SALTO_DUPLO, 'ESPAÇO 2x  salto duplo'),
+                              (Habilidade.ANCORAGEM, 'E  cabo nos anéis'),
                               (Habilidade.ARRANCADA, 'SHIFT  dash'), (Habilidade.ESCALADA_PAREDE, 'PAREDE + SALTO'),
                               (Habilidade.DISPARO_DISTANCIA, 'F  tiro'), (Habilidade.ESCUDO, 'Q  escudo')):
             if jogador.has(habilidade):

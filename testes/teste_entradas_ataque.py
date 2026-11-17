@@ -85,14 +85,14 @@ class TestesEntradasAtaque(unittest.TestCase):
         for comando in (pygame.K_k, 'mouse'):
             for interrupcao in (pygame.event.Event(pygame.KEYDOWN, key=pygame.K_ESCAPE),
                                 pygame.event.Event(pygame.WINDOWFOCUSLOST)):
-                jogo.estado = ESTADO_JOGANDO
+                jogo.maquina_estados.estado = ESTADO_JOGANDO
                 inicio, fim = self.eventos(comando)
                 eventos = jogo._process_events([inicio])
                 jogo._update(self.teclas, eventos)
                 self.assertTrue(jogo.jogador.carregando)
                 jogo._process_events([interrupcao])
                 self.assertFalse(jogo.jogador.carregando)
-                jogo.estado = ESTADO_JOGANDO
+                jogo.maquina_estados.estado = ESTADO_JOGANDO
                 jogo._update(self.teclas, jogo._process_events([fim]))
                 self.assertEqual(jogo.jogador.temporizador_golpe, 0)
 

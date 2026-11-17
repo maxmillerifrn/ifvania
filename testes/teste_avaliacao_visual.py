@@ -56,7 +56,8 @@ class TestesAvaliacaoVisual(unittest.TestCase):
                 camera = Camera(960, 540)
                 camera.deslocamento.update(chefe.rect.x-480, chefe.rect.bottom-400)
                 imagem = chefe.get_draw_image()
-                corpo_visual = imagem.get_rect(midbottom=camera.apply(chefe.rect).midbottom).inflate(4, 4)
+                # Margem da inclinação corporal; continua proibindo marcas no cenário.
+                corpo_visual = imagem.get_rect(midbottom=camera.apply(chefe.rect).midbottom).inflate(28, 28)
                 estados = ('preparar_disparo', 'pausa', 'preparar', 'executar', 'recuperar') if indice == 0 else ('carimbar',)
                 for estado in estados:
                     chefe.estado_ataque = estado
