@@ -39,7 +39,7 @@ class TestesHistoriaEscolar(unittest.TestCase):
 
     def start_corridor(self, personagem='boy'):
         self.jogo.personagem_escolhido = personagem
-        self.jogo._start_story()
+        self.jogo._iniciar_prologo_escolar()
         self.finish_dialogue()
         self.assertEqual(self.jogo.estado, ESTADO_CARTAO_FASE)
         self.key(pygame.K_RETURN)
@@ -103,7 +103,7 @@ class TestesHistoriaEscolar(unittest.TestCase):
                 self.assertEqual(jogador.personagem, personagem)
 
     def test_intro_shows_max_and_corrupts_monitors_when_ai_revolts(self):
-        self.jogo._start_story()
+        self.jogo._iniciar_prologo_escolar()
         ambiente = self.jogo.fase
         self.assertEqual(ambiente.ambiente, 'classroom')
         self.assertEqual(next(iter(ambiente.professores)).nome, 'Professor Max')
@@ -179,7 +179,7 @@ class TestesHistoriaEscolar(unittest.TestCase):
         self.assertFalse(self.jogo.jogador.chicote_desbloqueado)
 
     def test_school_geometry_supports_characters_and_camera_stays_in_bounds(self):
-        self.jogo._start_story()
+        self.jogo._iniciar_prologo_escolar()
         jogador = self.jogo.jogador
         for nome_ambiente in ('classroom', 'corridor', 'lab'):
             ambiente = FaseEscolar(nome_ambiente)

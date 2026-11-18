@@ -51,7 +51,7 @@ Experimentação direta: `.venv/bin/python -m ferramentas.experimentar_campus --
 
 Q segurado oferece bloqueio frontal após descobrir o mouse, com resistência limitada e quebra de guarda; costas e perigos ambientais exigem reposicionamento/esquiva. A guarda reduz movimento e não permite ataque simultâneo. M alterna áudio também na pausa. Pausa, foco e transições cancelam guarda e cargas.
 
-SpeedBug considera deslocamento real, colisões e retorno dos limites, com reposicionamento entre ataques. As quatro fases novas incluem poses dedicadas, Max com origem móvel/invocações, ricochetes e portas sequenciais. Biblioteca oferece atalhos por consulta e bilhete; quedas nas novas travessias retornam ao apoio seguro com custo de uma integridade, mínimo um. Revisitas concluídas não reiniciam chefes nem curam. Desfecho inclui monitores/nobreak desligados, pendrive isolado, sala física e fachada iluminada.
+SpeedBug considera deslocamento real, colisões e retorno dos limites, com reposicionamento entre ataques. As quatro fases novas incluem poses dedicadas, Max com origem móvel/invocações, ricochetes e portas sequenciais. Biblioteca oferece atalhos por consulta e bilhete; quedas nas novas travessias retornam ao apoio seguro com custo de uma integridade, mínimo um. Revisitas concluídas não reiniciam chefes nem curam. Desfecho inclui monitores/nobreak desligados, arquivo da tarefa isolado, sala física e fachada iluminada.
 
 Implementação técnica concluída; [revisão humana final](REVISAO_HUMANA_FINAL.md) documenta decisões e homologação adiada. Evidências: 172 testes e 15 exportadores em temporário (203 PNGs). Registros anteriores abaixo descrevem a evolução e cedem a esta atualização quando divergirem.
 
@@ -94,34 +94,34 @@ anteriores usaram Python 3.9.6 e Pygame 2.6.1.
 1. Menu com fachada em pixel art, Jogar e Sair; navegação por clique ou setas/Enter.
 2. Escolha Menino/Menina, com prévia animada e confirmação por botão ou Enter.
 3. Digitação do nome (obrigatório, até 20 caracteres); Enter confirma e Esc volta.
-   A aula começa com o aluno conversando com Max, sem narrador, sobre a tarefa
-   produzida por IA, com lembrança visual do quarto e jantar. Monitores exibem
-   a execução e a corrupção; colegas sentados são hipnotizados diante das telas.
-4. Pátio coberto navegável inspirado nas fotos do IFRN, entrada no A28 e encontro com Romerito por **E**.
-5. Investida de Romerito e sucção dos dois personagens para um monitor,
-   com trajetória, rotação e redução visual antes da chegada ao mundo virtual.
-6. Descoberta do mouse na bolsa; o chicote é liberado ao terminar esse diálogo.
-7. Percurso com bugs e degraus de 32 ou 64 pixels, alcançável com o salto básico.
-8. Reencontro com Romerito humano, fala sobre Brasília e corridas e infecção por um bug.
-9. RomerBug alterna dois aviões espaçados, pausa e investida; com até 50% da
+4. Abertura animada de 53 segundos, do fim da tarde à manhã seguinte. Enquanto
+   o protagonista dorme, a energia oscila e a IA reescreve a tarefa. Ao acordar,
+   ele encontra o código pronto e a entrega já enviada ao campus.
+   **Esc** pausa e retoma. **F** pula direto para o A28 com o mouse equipado.
+5. O quarto se fragmenta e dá lugar ao A28 virtual. Na chegada pela abertura,
+   o personagem encontra o mouse na bolsa e passa ao controle do jogador após
+   o diálogo. O menu **Continuar** retoma o checkpoint.
+6. Percurso com bugs e degraus de 32 ou 64 pixels, alcançável com o salto básico.
+7. Reencontro com Romerito humano, fala sobre Brasília e corridas e infecção por um bug.
+8. RomerBug alterna dois aviões espaçados, pausa e investida; com até 50% da
    vida, vira SpeedBug, que lança duas medalhas com pouco deslocamento e depois
    faz uma pausa, investida anunciada e recuperação.
-10. A derrota encerra ameaças e libera a saída, sem conceder poderes. Voltar ao
+9. A derrota encerra ameaças e libera a saída, sem conceder poderes. Voltar ao
     campus e usar E na porta da biblioteca permite continuar.
-11. Três terminais fornecem o mapa e os registros da rede. E examina o módulo
+10. Três terminais fornecem o mapa e os registros da rede. E examina o módulo
     que libera salto duplo e consulta os arquivos; o portão exige as três consultas.
-12. Indexador alterna faixas de ataque e fichas. Sua saída retorna à convivência;
+11. Indexador alterna faixas de ataque e fichas. Sua saída retorna à convivência;
     caminhar até o ginásio e usar E abre Recreio em repetição.
-13. Três travas e Elias abrem caminho pelo jardim, ponto seguro A28 e bloco M1.
-14. Comparar registros e libertar Max revela a autopreservação e libera ancoragem.
-15. Três ramais e Alessandro permitem isolar a rede e seguir ao LIT.
-16. Francisco e IFVania compartilham a integridade do último encontro. Após a
+12. Três travas e Elias abrem caminho pelo jardim, ponto seguro A28 e bloco M1.
+13. Comparar registros e libertar Max revela a autopreservação e libera ancoragem.
+14. Três ramais e Alessandro permitem isolar a rede e seguir ao LIT.
+15. Francisco e IFVania compartilham a integridade do último encontro. Após a
     vitória, percorrer o campus até o ponto A28 no jardim e confirmar com E.
-17. Confirmações, desligamento pelos aliados e epílogo dialogado encerram a campanha.
+16. Confirmações, desligamento pelos aliados e epílogo dialogado encerram a campanha.
 
 O prólogo e a fase virtual funcionam com os dois protagonistas, com os mesmos
 atributos e corpo lógico de 40 × 40 pixels. Protagonista, bosses, professores
-e entidade são apresentados em 80 × 80 pixels, em todas as cenas e animações.
+e entidade usam escala de 80 × 80 pixels durante a partida. A abertura varia a escala visual com o enquadramento e a sucção.
 Os bugs permanecem em 40 × 40. Os pés, as colisões e a geometria do mapa são
 preservados. A escolha do protagonista e o nome permanecem nas transições. O nome identifica
 as falas do aluno e aparece nas respostas dos professores. Não há gravação do

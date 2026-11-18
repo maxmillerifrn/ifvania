@@ -11,7 +11,7 @@ from sistema import configuracoes
 from entidades.jogador import Jogador
 from entidades.projetil import Projetil
 from sistema.jogo import (Jogo, ESTADO_JOGANDO, ESTADO_DIALOGO, ESTADO_INFECCAO,
-                  ESTADO_PAUSA, ESTADO_FIM_CONTEUDO, ESTADO_MENU, ESTADO_TRANSFORMACAO_CHEFE, ESTADO_CARTAO_FASE)
+                  ESTADO_PAUSA, ESTADO_FIM_CONTEUDO, ESTADO_INTRODUCAO, ESTADO_MENU, ESTADO_TRANSFORMACAO_CHEFE, ESTADO_CARTAO_FASE)
 from mundo.fase import Fase
 from mundo.dados_fases import build_levels, DIALOGO_REENCONTRO, DIALOGO_APOS_CHEFE
 from mundo.fases_antigas import build_legacy_levels
@@ -225,7 +225,8 @@ class TestesCampanhaVirtual(unittest.TestCase):
         self.key(pygame.K_RETURN)
         self.jogo._process_events([pygame.event.Event(pygame.TEXTINPUT, text='Alex')])
         self.key(pygame.K_RETURN)
-        self.assertEqual(self.jogo.fase.ambiente, 'classroom')
+        self.assertEqual(self.jogo.estado, ESTADO_INTRODUCAO)
+        self.assertIsNone(self.jogo.fase)
         self.assertIsNot(self.jogo.jogador, jogador)
         self.assertFalse(self.jogo.jogador.chicote_desbloqueado)
         self.assertEqual(self.jogo.jogador.habilidades, set())

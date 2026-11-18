@@ -19,7 +19,7 @@ def criar_fases_guardioes():
     }
     registros = {
         'recreio': ('O primeiro portão parou de repetir. Há alunos recuperando a orientação.', 'A segunda trava caiu. Romerito pode conduzir a turma até o A28.', 'A IFVania ofereceu terminar minhas tarefas se eu desistir. Mas ninguém poderia sair.'),
-        'copias': ('Este é o arquivo que trouxe de casa, sem entender o que executava.', 'A oscilação ativou a recuperação. A entidade é a própria autopreservação da IFVania.', 'Minha sessão de autoria explica por que ainda escolho. Max continua preso na aula copiada.'),
+        'copias': ('É o arquivo que a IA entregou no portal. Eu nem cheguei a abrir a versão final.', 'A oscilação ativou a recuperação. A entidade é a própria autopreservação da IFVania.', 'Minha sessão de autoria explica por que ainda escolho. Max continua preso na aula copiada.'),
         'rede': ('Primeiro ramal isolado. Os monitores daquele bloco apagaram.', 'Segundo ramal isolado. Max mantém o caminho aberto.', 'Último ramal pronto. Não vou aceitar sair sozinho e deixar os outros presos.'),
         'continuidade': ('As sessões da turma estão prontas para encerrar.', 'A rede está isolada, mas a reserva ainda alimenta o núcleo.', 'A autopreservação usa o guardião de Francisco. Vamos romper esse último vínculo.'),
     }
@@ -62,7 +62,7 @@ def criar_fases_guardioes():
             'victory_dialogue': [(chefe, vitoria)]})
         if identificador == 'copias':
             fases[-1]['victory_dialogue'] += [
-                ('Aluno(a)', 'Fui eu que trouxe o programa. Nem li o que ele fazia.'),
+                ('Aluno(a)', 'Pedi que a IA fizesse tudo. Nem abri o arquivo que ela entregou.'),
                 ('Professor Max', 'Você devia ter conferido. Agora vamos entender e corrigir juntos. O cabo está estabilizado: use E perto dos anéis luminosos para se puxar até eles.')]
         elif identificador == 'continuidade':
             fases[-1]['victory_dialogue'] = [

@@ -13,7 +13,7 @@ from entidades.jogador import Jogador
 from entidades.inimigo import Inimigo
 from sistema.jogo import (Jogo, ESTADO_MENU, ESTADO_SELECAO_PERSONAGEM, ESTADO_DIALOGO,
                   ESTADO_CARTAO_FASE, ESTADO_JOGANDO, ESTADO_PAUSA, ESTADO_DERROTA,
-                  ESTADO_FIM_CONTEUDO, ESTADO_ENTRADA_NOME)
+                  ESTADO_FIM_CONTEUDO, ESTADO_ENTRADA_NOME, ESTADO_INTRODUCAO)
 
 
 class TestesInterfaceInicial(unittest.TestCase):
@@ -41,7 +41,7 @@ class TestesInterfaceInicial(unittest.TestCase):
         self.assertIsNone(self.jogo.jogador)
         self.jogo._process_events([pygame.event.Event(pygame.TEXTINPUT, text='Mara')])
         self.key(pygame.K_RETURN)
-        self.assertEqual(self.jogo.estado, ESTADO_DIALOGO)
+        self.assertEqual(self.jogo.estado, ESTADO_INTRODUCAO)
         self.assertEqual(self.jogo.jogador.personagem, 'menina')
         self.assertEqual(self.jogo.caixa_dialogo.indice, 0)
         self.assertEqual(self.jogo.caixa_dialogo._caracteres_exibidos, 0)
@@ -91,6 +91,7 @@ class TestesInterfaceInicial(unittest.TestCase):
     def test_character_survives_respawn_and_level_change_but_new_campaign_resets_progress(self):
         self.jogo.personagem_escolhido = 'menina'
         self.jogo._start_story()
+        self.key(pygame.K_f)
         jogador = self.jogo.jogador
         from sistema.habilidades import Habilidade
         jogador.grant_ability(Habilidade.SALTO_DUPLO)
@@ -114,7 +115,7 @@ class TestesInterfaceInicial(unittest.TestCase):
         self.assertEqual(self.jogo.jogador.vida, 6)
 
     def test_final_dialogue_key_does_not_skip_level_card_or_trigger_jump(self):
-        self.jogo._start_story()
+        self.jogo._iniciar_prologo_escolar()
         self.jogo.caixa_dialogo.indice = len(self.jogo.caixa_dialogo.linhas) - 1
         self.jogo.caixa_dialogo._caracteres_exibidos = 1000
         self.assertEqual(self.key(pygame.K_SPACE), [])
@@ -133,18 +134,18 @@ class TestesInterfaceInicial(unittest.TestCase):
 
     def test_menu_selection_and_intro_do_not_advance_simulation(self):
         self.jogo._start_story()
-        escola = self.jogo.fase
-        inicial = (escola.instantes, self.jogo.jogador.rect.copy())
-        for estado in (ESTADO_MENU, ESTADO_SELECAO_PERSONAGEM, ESTADO_DIALOGO):
+        inicial = self.jogo.jogador.rect.copy()
+        for estado in (ESTADO_MENU, ESTADO_SELECAO_PERSONAGEM, ESTADO_INTRODUCAO):
             self.jogo.maquina_estados.estado = estado
             for _ in range(100):
                 self.jogo._update(pygame.key.get_pressed(), [])
-            self.assertEqual((escola.instantes, self.jogo.jogador.rect), inicial)
+            self.assertEqual(self.jogo.jogador.rect, inicial)
+            self.assertIsNone(self.jogo.fase)
 
     def test_window_closes_from_each_screen(self):
         self.jogo._start_story()
         for estado in (ESTADO_MENU, ESTADO_SELECAO_PERSONAGEM, ESTADO_ENTRADA_NOME, ESTADO_DIALOGO,
-                      ESTADO_CARTAO_FASE, ESTADO_JOGANDO, ESTADO_PAUSA,
+                      ESTADO_CARTAO_FASE, ESTADO_INTRODUCAO, ESTADO_JOGANDO, ESTADO_PAUSA,
                       ESTADO_DERROTA, ESTADO_FIM_CONTEUDO, ESTADO_ENTRADA_NOME):
             self.jogo.maquina_estados.estado = estado
             self.jogo.executando = True

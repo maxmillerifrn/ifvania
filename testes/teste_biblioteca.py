@@ -109,6 +109,7 @@ class TestesBiblioteca(unittest.TestCase):
         self.assertEqual(jogador.nome, 'Márcia')
         self.assertTrue(jogador.has(Habilidade.SALTO_DUPLO))
         self.assertFalse(jogador.carregando)
+        self.jogo.maquina_estados.estado = 'menu'
         self.jogo._start_story()
         self.assertFalse(self.jogo.jogador.habilidades)
         self.assertEqual(self.jogo.jogador.vida_maxima, 6)

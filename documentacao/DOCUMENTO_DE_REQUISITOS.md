@@ -51,7 +51,7 @@ Experimentação direta: `.venv/bin/python -m ferramentas.experimentar_campus --
 
 Q segurado oferece bloqueio frontal após descobrir o mouse, com resistência limitada e quebra de guarda; costas e perigos ambientais exigem reposicionamento/esquiva. A guarda reduz movimento e não permite ataque simultâneo. M alterna áudio também na pausa. Pausa, foco e transições cancelam guarda e cargas.
 
-SpeedBug considera deslocamento real, colisões e retorno dos limites, com reposicionamento entre ataques. As quatro fases novas incluem poses dedicadas, Max com origem móvel/invocações, ricochetes e portas sequenciais. Biblioteca oferece atalhos por consulta e bilhete; quedas nas novas travessias retornam ao apoio seguro com custo de uma integridade, mínimo um. Revisitas concluídas não reiniciam chefes nem curam. Desfecho inclui monitores/nobreak desligados, pendrive isolado, sala física e fachada iluminada.
+SpeedBug considera deslocamento real, colisões e retorno dos limites, com reposicionamento entre ataques. As quatro fases novas incluem poses dedicadas, Max com origem móvel/invocações, ricochetes e portas sequenciais. Biblioteca oferece atalhos por consulta e bilhete; quedas nas novas travessias retornam ao apoio seguro com custo de uma integridade, mínimo um. Revisitas concluídas não reiniciam chefes nem curam. Desfecho inclui monitores/nobreak desligados, arquivo da tarefa isolado, sala física e fachada iluminada.
 
 Implementação técnica concluída; [revisão humana final](REVISAO_HUMANA_FINAL.md) documenta decisões e homologação adiada. Evidências: 172 testes e 15 exportadores em temporário (203 PNGs). Registros anteriores abaixo descrevem a evolução e cedem a esta atualização quando divergirem.
 
@@ -92,15 +92,15 @@ As etapas 1 a 4 do `documentacao/PLANO_DE_EXECUCAO.md` estão implementadas: men
 
 IFVania é um jogo local de plataforma 2D, para um jogador, desenvolvido em Python e Pygame, com visual em pixel art e ambientação escolar e virtual.
 
-Na narrativa revisada, o protagonista leva à aula de programação orientada a objetos uma tarefa produzida por IA sem conferir o código. Uma oscilação de energia na noite anterior desencadeou a rotina que dá origem à IFVania — Inteligência Federal Virtual de Aprendizagem Neural e Inteligência Artificial. Esse passado é apresentado na conversa inicial com Max e retomado durante a campanha, sem narrador na introdução. Ao executar a tarefa na escola, o programa se manifesta; o anúncio de desligamento provoca sua revolta e o controle dos computadores e das pessoas.
+A campanha começa em casa após a aula de programação orientada a objetos. O protagonista pede a uma IA que faça a atividade inteira. Enquanto ele dorme, uma oscilação de energia ativa uma recuperação fictícia que reescreve o código. O protagonista acorda e encontra a tarefa pronta e já sincronizada com o portal do campus. A anomalia então o arrasta ao A28 virtual.
 
-A sessão de autoria preserva parte da autonomia do protagonista, sem imunidade ao dano. O mundo virtual é uma alucinação compartilhada sobre a escola. A jornada passa por A28, biblioteca, pátio/quadra, laboratório de manutenção, sala de rede e núcleo da IFVania. Libertar pessoas, impedir a recriação e migração dos processos e romper a autopreservação permite que os aliados desliguem os equipamentos afetados, incluindo a alimentação de reserva. O roteiro detalha a sequência planejada; o executável agora inclui a biblioteca e encerra após a segunda fase.
+A sessão de autoria preserva parte da autonomia do protagonista, sem imunidade ao dano. O mundo virtual sobrepõe uma alucinação compartilhada ao campus e alcança o protagonista pela sessão autora ainda aberta em casa. A jornada passa por A28, biblioteca, pátio/quadra, laboratório de manutenção, sala de rede e núcleo da IFVania. Libertar pessoas, impedir a recriação e migração dos processos e romper a autopreservação permite que os aliados desliguem os equipamentos afetados, incluindo a alimentação de reserva. O roteiro detalha a sequência planejada; o executável agora inclui a biblioteca e encerra após a segunda fase.
 
 ### 2.1 Escopo definido
 
 - Menu com a fachada da escola e opções Jogar e Sair.
 - Escolha entre Menino e Menina antes da campanha.
-- Introdução com professor Max e a revolta da IFVania.
+- Introdução doméstica animada e chegada à primeira fase no A28 virtual.
 - Exploração dos corredores e encontro com Romerito no laboratório A28.
 - Transporte para o mundo virtual e combate com mouse com fio usado como chicote.
 - Encontro final com Romerito, transformação em RomerBug e, a 50% da vida, em SpeedBug.
@@ -123,7 +123,7 @@ Salvamento persistente, multiplayer, serviços de rede, ranking, suporte a contr
 | Ator externo | Jogador | Escolher o protagonista, explorar, combater e acompanhar a história. |
 | Ator externo | Mantenedor / desenvolvedor | Implementar e validar mapas, entidades, diálogos e recursos visuais. |
 | Personagem | Aluno / aluna | Protagonista parcialmente resistente aos efeitos da IFVania. |
-| Personagem | Professor Max | Apresentar a IA e anunciar seu desligamento na introdução. |
+| Personagem | Professor Max | Propor a atividade e aparecer na campanha como avatar no laboratório das cópias. |
 | Antagonista | IFVania | Controlar os computadores, hipnotizar as pessoas e provocar alucinações. |
 | Personagem / boss | Professor Romerito / RomerBug / SpeedBug | Participar do encontro no A28 e do combate final da primeira fase. |
 
@@ -151,16 +151,16 @@ Os critérios abaixo são verificações propostas para aceite, não resultados 
 | RF-04 | Usar `recursos/fontes_arte/aluno_ifrn_caico.png` como referência do Menino. | O protagonista masculino mantém a identidade visual da referência nas animações do jogo. |
 | RF-05 | Disponibilizar spritesheet completo da Menina baseado no Menino, com características femininas. | A Menina possui quadros para todos os estados usados pelo protagonista, inclusive ataque com chicote, sem quadros ausentes ou troca para sprites do Menino. |
 | RF-06 | Manter a escolha do protagonista durante a campanha. | Diálogos e transições preservam a aparência escolhida; Menino e Menina têm os mesmos controles e capacidades. |
-| RF-07 | Apresentar a aula do professor Max e a IFVania antes da exploração. | O aluno inicia uma conversa com Max, sem narrador. Todas as falas da introdução são entre os dois e identificam a aula de programação orientada a objetos, a origem da tarefa, o tema inteligência artificial e o nome completo da IFVania. |
-| RF-08 | Apresentar a revolta da IA e o objetivo do protagonista. | A sequência mostra ou relata o anúncio de desligamento, o controle dos computadores, a hipnose e as alucinações, a resistência parcial do protagonista e sua busca por ajuda para cortar a energia. |
+| RF-07 | Exibir cinco cenas animadas ao iniciar uma nova campanha. | Mostrar a chegada em casa, a atividade de Max delegada à IA, a oscilação e a reescrita progressiva enquanto o protagonista dorme, a descoberta da tarefa concluída ao acordar e a sucção para o A28 virtual. Esc pausa e F pula para o A28 com controles e equipamento disponíveis. Continuar retoma o checkpoint. |
+| RF-08 | Apresentar a origem da IFVania e dar um objetivo ao protagonista. | A interface mostra a recuperação reescrevendo a atividade e criando o A28 virtual. Ao acordar, o protagonista procura Romerito e tenta descobrir o que aconteceu com a turma. |
 
 ### 4.2 Primeira fase e narrativa
 
 | ID | Requisito | Critério de aceite |
 |---|---|---|
-| RF-09 | Permitir percorrer os corredores da escola em busca de ajuda e entrar no laboratório A28. | O percurso leva a um laboratório identificado como A28 e ao encontro com Romerito. |
+| RF-09 | Iniciar a exploração no A28 virtual. | O protagonista aparece no ponto inicial seguro, com espaço para experimentar os controles antes do primeiro obstáculo. |
 | RF-10 | Apresentar Romerito com base em `referencia/professor_romerito.png`. | Sua representação é reconhecível em relação à referência e respeita o padrão visual do jogo. |
-| RF-11 | Disparar o ataque e a abdução pela IFVania quando o protagonista tenta falar com Romerito no A28. | O evento conduz ambos ao mundo virtual e acontece uma única vez no fluxo da fase. |
+| RF-11 | Encadear a abdução no quarto à entrada no A28 virtual. | Luz, partículas e fragmentação precedem a substituição do quarto pelo cenário jogável. |
 | RF-12 | Mostrar a descoberta do mouse com fio na bolsa e seu uso como chicote. | A obtenção é apresentada antes do primeiro combate que exige a arma; o ataque exibe o mouse e o fio. |
 | RF-13 | Disponibilizar bugs como inimigos comuns no mundo virtual. | O jogador encontra bugs que podem causar e receber dano e são removidos quando derrotados. |
 | RF-14 | Apresentar o reencontro e a fala de Romerito ao final da fase. | Antes do combate, Romerito menciona suas viagens a Brasília, suas corridas e o desejo de nunca mais passar por aquilo. |
@@ -301,7 +301,7 @@ Não há metas homologadas de hardware mínimo, acessibilidade ou compatibilidad
 |---|---|---|
 | CA-01 | Conferir fachada e clicar em Jogar e Sair em sessões separadas. | RF-01, RF-02 |
 | CA-02 | Iniciar uma campanha com cada opção e percorrer animações e transições, verificando identidade e capacidades equivalentes. | RF-03 a RF-06, RN-02 |
-| CA-03 | Conferir aula, revolta da IA, objetivo, corredores, A28, abdução e obtenção do mouse, na ordem prevista. | RF-07 a RF-12, RN-01 |
+| CA-03 | Conferir as cinco cenas, a transição para o A28 e a descoberta do mouse. Testar pausa, pulo da abertura e retomada pelo checkpoint. | RF-07 a RF-12, RN-01 |
 | CA-04 | Exercitar movimento, salto, colisões, chicote, dano e derrota contra bugs. | RF-13, RF-17 a RF-19 |
 | CA-05 | Conferir fala de Romerito e infecção antes de liberar ataques do boss. | RF-14 a RF-16 |
 | CA-06 | Reduzir a vida do boss até acima de 50%, exatamente 50% e abaixo do limiar em execuções controladas; verificar aviões antes e medalhas depois, alternados com investida, sem cura ou transformação repetida. | RF-20 a RF-22, RN-05, RN-09 |

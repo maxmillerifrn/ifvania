@@ -32,10 +32,10 @@ def principal(destino, salvar_quadros=False):
                 pygame.image.save(jogo.tela, str(destino/f'carga_{personagem}_{instante:02d}.png'))
     jogo.nome_jogador = 'Alex'
     jogo.nome_digitado = 'Alex'
-    jogo._start_story()
+    jogo._iniciar_prologo_escolar()
     for personagem in ('boy', 'menina'):
         jogo.personagem_escolhido = personagem
-        jogo._start_story()
+        jogo._iniciar_prologo_escolar()
         for falante in ('Alex', 'Professor Max', 'Professor Romerito', 'IFVania', 'Sistema', 'Indexador'):
             jogo.estado = ESTADO_DIALOGO
             jogo.caixa_dialogo.start([(falante, 'A carga continua enquanto eu caminho. Precisamos encontrar uma saída para a escola.')])

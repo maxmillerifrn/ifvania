@@ -1,5 +1,14 @@
 # Plano de execução — IFVania
 
+## Abertura cinematográfica doméstica
+
+- [x] Cinco cenas em `mundo/introducao.py`, com composição e editor em `mundo/arte_introducao.py`. O portal do campus liga a entrega doméstica aos registros da fase 4.
+- [x] Fachada e quarto refeitos em pixel art detalhada a partir da referência do laboratório. Arte em 960 × 540, escala ajustada na porta e na mobília, poses e efeitos alinhados à cadeira, à cama e ao monitor. [Fontes e prompts](../recursos/fontes_arte/introducao/REFERENCIAS.md).
+- [x] O protagonista vai dormir assim que a IA começa. A oscilação acontece durante o sono e o código pronto é descoberto ao acordar. O batente encobre a passagem com as bordas transparentes do sprite preservadas.
+- [x] Estado próprio em `sistema/jogo.py`, com pausa, salto direto ao A28 e transição por faixas para a descoberta do mouse. `sistema/sons.py` fornece os sinais e ambientes.
+- [x] Execução e captura dos quadros na engine, mais regressões de posicionamento, identidade, movimento, salto e checkpoint. Evidências em [avaliação da introdução](../avaliacao/introducao/RELATORIO.md).
+- [ ] Avaliar ritmo em tempo real e mixagem em uma sessão com janela e áudio.
+
 ## Revisão vigente — nitidez, golpes e Mente Brilhante (18/11/2026)
 
 O estado anterior foi registrado no commit `fe13741`, antes destas melhorias. O bug agora conserva a apresentação HD ao se virar para a esquerda, corrigindo a ampliação indevida do quadro lógico de 40 px. RomerBug usa novo atlas sombrio mantendo terno, gravata e sapatos; SpeedBug mantém regata laranja, shorts, medalha e tênis de corrida. Ambos têm poses próprias de soco e chute e lançam um pulso de energia como especial.

@@ -21,7 +21,7 @@ class TestesRevisaoInicio(unittest.TestCase):
         pygame.quit()
 
     def test_abertura_encadeia_memoria_pendrive_execucao_e_corrupcao(self):
-        self.jogo._start_story()
+        self.jogo._iniciar_prologo_escolar()
         fase = self.jogo.fase
         self.assertIsNotNone(fase.arte.turma)
         self.assertEqual(len(fase.arte.turma.postos), 2)
@@ -40,7 +40,7 @@ class TestesRevisaoInicio(unittest.TestCase):
             self.assertLessEqual(len(self.jogo.caixa_dialogo._wrap(fala, 810)), 3)
 
     def test_hipnose_visivel_em_dialogo_e_congelada_na_pausa(self):
-        self.jogo._start_story()
+        self.jogo._iniciar_prologo_escolar()
         self.jogo.caixa_dialogo.indice = INDICE_CORRUPCAO_HISTORIA
         self.jogo._update(self.teclas, [])
         for _ in range(50):

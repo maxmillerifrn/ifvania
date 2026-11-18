@@ -21,7 +21,8 @@ def definir_ambiente(identificador):
         return
     frequencias = {'a28': (82, 123), 'biblioteca': (98, 147), 'recreio': (110, 165),
                    'copias': (87, 130), 'rede': (73, 146), 'continuidade': (65, 97),
-                   'campus': (130, 195), 'escola': (146, 220)}
+                   'campus': (130, 195), 'escola': (146, 220), 'casa': (146, 174),
+                   'anomalia': (57, 81), 'silencio': (0, 0)}
     fundamental, harmonia = frequencias.get(identificador, frequencias['escola'])
     chave = (identificador, formato)
     if chave not in _ambientes:
@@ -65,7 +66,8 @@ def tocar(tipo):
         amostras = array('h')
         for indice in range(round(frequencia*duracao)):
             tempo = indice/frequencia
-            tom = (130-65*tempo/duracao) if tipo == 'impacto' else {'carga': 880, 'quebra': 110, 'dano': 180, 'bloqueio': 520, 'aviso_corporal': 310, 'golpe_corporal': 150}.get(tipo, 440)
+            tom = (130-65*tempo/duracao) if tipo == 'impacto' else {'carga': 880, 'quebra': 110, 'dano': 180, 'bloqueio': 520, 'aviso_corporal': 310, 'golpe_corporal': 150,
+                   'tecla': 690, 'energia': 65, 'recuperacao': 760}.get(tipo, 440)
             envelope = (1-tempo/duracao)**2
             valor = round(4800*envelope*math.sin(2*math.pi*tom*tempo))
             amostras.extend([valor]*canais)

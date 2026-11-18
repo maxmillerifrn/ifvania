@@ -221,6 +221,7 @@ class TestesExpansao(unittest.TestCase):
         for _ in range(12):
             self.jogo._process_events(self.interacao)
         self.assertEqual(self.jogo.estado, ESTADO_VITORIA)
+        self.jogo.maquina_estados.estado = 'menu'
         self.jogo._start_story()
         self.assertEqual(self.jogo.progresso_campanha.fases_concluidas, set())
 

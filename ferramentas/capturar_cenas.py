@@ -29,7 +29,7 @@ def capturar(destino):
     salvar('02_selecao')
     jogo._process_events([pygame.event.Event(pygame.KEYDOWN, key=pygame.K_RETURN)])
     salvar('03_nome')
-    jogo._start_story()
+    jogo._iniciar_prologo_escolar()
     jogo.caixa_dialogo._caracteres_exibidos = 1000
     salvar('04_aula')
     for indice, nome in [(INDICE_MEMORIA_HISTORIA, '05_memoria'), (INDICE_CORRUPCAO_HISTORIA, '06_hipnose')]:

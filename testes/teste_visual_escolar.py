@@ -74,7 +74,7 @@ class TestesVisualEscolar(unittest.TestCase):
         self.assertGreater(alteracoes, 50)
 
     def test_monitors_animate_during_intro_without_advancing_world_and_pause_freezes_them(self):
-        self.jogo._start_story()
+        self.jogo._iniciar_prologo_escolar()
         ambiente = self.jogo.fase
         corpo = self.jogo.jogador.rect.copy()
         for _ in range(60): self.jogo._update(self.teclas, [])

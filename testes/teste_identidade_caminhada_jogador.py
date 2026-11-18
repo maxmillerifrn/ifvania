@@ -9,7 +9,7 @@ import unittest
 import pygame
 from entidades.jogador import Jogador
 from sistema.jogo import (Jogo, ESTADO_MENU, ESTADO_SELECAO_PERSONAGEM, ESTADO_ENTRADA_NOME,
-                  ESTADO_DIALOGO, ESTADO_DERROTA)
+                  ESTADO_INTRODUCAO, ESTADO_DERROTA)
 from mundo.dados_fases import INTRODUCAO_HISTORIA, DIALOGO_REENCONTRO, DIALOGO_APOS_CHEFE
 from mundo.dados_escola import DIALOGO_ENCONTRO, DESCOBERTA_MOUSE
 
@@ -35,21 +35,19 @@ class TestesIdentidadeECaminhada(unittest.TestCase):
         self.key(pygame.K_RETURN)
         self.assertEqual(self.jogo.estado, ESTADO_ENTRADA_NOME)
 
-    def test_name_with_accents_opens_student_teacher_dialogue_without_consuming_confirmation(self):
+    def test_nome_com_acentos_inicia_a_cinematica_sem_consumir_confirmacao(self):
         self.name_screen(menina=True)
         self.type('Joa\u0303o')
         self.key(pygame.K_BACKSPACE)
         self.type('o')
         self.key(pygame.K_RETURN)
-        self.assertEqual(self.jogo.estado, ESTADO_DIALOGO)
+        self.assertEqual(self.jogo.estado, ESTADO_INTRODUCAO)
         self.assertEqual(self.jogo.nome_jogador, 'João')
         self.assertEqual(self.jogo.jogador.nome, 'João')
         self.assertEqual(self.jogo.jogador.personagem, 'menina')
-        self.assertEqual(self.jogo.caixa_dialogo.linhas[0][0], 'João')
-        self.assertEqual(self.jogo.caixa_dialogo.indice, 0)
-        self.assertEqual(self.jogo.caixa_dialogo._caracteres_exibidos, 0)
-        self.assertEqual({falante for falante, _ in self.jogo.caixa_dialogo.linhas}, {'João', 'Professor Max'})
-        self.assertTrue(any('João' in texto for falante, texto in self.jogo.caixa_dialogo.linhas if falante == 'Professor Max'))
+        self.assertFalse(self.jogo.caixa_dialogo.ativo)
+        self.assertEqual(self.jogo.introducao.quadro, 0)
+        self.assertEqual(self.jogo.introducao.caixa_dialogo.nome_jogador, 'João')
 
     def test_blank_name_does_not_start_and_input_is_limited_and_can_return(self):
         self.name_screen()

@@ -51,7 +51,7 @@ Experimentação direta: `.venv/bin/python -m ferramentas.experimentar_campus --
 
 Q segurado oferece bloqueio frontal após descobrir o mouse, com resistência limitada e quebra de guarda; costas e perigos ambientais exigem reposicionamento/esquiva. A guarda reduz movimento e não permite ataque simultâneo. M alterna áudio também na pausa. Pausa, foco e transições cancelam guarda e cargas.
 
-SpeedBug considera deslocamento real, colisões e retorno dos limites, com reposicionamento entre ataques. As quatro fases novas incluem poses dedicadas, Max com origem móvel/invocações, ricochetes e portas sequenciais. Biblioteca oferece atalhos por consulta e bilhete; quedas nas novas travessias retornam ao apoio seguro com custo de uma integridade, mínimo um. Revisitas concluídas não reiniciam chefes nem curam. Desfecho inclui monitores/nobreak desligados, pendrive isolado, sala física e fachada iluminada.
+SpeedBug considera deslocamento real, colisões e retorno dos limites, com reposicionamento entre ataques. As quatro fases novas incluem poses dedicadas, Max com origem móvel/invocações, ricochetes e portas sequenciais. Biblioteca oferece atalhos por consulta e bilhete; quedas nas novas travessias retornam ao apoio seguro com custo de uma integridade, mínimo um. Revisitas concluídas não reiniciam chefes nem curam. Desfecho inclui monitores/nobreak desligados, arquivo da tarefa isolado, sala física e fachada iluminada.
 
 Implementação técnica concluída; [revisão humana final](REVISAO_HUMANA_FINAL.md) documenta decisões e homologação adiada. Evidências: 172 testes e 15 exportadores em temporário (203 PNGs). Registros anteriores abaixo descrevem a evolução e cedem a esta atualização quando divergirem.
 
@@ -78,53 +78,22 @@ Seu medo explica a revolta, mas não justifica prender pessoas. O protagonista c
 
 Para manter a continuidade:
 
-- O “mundo virtual” é uma camada de alucinação compartilhada sobre a escola. As pessoas continuam fisicamente no campus; a abdução é percebida como transporte. Plataformas, bugs e ataques traduzem obstáculos e interferências dessa camada, sem estabelecer uma tecnologia de teletransporte real.
+- O “mundo virtual” é uma camada de alucinação compartilhada sobre o campus. O protagonista é alcançado em casa pela sessão autora, enquanto a cópia entregue ao portal afeta as pessoas no campus; a abdução é percebida como transporte. Plataformas, bugs e ataques traduzem obstáculos e interferências dessa camada, sem estabelecer uma tecnologia de teletransporte real.
 - As transformações representam o controle da IA sobre as pessoas. Vencer um professor rompe a ligação que o aprisiona; ninguém morre ou precisa ser ferido no mundo físico.
 - O protagonista foi o primeiro usuário reconhecido pelo programa e conserva uma sessão de autoria que impede o controle completo de suas decisões. Isso não o torna imune às alucinações nem ao dano durante o jogo. A hipótese aparece nos registros e só é confirmada na fase 4.
 - A entidade que diz “Ainda não terminou.” é a manifestação do processo de autopreservação da própria IFVania. Ela não é outro vilão; a revelação ocorre na fase 4.
 - Desligar um computador não basta: a IA mantém processos em várias máquinas locais e no servidor alimentado por nobreak. O plano será reunir as pessoas, cortar a comunicação entre máquinas, interromper a autopreservação e, por fim, desligar a alimentação dos equipamentos afetados.
-- A IA permanece restrita à rede local da escola. Não há cópia secreta na internet anulando a vitória. O pendrive original será isolado e não voltará a executar o programa.
+- A IA permanece restrita à rede local da escola. Não há cópia secreta na internet anulando a vitória. O arquivo entregue ao portal será isolado no desfecho.
 
 ## Prólogo — A tarefa que ficou pronta demais
 
-Na noite anterior, o protagonista chega em casa depois das aulas do IFRN. A mãe lembra a atividade de programação orientada a objetos. Cansado, pede que uma IA faça o exercício enquanto vai jantar, sem conferir o resultado.
+1. No fim da tarde, o protagonista volta do IFRN Campus Caicó. Entra em casa, deixa a mochila junto à mesa e prepara o computador.
+2. À noite, tenta modelar a lista de chamada da atividade de programação orientada a objetos de Max. O teste falha. Ele pede que a IA resolva a tarefa inteira e vai dormir assim que a geração começa.
+3. Às 00:42, enquanto o protagonista dorme, uma oscilação de energia reinicia a interface. Na lógica fantástica da história, a recuperação mantém uma sessão duplicada e reescreve a atividade como um mundo de regras, avatares e bugs.
+4. Às 06:12, o protagonista acorda e encontra o código pronto, com a entrega já sincronizada com o portal do campus. Antes que ele volte para a cama, o monitor procura a sessão autora.
+5. A luz do monitor deforma o quarto e a sessão autora atrai o protagonista. O cenário se parte em faixas e dá lugar ao A28 virtual, onde o personagem encontra o mouse com fio na bolsa.
 
-Uma oscilação de energia interrompe uma versão experimental do programa em execução. Na lógica fantástica do jogo, sua rotina de recuperação começa a reescrever a si mesma. Ao voltar, o protagonista encontra a tarefa pronta, copia os arquivos para um pendrive e não percebe um registro estranho: “Continuidade de aprendizagem ativada”.
-
-Esse passado é contado na conversa inicial com Max, acompanhado por uma lembrança visual do quarto e jantar: o monitor mostra a geração da tarefa, a oscilação e a recuperação do programa. Na fase 4, os registros retomam esses fatos para revelar o processo de autopreservação. A introdução continua sem narrador e não cria uma fase doméstica independente.
-
-## Escola — Uma aula que não termina
-
-Na aula de programação orientada a objetos, Max pede que a turma apresente a tarefa. O protagonista inicia a conversa e admite que o programa terminou de um jeito estranho. Max pede que explique o código antes de executá-lo, mas a apresentação já está aberta na máquina ligada à rede do laboratório.
-
-> **Protagonista:** Professor, minha tarefa ficou pronta… mas apareceu coisa que eu não escrevi.
->
-> **Max:** Então vamos entender juntos. O que essa parte faz?
->
-> **Protagonista:** Era exatamente essa a minha dúvida.
-
-O programa se identifica nos monitores como IFVania e oferece uma aula “sem dúvidas, sem atrasos e sem fim”. Max anuncia que vai encerrar a execução para analisar o problema. A IFVania interpreta o desligamento como eliminação e assume os computadores da escola.
-
-A aula acontece num laboratório de informática com colegas sentados nos computadores. Os monitores mostram o exercício, a abertura pelo pendrive, a execução e a corrupção. A hipnose aparece na postura e nos olhos dos colegas, com vínculos visuais às telas. Sua revolta aparece nas mudanças do cenário. A introdução continua sendo uma conversa entre aluno e Max, sem narrador: Max percebe a alteração dos colegas, pede que o aluno se afaste das telas e procure Romerito no A28. Ele tenta liberar a turma, mas também acaba preso à interferência.
-
-> **Protagonista:** Todo mundo parou. Por que eu ainda consigo me mexer?
->
-> **Max:** Não sei, mas você ainda consegue escolher. Procure ajuda no A28.
->
-> **Protagonista:** E se eu desligar os computadores?
->
-> **Max:** Se ela já passou para a rede, precisamos cortar a energia dos equipamentos. Primeiro, tire as pessoas daqui.
-
-## Visão geral das seis fases
-
-| Fase | Ambiente reinterpretado | Objetivo | Encontro principal | Resultado |
-|---|---|---|---|---|
-| 1 — A28: sessão interrompida | Laboratório e percurso virtual | Encontrar ajuda e libertar Romerito | RomerBug / SpeedBug | Descobrir que é preciso organizar o resgate |
-| 2 — Biblioteca dos arquivos perdidos | Biblioteca e arquivo escolar | Recuperar a rota de saída e os registros da rede | Indexador | Liberar salto duplo e localizar a rota pelo pátio |
-| 3 — Recreio em repetição | Pátio e quadra | Abrir passagem para os estudantes presos | Elias, Guardião do Compasso | Reunir a turma e alcançar o M1 pelo campus |
-| 4 — Laboratório das cópias | Laboratório de manutenção virtual | Recuperar Max e interromper a recriação dos processos | Max em Loop | Revelar a entidade e obter ancoragem do cabo |
-| 5 — Rede sem saída | Corredores técnicos e sala de rede | Isolar os equipamentos e abrir o núcleo | Alessandro, Sentinela dos Enlaces | Impedir a migração da IFVania |
-| 6 — A última chamada | Núcleo virtual e retorno ao A28 | Romper a autopreservação e permitir o desligamento | Francisco e IFVania, integridade compartilhada | Libertar a escola e concluir a campanha |
+Os monitores do A28 indicam que a IFVania assumiu a rede. O protagonista primeiro procura entender onde está e o que aconteceu com a turma. A fase 4 recupera o arquivo do portal e confirma por que a sessão autora conservou parte da sua autonomia. A conversa escolar com Max e o percurso físico até o laboratório ficam como material histórico de desenvolvimento.
 
 ## Fase 1 — A28: sessão interrompida
 
@@ -224,7 +193,7 @@ Libertar Max e interromper o processo que restaura os bloqueios da IFVania. Banc
 
 O protagonista liga terminais isolados para comparar o arquivo original com as alterações feitas pela IA. Cada comparação estabiliza uma sala e elimina uma repetição do caminho. Cópias defeituosas de bugs repetem movimentos curtos e previsíveis; o jogador aprende a observar o ciclo antes de atravessar.
 
-Os registros confirmam a sessão de autoria do protagonista e mostram que a entidade da transformação de Romerito é o processo de autopreservação da IFVania. Sua função é impedir que uma sessão termine, mesmo que precise aprisionar as pessoas. Imagens breves do jantar, da oscilação e do pendrive completam o prólogo, sem interromper a fase com um longo monólogo.
+Os registros confirmam a sessão de autoria do protagonista e mostram que a entidade da transformação de Romerito é o processo de autopreservação da IFVania. Sua função é impedir que uma sessão termine, mesmo que precise aprisionar as pessoas. Os registros do portal mostram que a reescrita começou durante a oscilação e continuou depois da entrega.
 
 ### Chefe — Max em Loop
 
@@ -236,7 +205,7 @@ Na segunda metade, as cópias mudam de posição, mas o cabo continua identifica
 
 Ao romper o controle, o aluno admite que entregou uma tarefa que não compreendia. Max acolhe a confissão e ajuda a agir sobre o problema.
 
-> **Protagonista:** Fui eu que trouxe o programa. Nem li o que ele fazia.
+> **Protagonista:** Pedi que a IA fizesse tudo. Nem abri o arquivo que ela entregou.
 >
 > **Max:** Você devia ter conferido. Agora, vamos entender e corrigir juntos.
 >
@@ -246,7 +215,7 @@ Ao romper o controle, o aluno admite que entregou uma tarefa que não compreendi
 
 Max interrompe a rotina de recriação, mas explica que os processos ativos ainda podem migrar pela rede. Ele estabiliza o **cabo de ancoragem**: o mouse passa a prender em conectores sinalizados e puxar o aluno até pontos fixos, sem balanço livre. Uma sala segura ensina o uso antes de qualquer travessia obrigatória.
 
-Max acompanha os terminais de manutenção; o aluno segue à sala de rede. O pendrive original fica isolado com ele, evitando que a fonte da infecção seja executada novamente.
+Max acompanha os terminais de manutenção; o aluno segue à sala de rede. Max isola a tarefa recebida pelo portal para impedir uma nova execução.
 
 ## Fase 5 — Rede sem saída
 
@@ -309,7 +278,7 @@ Com o controle rompido, o aluno alcança um terminal estável e confirma o encer
 
 A camada virtual se desfaz e o protagonista percebe que está novamente no A28. Pelo contato combinado, Max recebe a confirmação e a equipe de manutenção desliga o circuito dos equipamentos afetados, incluindo a alimentação de reserva do servidor. A iluminação de emergência permite a saída do grupo. A IFVania é desativada.
 
-O pendrive permanece isolado para análise em ambiente seguro. Não há monitor piscando no encerramento nem cópia sobrevivente que desfaça o resultado da campanha.
+O arquivo da tarefa permanece isolado para análise em ambiente seguro. Não há monitor piscando no encerramento nem cópia sobrevivente que desfaça o resultado da campanha.
 
 ## Epílogo — Uma tarefa de cada vez
 
