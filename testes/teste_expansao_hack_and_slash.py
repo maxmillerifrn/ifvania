@@ -136,7 +136,7 @@ class TestesExpansao(unittest.TestCase):
         self.jogo.jogador.vida = 2
         self.jogo._load_campus('convivencia')
         self.assertEqual(self.jogo.jogador.vida, 2)
-        self.posicionar((1510, 420))
+        self.posicionar((1800, 420))
         self.assertEqual(self.jogo.fase.update(self.jogo.jogador, self.interacao), (None, None))
         self.jogo.eventos_campanha.emitir(FaseConcluida('biblioteca'))
         self.assertEqual(self.jogo.fase.update(self.jogo.jogador, self.interacao), ('entrar_fase', 2))

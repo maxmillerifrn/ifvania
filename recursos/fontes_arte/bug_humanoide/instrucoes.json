@@ -1,0 +1,8 @@
+{
+  "data": "2026-11-17",
+  "ferramenta": "image_gen",
+  "arquivo": "atlas.png",
+  "transparencia": true,
+  "uso": "Atlas 4 colunas x 2 linhas; bugs humanoides e SpeedBug sombrio",
+  "prompt": "Use case: stylized-concept. Asset type: production sprite atlas for IFVania, 2D side view school action platformer. Create one transparent PNG atlas, exact regular 4 columns by 2 rows, eight isolated full body sprites, generous equal transparent gutters. All face RIGHT, feet same baseline within each cell, no text, no background. Crisp hand-drawn cartoon game illustration, clean dark outlines, detailed but readable at 80 pixels. Row 1: same HUMANOID computer bug in four poses: idle, left-foot running, right-foot running, recoil. Bug is a lean biped with two arms and two legs, angular green and graphite segmented cybernetic armor, two short antennae and bright emerald visor, clearly humanoid proportions; mischievous digital parasite, no insect quadruped silhouette. Row 2: same SPEEDBUG dark possessed athletic teacher humanoid in four poses: idle combat guard, running left stride, running right stride, forward punch. Brazilian adult male teacher, short dark hair, recognizable human face partly covered by violet glitch corruption, dark navy athletic clothes, black segmented armor plates, purple luminous cracks and small cyan eyes, threatening but no gore, no weapons, shoes with white soles. Consistent heights and silhouette across each row. Poses fully contained each cell with no overlapping objects."
+}

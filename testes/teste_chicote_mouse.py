@@ -26,6 +26,7 @@ class TestesChicoteMouse(unittest.TestCase):
 
     def swing(self, alvos, solidos=()):
         self.jogador.espera_ataque = 0
+        self.jogador.temporizador_golpe = 0
         self.jogador._try_melee()
         for idade in range(self.jogador.chicote.DURACAO):
             self.jogador.temporizador_golpe = self.jogador.chicote.DURACAO - idade
@@ -107,21 +108,23 @@ class TestesMovimentoChefe(unittest.TestCase):
     def tearDownClass(cls):
         pygame.quit()
 
-    def test_deslocamento_curto_preserva_fracoes_e_investida_usa_ciclo_completo(self):
+    def test_corrida_preserva_fracoes_e_ciclo_completo_de_animacao(self):
         chefe=RomerBug(600,408,arena=pygame.Rect(0,0,2000,600))
         jogador=Jogador(100,408);chefe.activate();chefe.take_damage(8)
         chefe.temporizador_transformacao=0
         piso=[pygame.Rect(0,448,2000,100)]
         origem=chefe.rect.x
+        chefe.temporizador_ataque=400
         fracoes=[]
+        quadros=set()
         for _ in range(100):
             chefe.update(jogador,piso)
             fracoes.append(abs(chefe.posicao.x-round(chefe.posicao.x)))
-        self.assertLessEqual(abs(chefe.rect.x-origem),24)
+            quadros.add(chefe.quadro_movimento)
+        self.assertGreater(abs(chefe.rect.x-origem),24)
         self.assertGreater(max(fracoes),0.1)
         chefe.projeteis.empty();chefe.preparar_ataque(jogador,piso)
-        quadros=set()
-        for _ in range(63):
+        for _ in range(100):
             chefe.update(jogador,piso);quadros.add(chefe.quadro_movimento)
         self.assertEqual(quadros,set(range(6)))
         self.assertEqual(chefe.rect.bottom,448)

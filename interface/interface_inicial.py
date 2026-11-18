@@ -14,7 +14,7 @@ class InterfaceInicial:
         self.fonte_cabecalho = pygame.font.Font(None, 36)
         self.fonte = pygame.font.Font(None, 28)
         self.fonte_pequena = pygame.font.Font(None, 20)
-        self.retangulos_menu = [pygame.Rect(56, 300, 304, 54), pygame.Rect(56, 370, 304, 54)]
+        self.tem_salvamento = False
         self.retangulos_personagens = [pygame.Rect(244, 132, 220, 272), pygame.Rect(496, 132, 220, 272)]
         self.retangulo_confirmar = pygame.Rect(320, 428, 320, 48)
         self.retangulo_voltar = pygame.Rect(28, 28, 120, 40)
@@ -30,6 +30,10 @@ class InterfaceInicial:
         for x in range(configuracoes.LARGURA_TELA):
             transparencia = max(0, int(225*(1-x/760)))
             pygame.draw.line(self.veu, (*tema.TINTA, transparencia), (x, 0), (x, configuracoes.ALTURA_TELA))
+
+    @property
+    def retangulos_menu(self):
+        return [pygame.Rect(56,280+i*56,304,48) for i in range(3 if self.tem_salvamento else 2)]
 
     def update(self):
         self.instante_animacao += 1
@@ -58,7 +62,7 @@ class InterfaceInicial:
         tema.text(superficie, self.fonte_titulo, 'IFVania', (51, 106))
         pygame.draw.line(superficie, tema.AMBAR, (58, 193), (104, 193), 3)
         tema.text(superficie, self.fonte, 'A escola não é mais a mesma.', (58, 218), tema.PAPEL)
-        for i, (retangulo, rotulo) in enumerate(zip(self.retangulos_menu, ('Jogar', 'Sair'))):
+        for i, (retangulo, rotulo) in enumerate(zip(self.retangulos_menu, ('Novo jogo', 'Continuar', 'Sair') if self.tem_salvamento else ('Jogar', 'Sair'))):
             self._button(superficie, retangulo, rotulo, i == indice_menu, f'0{i+1}')
         tema.text(superficie, self.fonte_pequena, 'Uma presença tomou os corredores.', (58, 454), tema.ATENUADO)
         pygame.draw.rect(superficie, tema.TINTA, (0, 498, configuracoes.LARGURA_TELA, 42))

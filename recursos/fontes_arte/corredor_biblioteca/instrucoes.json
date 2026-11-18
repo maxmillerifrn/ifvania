@@ -1,0 +1,8 @@
+{
+  "data": "2026-11-17",
+  "ferramenta": "image_gen",
+  "arquivo": "panorama.png",
+  "transparencia": false,
+  "prompt": "Use case: stylized-concept. Asset type: seamless architectural background for a 2D side-scrolling school platform game IFVania. Create a very wide 32:9 panoramic illustrated scene of a covered Brazilian school corridor at night, SIDE ON, architecture parallel to image plane, no vanishing point down the walkway. Full width walkable foreground tiled floor occupies bottom 20 percent, clear uninterrupted horizontal top edge of walkway at 81 percent image height. Left end exit from computer laboratory, middle quiet school noticeboards and benches, right half a large unmistakable double wooden library doorway set into the wall with rectangular sign area above it, far right a distant gymnasium doorway; doors closed, all threshold bases at exactly 81 percent image height. IFRN school atmosphere: tiled lower walls, cream upper wall, red clay tiled roof, fluorescent lights, framed windows revealing dark garden plants, no people or characters, no text letters logos or typography (labels will be drawn by game). Rich hand-painted 2D game environment, detailed clean illustration, dark blue night shadows, muted warm lighting, straight horizontal corridor, consistent scale, plants visible only in open window sections, no foreground obstacles, avoid dramatic perspective or central aisle going into distance. Leave 12 percent bottom margin as floor below walkway. This is a game background that must support walking left to right across the entire panorama.",
+  "exportador": "python -m ferramentas.preparar_corredor_biblioteca"
+}

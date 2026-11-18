@@ -298,3 +298,15 @@ Exportadores: `python -m ferramentas.preparar_turma_laboratorio`, `python -m fer
 ## Poses de combate dos guardiões — 16/11/2026
 
 Fonte preservada em `guardioes_campus/poses_combate.png`; prompt e referências em `instrucoes_poses_guardioes.json`. `python -m ferramentas.preparar_poses_guardioes` exporta quatro poses de cada guardião em 40 e 80 px. Retratos separados são derivados da fonte original pelo exportador de guardiões. O verificador executou os 15 exportadores em temporário, com 203 PNGs distintos; recursos aprovados anteriores preservados.
+
+## Parasita humanoide e SpeedBug sombrio — 17/11/2026
+
+Fonte original transparente: `bug_humanoide/atlas.png`; prompt integral em `bug_humanoide/instrucoes.json`. Exportar com `python -m ferramentas.preparar_bug_humanoide --destino /tmp/ifvania-bug-humanoide`. O atlas contém duas linhas de quatro poses; exporta quadros de 40 e apresentações de 80 px. Nova pasta, sem substituir os bugs e SpeedBug antigos. Verificador: 16 exportadores, 219 PNGs em cópia temporária.
+
+## Corredor da biblioteca — 17/11/2026
+
+Panorama em `corredor_biblioteca/panorama.png`, prompt em `corredor_biblioteca/instrucoes.json`. Exportar com `python -m ferramentas.preparar_corredor_biblioteca --destino /tmp/ifvania-corredor`. Saída em 1920 × 540, piso alinhado ao passeio; arte do pátio anterior preservada. A vegetação recebe deformação visual em tempo de execução, sem sobrescrever a fonte. Verificador: 17 exportadores, 220 PNGs em temporário.
+
+## Parasita humanoide e SpeedBug sombrio — 17/11/2026
+
+Fonte original transparente: `bug_humanoide/atlas.png`; prompt integral em `bug_humanoide/instrucoes.json`. Exportar com `python -m ferramentas.preparar_bug_humanoide --destino /tmp/ifvania-bug-humanoide`. O atlas contém duas linhas de quatro poses; exporta quadros de 40 e apresentações de 80 px. Nova pasta, sem substituir os bugs e SpeedBug antigos. Verificador: 16 exportadores, 219 PNGs em cópia temporária.

@@ -109,7 +109,7 @@ class Jogador(Personagem):
         self.defesa = DefesaMouse()
         self.estados_combate = MaquinaEstados('pronto', {
             'pronto': acoes-{'pronto'}, 'carga': {'pronto', 'golpe', 'esquiva', 'recuo'},
-            'golpe': {'pronto', 'esquiva', 'recuo'}, 'esquiva': {'pronto', 'recuo'},
+            'golpe': {'pronto', 'carga', 'esquiva', 'recuo'}, 'esquiva': {'pronto', 'recuo'},
             'recuo': {'pronto'}, 'ancoragem': {'pronto', 'recuo'}})
         self.estados_combate.transicoes['bloqueio'] = frozenset({'pronto', 'esquiva', 'recuo'})
         self.temporizador_ancoragem = 0
@@ -163,8 +163,6 @@ class Jogador(Personagem):
             self.velocidade.x = self.direcao_esquiva * configuracoes.VELOCIDADE_ESQUIVA
         elif self.temporizador_arrancada <= 0 and self.temporizador_recuo <= 0:
             limite = configuracoes.VELOCIDADE_JOGADOR * (0.75 if self.carregando else 1)
-            if self.defesa.ativa:
-                limite *= 0.35
             alvo = movimento * limite
             aceleracao = (configuracoes.ACELERACAO_JOGADOR if self.no_chao
                           else configuracoes.ACELERACAO_AEREA)
@@ -191,8 +189,8 @@ class Jogador(Personagem):
                     if (self.chicote_desbloqueado and not self.aguardando_soltar
                             and not self.defesa.ativa
                             and not self.temporizador_ancoragem and not self.temporizador_recuo
-                            and self.temporizador_esquiva == 0 and self.temporizador_golpe == 0
-                            and self.espera_ataque <= 6):
+                            and self.temporizador_esquiva == 0 and self.temporizador_golpe <= 8
+                            and self.espera_ataque <= 8):
                         self.carregando = True
                         self.estados_combate.mudar('carga')
                         self.aguardando_soltar = True
@@ -205,7 +203,7 @@ class Jogador(Personagem):
                         self.tipo_golpe = ('ascendente' if teclas[pygame.K_UP] or teclas[pygame.K_w] else
                                            'descendente' if not self.no_chao and (teclas[pygame.K_DOWN] or teclas[pygame.K_s]) else 'normal')
                         self.ataque_pendente = 2 if self.carga >= configuracoes.TEMPO_CARGA else 1
-                        self.memoria_ataque = 6
+                        self.memoria_ataque = 10
                         self.carregando = False
                         self._try_melee(self.ataque_pendente)
                     self.aguardando_soltar = False
@@ -322,7 +320,8 @@ class Jogador(Personagem):
             self.escudo_ativo = not self.escudo_ativo
 
     def _try_melee(self, dano=1):
-        if self.chicote_desbloqueado and not self.defesa.ativa and self.espera_ataque <= 0 and self.temporizador_esquiva == 0:
+        if (self.chicote_desbloqueado and not self.defesa.ativa and self.espera_ataque <= 0
+                and self.temporizador_golpe == 0 and self.temporizador_esquiva == 0):
             self.etapa_combo = (self.etapa_combo % 3)+1 if dano == 1 and self.janela_combo else 1
             self.janela_combo = 50 if dano == 1 else 0
             self.espera_ataque = configuracoes.ESPERA_ATAQUE
@@ -486,8 +485,17 @@ class Jogador(Personagem):
         """Escolhe o estado de animação (ataque > dash > pulo > andar > parado) e
         sincroniza os passos ao deslocamento real; repouso usa temporizador."""
         if self.defesa.ativa:
+            sufixo = '_r' if self.direcao_olhar > 0 else '_l'
             self.estado_animacao = 'block'
-            self.image = self.figuras['attack_r' if self.direcao_olhar > 0 else 'attack_l'][0]
+            if self.deslocamento_x > 0.01 and self.no_chao:
+                self.distancia_caminhada += self.deslocamento_x
+                quadros = self.figuras['walk_charge'+sufixo]
+                self.quadro_animacao = int(self.distancia_caminhada/(4*self.ESCALA_VISUAL)) % len(quadros)
+                self.image = quadros[self.quadro_animacao]
+            elif not self.no_chao:
+                self.image = self.figuras['jump'+sufixo]
+            else:
+                self.image = self.figuras['attack'+sufixo][0]
             return
         if self.carregando and self.no_chao and self.deslocamento_x <= 0.01:
             self.estado_animacao = 'charge'
@@ -557,8 +565,8 @@ class Jogador(Personagem):
                 imagem.blit(mistura, (0, 0))
         return imagem
 
-    def draw(self, superficie, camera):
-        piscando = self.temporizador_invulnerabilidade > 0 and (self.temporizador_invulnerabilidade // 4) % 2 == 0
+    def draw(self, superficie, camera, mostrar_sempre=False):
+        piscando = not mostrar_sempre and self.temporizador_invulnerabilidade > 0 and (self.temporizador_invulnerabilidade // 4) % 2 == 0
         destino = camera.apply(self.rect)
         if self.defesa.ativa:
             import math

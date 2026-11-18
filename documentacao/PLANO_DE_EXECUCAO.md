@@ -1,5 +1,74 @@
 # Plano de execução — IFVania
 
+## Atualização vigente — parasita humanoide, cenas e save (17/11/2026)
+
+Bloqueio com Q permite caminhada animada na velocidade normal, salto e troca de direção, mantendo resistência e proteção frontal. Os bugs agora têm corpo humanoide, com poses próprias de repouso, corrida e dano. O golpe que eliminaria o último bug do A28 inicia uma cena: ele corre até Romerito e se funde ao professor. Entrar na arena sozinho não dispara mais a transformação. A metamorfose aos 50% permanece protegida e agora revela SpeedBug com armadura escura e corrupção violeta. Após a vitória, o parasita sai do corpo e se desintegra antes do diálogo de libertação.
+
+Salvamento automático em `dados/salvamento.json`, ignorado pelo Git: um slot, com versão e gravação atômica. Checkpoints nas entradas, durante travessias seguras, antes do confronto e após vitória. F5 grava o checkpoint atual; R após morrer retoma nele com integridade completa. O menu oferece **Continuar** quando há arquivo válido. Nome, aparência, habilidades, objetivos, vitórias e inimigos já eliminados antes do checkpoint são preservados. Chefes não vencidos reiniciam com vida completa; não se salva no meio de um golpe/cena. O prólogo não possui checkpoint; o primeiro fica no mundo virtual. Novo jogo substitui o slot quando atinge esse ponto. Ferramentas de experimentação não sobrescrevem o save do jogador.
+
+O novo contrato substitui as descrições anteriores de progresso somente em memória e movimento reduzido na guarda. Evidências, arquitetura do save e revisão pendente no [relatório](../avaliacao/parasita_e_save/RELATORIO.md).
+
+- [x] Guarda com caminhada animada e velocidade normal, preservando colisão e cancelamento de entradas.
+- [x] Atlas humanoide e SpeedBug sombrio gerados em fonte separada; exportador dedicado, sem substituir arte aprovada.
+- [x] Último golpe interceptado antes da morte do bug: fuga, fusão e diálogo, sem iniciar pelo gatilho da arena.
+- [x] Metamorfose sombria e expulsão/desintegração integradas; física/dano suspensos e pausa respeitada.
+- [x] Save versionado, gravação atômica, checkpoint seguro, retomada por R, F5 e Continuar no menu.
+- [x] Restauração de objetivos/habilidades e inimigos do checkpoint; chefe já vencido não reaparece.
+- [x] 187 testes aprovados, 16 exportadores em temporário (219 PNGs) e oito capturas controladas.
+- [ ] Revisão humana: ritmo das três cenas, silhueta do humanoide, caminhada defensiva e distribuição dos checkpoints numa partida integral. Testes não homologam diversão.
+
+
+## Correção vigente — alinhamento, corredor e brisa (17/11/2026)
+
+O bug humanoide agora usa a mesma escala visual de 80 px do protagonista, mantendo a colisão de 40 × 40. Na fuga para Romerito, posição, câmera e desenho usam os pés; o trajeto acompanha o piso. A fusão encolhe o bug até o tórax visual, com espelhamento quando ele corre para a esquerda. A expulsão foi ajustada à mesma referência.
+
+Após a fase 1, o jogador sai do A28 no início do corredor de convivência (x=180) e precisa caminhar até a porta de madeira da biblioteca (x=1200), usando E para entrar na fase 2. O cenário recebeu panorama próprio, placas e janela para o jardim. A volta da biblioteca fica em x=1330, fora do gatilho; o ginásio está mais adiante, em x=1800. A travessia ao jardim continua acessível após o recreio.
+
+Folhas e plantas do pátio, jardim, recreio e janelas do corredor recebem brisa com ritmos distintos. A animação é apenas visual, usa o relógio pausável da cena e mantém arquitetura, bancos e colisões. Fontes anteriores foram preservadas. Evidências em [RELATORIO.md](../avaliacao/corredor_e_vento/RELATORIO.md).
+
+- [x] Corrigidos apoio pelos pés, altura visual e destino da fusão; corpo lógico preservado.
+- [x] Saída da fase 1 no começo do corredor, biblioteca adiante com porta ilustrada e acesso por E; retornos e avanço ao jardim verificados.
+- [x] Arte nova separada e exportador do corredor; brisa aplicada à vegetação em áreas externas e janelas.
+- [x] Construções isoladas de Jogo não consultam o save real; execução normal e caminhos explícitos continuam habilitando Continuar. Isso evita que saves existentes do jogador interfiram nos testes.
+- [x] 193 testes aprovados; 17 exportadores em temporário, 220 PNGs distintos; capturas controladas atualizadas.
+- [ ] Revisão humana: naturalidade da corrida/fusão, leitura das placas, duração da caminhada e intensidade da brisa. Sem homologação de diversão por testes.
+
+
+## Atualização vigente — parasita humanoide, cenas e save (17/11/2026)
+
+Bloqueio com Q permite caminhada animada na velocidade normal, salto e troca de direção, mantendo resistência e proteção frontal. Os bugs agora têm corpo humanoide, com poses próprias de repouso, corrida e dano. O golpe que eliminaria o último bug do A28 inicia uma cena: ele corre até Romerito e se funde ao professor. Entrar na arena sozinho não dispara mais a transformação. A metamorfose aos 50% permanece protegida e agora revela SpeedBug com armadura escura e corrupção violeta. Após a vitória, o parasita sai do corpo e se desintegra antes do diálogo de libertação.
+
+Salvamento automático em `dados/salvamento.json`, ignorado pelo Git: um slot, com versão e gravação atômica. Checkpoints nas entradas, durante travessias seguras, antes do confronto e após vitória. F5 grava o checkpoint atual; R após morrer retoma nele com integridade completa. O menu oferece **Continuar** quando há arquivo válido. Nome, aparência, habilidades, objetivos, vitórias e inimigos já eliminados antes do checkpoint são preservados. Chefes não vencidos reiniciam com vida completa; não se salva no meio de um golpe/cena. O prólogo não possui checkpoint; o primeiro fica no mundo virtual. Novo jogo substitui o slot quando atinge esse ponto. Ferramentas de experimentação não sobrescrevem o save do jogador.
+
+O novo contrato substitui as descrições anteriores de progresso somente em memória e movimento reduzido na guarda. Evidências, arquitetura do save e revisão pendente no [relatório](../avaliacao/parasita_e_save/RELATORIO.md).
+
+- [x] Guarda com caminhada animada e velocidade normal, preservando colisão e cancelamento de entradas.
+- [x] Atlas humanoide e SpeedBug sombrio gerados em fonte separada; exportador dedicado, sem substituir arte aprovada.
+- [x] Último golpe interceptado antes da morte do bug: fuga, fusão e diálogo, sem iniciar pelo gatilho da arena.
+- [x] Metamorfose sombria e expulsão/desintegração integradas; física/dano suspensos e pausa respeitada.
+- [x] Save versionado, gravação atômica, checkpoint seguro, retomada por R, F5 e Continuar no menu.
+- [x] Restauração de objetivos/habilidades e inimigos do checkpoint; chefe já vencido não reaparece.
+- [x] 187 testes aprovados, 16 exportadores em temporário (219 PNGs) e oito capturas controladas.
+- [ ] Revisão humana: ritmo das três cenas, silhueta do humanoide, caminhada defensiva e distribuição dos checkpoints numa partida integral. Testes não homologam diversão.
+
+
+## Revisão vigente — duelo corporal (17/11/2026)
+
+A nova avaliação humana reprovou a fluidez da luta com RomerBug. O encontro foi redesenhado: aproximação livre, cruzado, varrida baixa e avanço curto substituem o roteiro automático de aviões/medalhas. RomerBug encadeia dois golpes; SpeedBug encadeia três, aproxima mais rápido e mantém a mesma reserva de vida. Cada golpe tem preparação sem dano, direção fixa durante execução e recuperação. Q bloqueia e cancela a sequência inteira, abrindo 44 atualizações de contra-ataque. A varrida tem aviso baixo e pode ser saltada.
+
+Os primeiros dois acertos fora da execução/recuperação provocam recuo breve; depois o chefe firma a postura até completar sua resposta, continuando a receber dano. Isso limita aprisionamento por interrupções. O próximo toque do combo pode ser antecipado nas últimas oito atualizações do recolhimento; carga e ataque na soltura continuam preservados. Foram retirados o limite artificial de deslocamento e o balanço contínuo do corpo.
+
+Experimentação direta: `.venv/bin/python -m ferramentas.experimentar_campus --duelo`. É um atalho de desenvolvimento sem habilidades futuras; não altera o menu nem a campanha. Fontes de inspiração, parâmetros e evidências em [RELATORIO.md](../avaliacao/duelo_romerbug/RELATORIO.md). A avaliação humana da nova dinâmica continua aberta; os registros de 16/11 abaixo descrevem a versão anterior quando divergirem deste trecho.
+
+- [x] Retorno humano incorporado: luta anterior continuava artificial e sem fluidez.
+- [x] Substituição do ciclo de projéteis por duelo corporal nas duas formas, mantendo transformação, corpo e vida.
+- [x] Origem do golpe corporal vem do atacante, evitando bloqueio/recuo invertidos quando a área ultrapassa o centro do jogador. Áreas são cortadas pelas paredes.
+- [x] Memória de combo no recolhimento, pausa/foco/transição e consumo único preservados.
+- [x] Regressões antigas de lançamentos substituídas pelos novos contratos; preservados testes de acesso, vida compartilhada, recompensa, cinematográfica, pausa e colisões.
+- [x] 176 testes aprovados; seis capturas controladas das duas formas. Nenhuma nova exportação de arte necessária.
+- [ ] Reavaliar humanamente diversão, pressão, avisos e conforto; não implica aprovação automática por testes.
+
+
 ## Entrega corrente — fechamento técnico do plano (16/11/2026)
 
 H0–H9 implementados tecnicamente conforme [plano detalhado](PLANO_HACK_AND_SLASH.md). Foram concluídos os refinamentos que o registro anterior listava como pendentes: bloqueio Q, deslocamento de SpeedBug nos limites/paredes e reposicionamento, poses próprias, troca da origem de Max/invocações, bola com ricochete, portas sequenciais, perigos e resgates animados, atalhos/bilhete da biblioteca, bolsa, ambiência/M e desligamento com epílogo visual. Revisitas e retomadas preservam objetivos; queda retorna ao apoio seguro. Sem novos commits nesta entrega.

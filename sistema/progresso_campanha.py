@@ -21,6 +21,10 @@ class ProgressoCampanha:
     def fases_concluidas(self):
         return frozenset(self._fases_concluidas)
 
+    @property
+    def objetivos_concluidos(self):
+        return frozenset(self._objetivos_concluidos)
+
     def _registrar_chefe(self, evento):
         self._chefes_derrotados.add(evento.identificador_fase)
 

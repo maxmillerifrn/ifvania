@@ -58,26 +58,6 @@ class TestesRomerBug(unittest.TestCase):
         self.assertEqual(self.chefe.rect, inicial)
         self.assertFalse(self.chefe.projeteis)
 
-    def test_aviao_tem_aviso_mira_fixa_e_intervalo_maior(self):
-        self.chefe.activate()
-        for _ in range(70):self.chefe.update(self.jogador,self.piso)
-        self.assertEqual(self.chefe.estado_ataque,'preparar_disparo')
-        mira=self.chefe.mira_disparo.copy()
-        self.jogador.rect.x=800
-        for _ in range(29):
-            self.assertFalse(self.chefe.projeteis)
-            self.chefe.update(self.jogador,self.piso)
-        self.assertEqual(self.chefe.mira_disparo,mira)
-        self.chefe.update(self.jogador,self.piso)
-        projetil=next(iter(self.chefe.projeteis))
-        self.assertEqual(projetil.tipo,'plane')
-        self.assertLess(projetil.velocidade.x,0)
-        self.assertEqual(self.chefe.temporizador_ataque,108)
-        for _ in range(137):self.chefe.update(self.jogador,self.piso)
-        self.assertEqual(self.chefe.disparos_no_ciclo,1)
-        self.chefe.update(self.jogador,self.piso)
-        self.assertEqual(self.chefe.disparos_no_ciclo,2)
-        self.assertEqual(self.chefe.estado_ataque,'pausa')
 
     def test_transforms_at_exactly_half_health_once(self):
         self.chefe.activate()
@@ -106,55 +86,9 @@ class TestesRomerBug(unittest.TestCase):
         self.assertTrue(self.chefe.transformado)
         self.assertEqual(self.chefe.vida, 6)
 
-    def test_transformacao_limpa_projeteis_e_interrompe_ataque(self):
-        self.chefe.activate()
-        self.chefe.preparar_disparo(self.jogador)
-        self.chefe.lancar_projetil()
-        self.assertTrue(self.chefe.projeteis)
-        self.chefe.take_damage(8)
-        inicial=self.chefe.rect.copy()
-        self.chefe.update(self.jogador,self.piso)
-        self.assertFalse(self.chefe.projeteis)
-        self.assertEqual(self.chefe.disparos_no_ciclo,0)
-        self.assertEqual(self.chefe.get_all_hit_rects(),[])
-        self.assertEqual(self.chefe.rect,inicial)
 
-    def test_investida_nao_corrige_direcao_e_oferece_recuperacao(self):
-        self.transform()
-        self.chefe.preparar_ataque(self.jogador, self.piso)
-        direcao = self.chefe.direcao_investida
-        self.jogador.rect.x = 800
-        for _ in range(36):
-            self.assertEqual(self.chefe.get_all_hit_rects(), [])
-            self.chefe.update(self.jogador, self.piso)
-        inicial = self.chefe.rect.x
-        for _ in range(27):
-            self.assertEqual(self.chefe.direcao_investida, direcao)
-            self.chefe.update(self.jogador, self.piso)
-        self.assertEqual(self.chefe.rect.x-inicial, direcao*160)
-        self.assertEqual(self.chefe.estado_ataque, 'recuperar')
-        self.assertEqual(self.chefe.get_all_hit_rects(), [])
-        self.assertEqual(self.chefe.temporizador_ataque, 78)
-        self.assertFalse(self.chefe.projeteis)
 
-    def test_investida_para_na_parede_sem_salto_reativo(self):
-        self.transform()
-        self.chefe.preparar_ataque(self.jogador, self.piso)
-        parede = pygame.Rect(self.chefe.rect.left-32, 384, 32, 64)
-        for _ in range(40):
-            self.chefe.update(self.jogador, self.piso+[parede])
-        self.assertGreaterEqual(self.chefe.rect.left, parede.right)
-        self.assertEqual(self.chefe.velocidade.y, 0)
-        self.assertEqual(self.chefe.estado_ataque, 'recuperar')
 
-    def test_mira_lida_com_sobreposicao_e_alvo_a_direita(self):
-        for centro in (self.chefe.rect.center,(800,420)):
-            self.jogador.rect.center=centro
-            self.chefe.preparar_disparo(self.jogador)
-            self.assertEqual(self.chefe.direcao_olhar,1)
-            self.chefe.lancar_projetil()
-            self.assertGreater(len(self.chefe.projeteis),0)
-            self.assertEqual(self.chefe.mira_disparo,pygame.Vector2(centro))
 
     def test_projectiles_expire_and_collide_with_world(self):
         for tipo in ('plane', 'medal'):
@@ -191,50 +125,131 @@ class TestesRomerBug(unittest.TestCase):
         jogador.rect.topleft = fase.mapa_blocos.gatilho_saida.topleft
         self.assertEqual(fase.update(jogador, [])[0], 'level_complete')
 
-    def test_ciclo_completo_tem_dois_projeteis_pausa_e_investida_em_ambas_formas(self):
-        for transformado in (False,True):
-            chefe=RomerBug(500,408,arena=pygame.Rect(32,32,896,480))
-            chefe.activate()
-            if transformado:
-                chefe.take_damage(8);chefe.temporizador_transformacao=0
-            vistos=[];maximo_disparos=0
-            for _ in range(650):
-                chefe.update(self.jogador,self.piso)
-                if not vistos or vistos[-1]!=chefe.estado_ataque:vistos.append(chefe.estado_ataque)
-                maximo_disparos=max(maximo_disparos,chefe.disparos_no_ciclo)
-                if chefe.estado_ataque in ('preparar','executar'):
-                    self.assertFalse(chefe.projeteis)
-                    self.assertEqual(chefe.disparos_no_ciclo,2)
-                if chefe.estado_ataque=='recuperar':break
-            self.assertEqual(maximo_disparos,2)
-            self.assertEqual(vistos.count('preparar_disparo'),2)
-            self.assertIn('pausa',vistos)
-            self.assertEqual(vistos[-3:],['preparar','executar','recuperar'])
-            self.assertEqual(chefe.get_all_hit_rects(),[])
 
-    def test_medalha_tem_velocidade_moderada_e_nao_persegue_alvo(self):
-        self.transform();self.chefe.preparar_disparo(self.jogador)
-        self.chefe.lancar_projetil()
-        projetil=next(iter(self.chefe.projeteis))
-        velocidade=projetil.velocidade.copy()
-        self.assertEqual(projetil.tipo,'medal')
-        self.assertAlmostEqual(velocidade.length(),5)
-        self.jogador.rect.x=850
-        for _ in range(10):self.chefe.update(self.jogador,self.piso)
-        self.assertEqual(projetil.velocidade,velocidade)
-        self.assertIn((projetil.rect,projetil.dano),self.chefe.get_all_hit_rects())
 
-    def test_pausa_antes_da_investida_aguarda_projeteis_restantes(self):
-        self.chefe.activate();self.chefe.preparar_disparo(self.jogador)
-        self.chefe.disparos_no_ciclo=1;self.chefe.lancar_projetil()
-        projetil=next(iter(self.chefe.projeteis));projetil.velocidade.update(0,0)
-        self.chefe.temporizador_ataque=1
-        self.chefe.update(self.jogador,self.piso)
-        self.assertEqual(self.chefe.estado_ataque,'pausa')
-        self.assertTrue(self.chefe.projeteis)
-        for _ in range(90):self.chefe.update(self.jogador,self.piso)
+
+    def test_aproxima_sem_trilho_e_ataca_sem_projeteis_nas_duas_formas(self):
+        for transformar in (False, True):
+            self.setUp()
+            self.chefe.activate()
+            if transformar:
+                self.transform()
+            vistos = set()
+            menor_distancia = 1000
+            for _ in range(240):
+                self.chefe.update(self.jogador, self.piso)
+                vistos.add(self.chefe.estado_ataque)
+                menor_distancia = min(menor_distancia, abs(self.chefe.rect.centerx-self.jogador.rect.centerx))
+                self.assertFalse(self.chefe.projeteis)
+            self.assertLess(menor_distancia, 110)
+            self.assertTrue({'preparar', 'executar', 'recuperar'} <= vistos)
+
+    def test_aviso_nao_causa_dano_e_direcao_nao_persegue_durante_golpe(self):
+        self.chefe.activate()
+        self.jogador.rect.x = 330
+        self.chefe.preparar_ataque(self.jogador)
+        direcao = self.chefe.direcao_investida
+        self.jogador.rect.x = 600
+        for _ in range(28):
+            self.assertFalse(self.chefe.get_all_hit_rects())
+            self.chefe.update(self.jogador, self.piso)
+        self.assertEqual(self.chefe.estado_ataque, 'executar')
+        self.assertEqual(self.chefe.direcao_investida, direcao)
+        area, dano = self.chefe.get_all_hit_rects()[0]
+        self.assertLess(area.centerx, self.chefe.rect.centerx)
+        self.assertEqual(dano, 1)
+        for _ in range(10):
+            self.chefe.update(self.jogador, self.piso)
+        self.assertEqual(self.chefe.estado_ataque, 'recuperar')
+        self.assertFalse(self.chefe.get_all_hit_rects())
+
+    def test_sequencia_tem_novo_aviso_entre_golpes_e_recuperacao(self):
+        for transformar, quantidade in ((False, 2), (True, 3)):
+            self.setUp()
+            self.chefe.activate()
+            if transformar:
+                self.transform()
+            self.jogador.rect.x = 340
+            self.chefe.preparar_ataque(self.jogador)
+            golpes = 0
+            anterior = ''
+            for _ in range(200):
+                self.chefe.update(self.jogador, self.piso)
+                if self.chefe.estado_ataque == 'executar' and anterior != 'executar':
+                    golpes += 1
+                    self.assertEqual(anterior, 'preparar')
+                anterior = self.chefe.estado_ataque
+                if anterior == 'recuperar':
+                    break
+            self.assertEqual(golpes, quantidade)
+            self.assertGreaterEqual(self.chefe.temporizador_ataque, 32)
+
+    def test_dano_interrompe_duas_vezes_sem_permitir_trava_infinita(self):
+        self.chefe.activate()
+        origem = self.chefe.posicao.x
+        self.chefe.take_damage(1, recuo=(4, 0))
+        self.assertEqual(self.chefe.estado_ataque, 'recuo')
+        for _ in range(10): self.chefe.update(self.jogador, self.piso)
+        self.assertGreater(self.chefe.posicao.x, origem)
+        self.chefe.take_damage(1)
+        for _ in range(10): self.chefe.update(self.jogador, self.piso)
+        self.chefe.preparar_ataque(self.jogador)
+        self.chefe.take_damage(1)
+        self.assertEqual(self.chefe.estado_ataque, 'preparar')
+        self.assertEqual(self.chefe.vida, 13)
+
+    def test_bloquear_golpe_cancela_resto_da_sequencia(self):
+        self.chefe.activate()
+        self.jogador.rect.x = 340
+        self.chefe.preparar_ataque(self.jogador)
+        for _ in range(28): self.chefe.update(self.jogador, self.piso)
+        self.chefe.reagir_bloqueio(self.chefe.get_all_hit_rects()[0][0])
+        self.assertEqual(self.chefe.estado_ataque, 'recuperar')
+        self.assertEqual(self.chefe.temporizador_ataque, 44)
+        self.assertFalse(self.chefe.get_all_hit_rects())
+
+    def test_varrida_pode_ser_saltada_e_nao_atinge_pelas_costas(self):
+        self.chefe.golpe_atual = 'varrida'
+        self.chefe.direcao_investida = 1
+        area = self.chefe.area_golpe()
+        self.assertEqual(area.height, 22)
+        self.assertFalse(area.colliderect(pygame.Rect(380, 408, 15, 40)))
+        self.assertFalse(area.colliderect(pygame.Rect(450, 350, 40, 40)))
+        self.assertTrue(area.colliderect(pygame.Rect(450, 408, 40, 40)))
+
+    def test_transformacao_limpa_ataques_e_protege_reserva_compartilhada(self):
+        self.chefe.activate()
+        self.chefe.projeteis.add(ProjetilProfessor(self.chefe.rect.center, (1, 0), 'plane'))
+        self.chefe.take_damage(8)
+        self.chefe.take_damage(2)
+        self.assertEqual(self.chefe.vida, 8)
         self.assertFalse(self.chefe.projeteis)
-        self.assertEqual(self.chefe.estado_ataque,'preparar')
+        self.assertFalse(self.chefe.get_all_hit_rects())
+
+    def test_deslocamento_e_hitboxes_respeitam_parede(self):
+        self.chefe.activate()
+        self.jogador.rect.x = 100
+        parede = pygame.Rect(368, 0, 32, 448)
+        for _ in range(100):
+            self.chefe.update(self.jogador, self.piso+[parede])
+            self.assertFalse(self.chefe.rect.colliderect(parede))
+        self.assertEqual(self.chefe.rect.x, 400)
+        self.assertEqual(self.chefe.deslocamento_real, 0)
+
+    def test_golpe_nao_atravessa_parede_e_origem_e_do_atacante(self):
+        self.chefe.solidos_combate = [pygame.Rect(445, 360, 32, 88)]
+        self.chefe.direcao_investida = 1
+        area = self.chefe.area_golpe()
+        self.assertLessEqual(area.right, 445)
+        self.assertEqual(self.chefe.origem_ataque(area), self.chefe.rect.center)
+
+    def test_recuperacao_nao_encurta_quando_recebe_combo(self):
+        self.chefe.activate()
+        self.chefe._recuperar(bloqueado=True)
+        self.chefe.take_damage(1, recuo=(5, 0))
+        self.assertEqual(self.chefe.estado_ataque, 'recuperar')
+        self.assertEqual(self.chefe.temporizador_ataque, 44)
+        self.assertEqual(self.chefe.vida, 15)
 
 
 if __name__ == '__main__':

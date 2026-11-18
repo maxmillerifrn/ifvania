@@ -30,12 +30,14 @@ class BugCombate(Inimigo):
         if estado == 'patrulhar':
             super().update(solidos)
         else:
+            anterior = self.rect.x
             self.brilho_dano = max(0, self.brilho_dano-1)
             self.tempo_barra_vida = max(0, self.tempo_barra_vida-1)
             self.velocidade.x = self.direcao_ataque*4 if estado == 'atacar' and not self.lancador else 0
             self.move_and_collide_x(solidos)
             self.apply_gravity()
             self.move_and_collide_y(solidos)
+            self.deslocamento_atual = abs(self.rect.x-anterior)
         self.tempo_acao -= 1
         if self.tempo_acao > 0:
             return

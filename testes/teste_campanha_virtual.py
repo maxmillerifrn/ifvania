@@ -41,20 +41,21 @@ class TestesCampanhaVirtual(unittest.TestCase):
         self.fail('Diálogo não terminou')
 
     def start_meeting(self):
-        fase = self.jogo.fase
-        jogador = self.jogo.jogador
+        fase, jogador = self.jogo.fase, self.jogo.jogador
         jogador.posicao.update(fase.mapa_blocos.gatilho_dialogo.left+10, fase.surgimento_jogador[1])
         jogador.rect.topleft = jogador.posicao
+        for inimigo in list(fase.inimigos):
+            inimigo.take_damage(100)
         self.jogo._update(self.teclas, [])
-        self.assertEqual(self.jogo.estado, ESTADO_DIALOGO)
+        self.assertEqual(self.jogo.estado, ESTADO_INFECCAO)
         return fase, jogador, fase.chefe
 
     def start_fight(self):
         fase, jogador, chefe = self.start_meeting()
-        self.finish_dialogue()
-        self.assertEqual(self.jogo.estado, ESTADO_INFECCAO)
         for _ in range(self.jogo.duracao_infeccao):
             self.jogo._update(self.teclas, [])
+        self.assertEqual(self.jogo.estado, ESTADO_DIALOGO)
+        self.finish_dialogue()
         self.assertEqual(self.jogo.estado, ESTADO_JOGANDO)
         self.assertTrue(chefe.ativo)
         return fase, jogador, chefe
@@ -104,41 +105,32 @@ class TestesCampanhaVirtual(unittest.TestCase):
                 self.assertEqual(jogador.vida_maxima, 6)
                 self.assertEqual(jogador.vida, 6)
 
-    def test_human_romerito_speaks_before_infection_and_cannot_take_damage(self):
+    def test_romerito_nao_recebe_dano_antes_da_fusao_e_dialoga_depois(self):
         fase, jogador, chefe = self.start_meeting()
         self.assertFalse(fase.infectado)
         self.assertEqual(fase.professor_humano.nome, 'Professor Romerito')
-        self.assertEqual(self.jogo.caixa_dialogo.linhas, self.jogo.caixa_dialogo.resolve_lines(DIALOGO_REENCONTRO))
-        texto = ' '.join(linha for _, linha in DIALOGO_REENCONTRO)
-        self.assertIn('Brasília', texto)
-        self.assertIn('corridas', texto)
-        self.assertIn('nunca mais', texto)
         chefe.take_damage(100)
-        self.assertEqual(chefe.vida, chefe.vida_maxima)
-        temporizador_anterior = chefe.temporizador_ataque
-        for _ in range(120):
-            self.jogo._update(self.teclas, [])
-            self.assertEqual(fase.update(jogador, []), (None, None))
-        self.assertEqual(chefe.temporizador_ataque, temporizador_anterior)
-        self.assertFalse(chefe.projeteis)
+        self.assertEqual(chefe.vida,chefe.vida_maxima)
         self.assertFalse(chefe.ativo)
-        self.assertEqual(fase.professor_humano.rect, chefe.rect)
+        for _ in range(self.jogo.duracao_infeccao): self.jogo._update(self.teclas,[])
+        self.assertEqual(self.jogo.estado,ESTADO_DIALOGO)
+        self.assertEqual(self.jogo.caixa_dialogo.linhas,self.jogo.caixa_dialogo.resolve_lines(DIALOGO_REENCONTRO))
+        texto = ' '.join(linha for _,linha in DIALOGO_REENCONTRO)
+        self.assertIn('Brasília',texto)
+        self.assertIn('corridas',texto)
 
-    def test_infection_swaps_visual_without_changing_body_or_health_and_then_starts_fight(self):
-        fase, jogador, chefe = self.start_meeting()
-        antes = (chefe.rect.copy(), chefe.vida, jogador.vida, jogador.rect.copy())
-        self.finish_dialogue()
-        self.assertEqual(self.jogo.estado, ESTADO_INFECCAO)
-        for _ in range(self.jogo.duracao_infeccao//2):
-            self.jogo._update(self.teclas, [])
+    def test_fusao_preserva_corpo_vida_e_jogador_ate_dialogo(self):
+        fase,jogador,chefe = self.start_meeting()
+        antes = (chefe.rect.copy(),chefe.vida,jogador.vida,jogador.rect.copy())
+        for _ in range(self.jogo.duracao_infeccao):
+            self.jogo._update(self.teclas,[])
+            self.assertEqual((chefe.rect,chefe.vida,jogador.vida,jogador.rect),antes)
         self.assertTrue(fase.infectado)
-        self.assertFalse(chefe.ativo)
-        self.assertEqual((chefe.rect, chefe.vida, jogador.vida, jogador.rect), antes)
-        for _ in range(self.jogo.duracao_infeccao//2):
-            self.jogo._update(self.teclas, [])
         self.assertTrue(chefe.ativo)
         self.assertFalse(fase.encontro_pendente)
-        self.assertEqual(self.jogo.estado, ESTADO_JOGANDO)
+        self.assertEqual(self.jogo.estado,ESTADO_DIALOGO)
+        self.finish_dialogue()
+        self.assertEqual(self.jogo.estado,ESTADO_JOGANDO)
 
     def test_infection_pauses_resumes_and_window_closes(self):
         self.start_meeting()
@@ -161,7 +153,7 @@ class TestesCampanhaVirtual(unittest.TestCase):
         fase, jogador, chefe = self.start_fight()
         antes = chefe.rect.copy()
         chefe.preparar_ataque(jogador, fase.mapa_blocos.solidos)
-        self.assertEqual(chefe.choose_attack(jogador), 'aviao')
+        self.assertIn(chefe.choose_attack(jogador), ('cruzado', 'varrida', 'avanco'))
         self.assertEqual(chefe.estado_ataque, 'preparar')
         chefe.take_damage(7)
         self.assertFalse(chefe.transformado)
@@ -172,7 +164,7 @@ class TestesCampanhaVirtual(unittest.TestCase):
         self.assertEqual(chefe.rect.size, configuracoes.TAMANHO_PERSONAGEM)
         self.finish_transformation()
         chefe.preparar_ataque(jogador, fase.mapa_blocos.solidos)
-        self.assertEqual(chefe.choose_attack(jogador), 'medalha')
+        self.assertIn(chefe.choose_attack(jogador), ('cruzado', 'varrida', 'avanco'))
         self.assertEqual(chefe.estado_ataque, 'preparar')
         chefe.take_damage(1)
         self.assertEqual(chefe.vida, 7)
@@ -183,8 +175,9 @@ class TestesCampanhaVirtual(unittest.TestCase):
         fase, jogador, chefe = self.start_fight()
         self.defeat(chefe, jogador, fase.mapa_blocos.solidos)
         jogador.projeteis.add(Projetil(200, 300, (1, 0)))
-        self.assertTrue(fase.inimigos)
+        self.assertFalse(fase.inimigos)
         self.jogo._update(self.teclas, [])
+        for _ in range(self.jogo.duracao_infeccao): self.jogo._update(self.teclas,[])
         self.assertEqual(self.jogo.estado, ESTADO_DIALOGO)
         self.assertEqual(self.jogo.caixa_dialogo.linhas, self.jogo.caixa_dialogo.resolve_lines(DIALOGO_APOS_CHEFE))
         self.assertFalse(fase.inimigos)
@@ -210,6 +203,7 @@ class TestesCampanhaVirtual(unittest.TestCase):
         self.assertFalse(fase.concluido)
         self.defeat(chefe, jogador, fase.mapa_blocos.solidos)
         self.jogo._update(self.teclas, [])
+        for _ in range(self.jogo.duracao_infeccao): self.jogo._update(self.teclas,[])
         self.assertEqual(self.jogo.estado, ESTADO_DIALOGO)
         self.finish_dialogue()
         self.assertEqual(self.jogo.estado, ESTADO_JOGANDO)
@@ -243,6 +237,7 @@ class TestesCampanhaVirtual(unittest.TestCase):
     def test_both_characters_defeat_both_forms_using_keyboard_whip_without_powers(self):
         for personagem in ('boy', 'menina'):
             with self.subTest(character=personagem):
+                self.jogo._iniciar_sessao_campanha()
                 self.jogo.personagem_escolhido = personagem
                 self.jogo._load_level(0, novo_jogador=True)
                 self.jogo.maquina_estados.estado = ESTADO_JOGANDO
@@ -266,6 +261,8 @@ class TestesCampanhaVirtual(unittest.TestCase):
                             break
                     if chefe.derrotado:
                         break
+                for _ in range(151):
+                    if self.jogo.estado == ESTADO_INFECCAO: self.jogo._update(self.teclas,[])
                 self.assertTrue(viu_speedbug)
                 self.assertTrue(chefe.derrotado)
                 self.assertEqual(self.jogo.estado, ESTADO_DIALOGO)

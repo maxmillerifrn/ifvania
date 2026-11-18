@@ -3,6 +3,7 @@ from types import SimpleNamespace
 import pygame
 from mundo.camera import Camera
 from mundo.arte_escolar import ArteEscolar
+from mundo.vegetacao_vento import VegetacaoAoVento
 from mundo.dados_campus import SETORES, FALAS_CAMPUS
 from entidades.professor import Professor
 from sistema import configuracoes, recursos
@@ -29,9 +30,11 @@ class CampusVirtual:
         self.mapa_blocos.solidos.extend(self.apoios)
         self.conectores = [pygame.Vector2(1060, 300), pygame.Vector2(1320, 310)] if setor in ('jardim', 'informatica') else []
         self.camera = Camera(self.largura, 540)
-        pontos_retorno = {'biblioteca': 320, 'recreio': 1410, 'copias': 620, 'rede': 1390, 'continuidade': 1220}
+        pontos_retorno = {'a28': 180, 'biblioteca': 1330, 'recreio': 1680, 'copias': 620, 'rede': 1390, 'continuidade': 1220}
         self.surgimento_jogador = (1750 if chegada == 'fim' else pontos_retorno.get(chegada, 100), self.piso-40)
         self.arte = ArteEscolar('corridor', self.largura)
+        self.corredor_biblioteca = recursos.load_image('cenarios/corredor_biblioteca.png') if setor == 'convivencia' else None
+        self.vento_corredor = VegetacaoAoVento(self.corredor_biblioteca,[(275,200,300,150),(1410,200,230,150),(565,315,80,85),(970,280,80,120)]) if self.corredor_biblioteca else None
         self.instantes = 0
         self.fonte = pygame.font.Font(None, 25)
         self.fonte_pequena = pygame.font.Font(None, 21)
@@ -50,6 +53,8 @@ class CampusVirtual:
         if not houve_interacao(eventos):
             return None, None
         concluidas = self.progresso.fases_concluidas
+        if jogador.rect.centerx > 1800 and 'proximo' in self.dados_setor and self.dados_setor['requisito'] in concluidas:
+            return 'trocar_setor', (self.dados_setor['proximo'], 'inicio')
         if jogador.rect.colliderect(self.bilhete.inflate(45, 24)):
             if self.eventos:
                 self.eventos.emitir(ObjetivoConcluido('campus', 'bilhete_'+self.setor))
@@ -72,6 +77,8 @@ class CampusVirtual:
                 self.tempo_aviso = 180
                 return None, None
         if abs(jogador.rect.centerx-self.professor.rect.centerx) < 85:
+            if self.setor == 'convivencia' and 'biblioteca' in concluidas:
+                return 'dialogue', [('Professor Romerito','Os registros estão seguros. Continue pelo corredor até a porta do ginásio.')]
             if self.setor == 'informatica' and 'copias' not in concluidas:
                 return 'dialogue', [('Aluno(a)', 'Max repete a mesma aula na tela do M1. Preciso romper as cópias para libertá-lo.')]
             if self.setor == 'tecnico' and 'rede' not in concluidas:
@@ -87,13 +94,18 @@ class CampusVirtual:
         return None, None
 
     def draw(self, superficie):
-        self.arte.draw(superficie, self.camera, self.instantes, False)
+        if self.corredor_biblioteca:
+            superficie.blit(self.corredor_biblioteca,(-round(self.camera.deslocamento.x),-round(self.camera.deslocamento.y)))
+            self.vento_corredor.draw(superficie,self.instantes,self.camera.deslocamento)
+        else:
+            self.arte.draw(superficie, self.camera, self.instantes, False)
         if self.setor == 'informatica' and 'copias' not in self.progresso.fases_concluidas:
             for x in (410, 630):
                 copia = pygame.Surface((66, 116), pygame.SRCALPHA)
                 pygame.draw.rect(copia, (103, 169, 176, 65), copia.get_rect(), 2)
                 superficie.blit(copia, (x-self.camera.deslocamento.x, self.piso-116))
-        pygame.draw.rect(superficie, (34, 47, 48), (0, self.piso, 960, 100))
+        if self.corredor_biblioteca is None:
+            pygame.draw.rect(superficie, (34, 47, 48), (0, self.piso, 960, 100))
         for apoio in self.apoios:
             destino = self.camera.apply(apoio)
             pygame.draw.rect(superficie, (55, 73, 76), destino)
@@ -112,6 +124,13 @@ class CampusVirtual:
         destino_orientacao = self.camera.apply(self.professor.rect)
         superficie.blit(orientacao, orientacao.get_rect(midbottom=(destino_orientacao.centerx, destino_orientacao.top-43)))
         for x, nome, indice, requisito in self.dados_setor['entradas']:
+            if self.corredor_biblioteca is not None:
+                aberta = requisito is None or requisito in self.progresso.fases_concluidas
+                posicao = self.camera.apply(pygame.Rect(x-110,160 if indice == 1 else 195,220,30))
+                tema.panel(superficie,posicao,(116,202,167) if aberta else (162,103,85))
+                texto = self.fonte_pequena.render('BIBLIOTECA' if indice == 1 else 'GINÁSIO',True,tema.PAPEL)
+                superficie.blit(texto,texto.get_rect(center=posicao.center))
+                continue
             posicao = self.camera.apply(pygame.Rect(x-35, self.piso-116, 70, 116))
             aberta = requisito is None or requisito in self.progresso.fases_concluidas
             cor = (74, 161, 132) if aberta else (124, 77, 72)
@@ -120,6 +139,9 @@ class CampusVirtual:
             pygame.draw.circle(superficie, cor, (posicao.right-12, posicao.centery), 4)
             texto = self.fonte_pequena.render(nome, True, (241, 225, 192))
             superficie.blit(texto, texto.get_rect(midbottom=(posicao.centerx, posicao.top-10)))
+        if self.corredor_biblioteca is not None:
+            texto = self.fonte_pequena.render('A28  <     BIBLIOTECA  >',True,(242,220,175))
+            superficie.blit(texto,self.camera.apply(pygame.Rect(320,215,1,1)).topleft)
         if self.progresso.chefes_derrotados:
             texto = self.fonte_pequena.render('Vínculos rompidos: '+str(len(self.progresso.chefes_derrotados)), True, (132, 221, 177))
             superficie.blit(texto, (24, 210))
@@ -129,6 +151,21 @@ class CampusVirtual:
                 figura = recursos.load_image(caminho)
                 centro = self.camera.apply(pygame.Rect(630+indice*64, self.piso-40, 40, 40))
                 superficie.blit(figura, figura.get_rect(midbottom=centro.midbottom))
-        texto = self.aviso if self.tempo_aviso else 'E nas bordas: trocar setor   |   E na porta: entrar   |   E no A28: recuperar integridade'
-        tema.panel(superficie, pygame.Rect(18, 155, 924, 38))
-        tema.text(superficie, self.fonte_pequena, texto, (30, 165), tema.PAPEL)
+        if self.corredor_biblioteca is not None:
+            texto = self.aviso if self.tempo_aviso else ('Biblioteca > E na porta de madeira' if 'biblioteca' not in self.progresso.fases_concluidas else 'Ginásio > continue pelo corredor')
+            tema.panel(superficie, pygame.Rect(235, 90, 470, 58))
+            palavras, linha, linhas = texto.split(), '', []
+            for palavra in palavras:
+                tentativa = (linha+' '+palavra).strip()
+                if linha and self.fonte_pequena.size(tentativa)[0] > 445:
+                    linhas.append(linha)
+                    linha = palavra
+                else:
+                    linha = tentativa
+            linhas.append(linha)
+            for indice, linha in enumerate(linhas[:2]):
+                tema.text(superficie,self.fonte_pequena,linha,(247,101+indice*21),tema.PAPEL)
+        else:
+            texto = self.aviso if self.tempo_aviso else 'E nas bordas: trocar setor   |   E na porta: entrar   |   E no A28: recuperar integridade'
+            tema.panel(superficie, pygame.Rect(18, 155, 924, 38))
+            tema.text(superficie, self.fonte_pequena, texto, (30, 165), tema.PAPEL)

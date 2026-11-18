@@ -49,6 +49,9 @@ class Chefe(Personagem):
         """Projéteis são consumidos pela fase; encontros especializam impacto corporal."""
         return None
 
+    def origem_ataque(self, area):
+        return area.center
+
     def take_damage(self, quantidade, recuo=(0, 0)):
         if not self.ativo or not self.vivo:
             return

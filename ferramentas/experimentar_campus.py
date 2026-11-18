@@ -8,6 +8,7 @@ from sistema.eventos_campanha import FaseConcluida, ChefeDerrotado
 
 
 def preparar(jogo, indice):
+    jogo.modo_experimento = True
     jogo._iniciar_sessao_campanha()
     for dados in jogo.definicoes_fases[:indice]:
         jogo.eventos_campanha.emitir(FaseConcluida(dados['identificador']))
@@ -16,6 +17,23 @@ def preparar(jogo, indice):
     jogo.jogador.grant_ability(Habilidade.SALTO_DUPLO, aumentar_vida=False)
     if indice >= 4:
         jogo.jogador.grant_ability(Habilidade.ANCORAGEM, aumentar_vida=False)
+    jogo.maquina_estados.estado = ESTADO_JOGANDO
+
+
+def preparar_duelo(jogo):
+    """Encontro inicial sem habilidades futuras; somente atalho de desenvolvimento."""
+    jogo.modo_experimento = True
+    jogo._iniciar_sessao_campanha()
+    jogo._load_level(0, novo_jogador=True)
+    fase = jogo.fase
+    fase.infectado = fase.dialogo_exibido = True
+    fase.inimigos.empty()
+    fase.chefe.activate()
+    jogador = jogo.jogador
+    jogador.rect.midbottom = (fase.chefe.rect.centerx-110, fase.chefe.rect.bottom)
+    jogador.posicao.update(jogador.rect.topleft)
+    jogador.direcao_olhar = 1
+    fase.camera.update(jogador.rect)
     jogo.maquina_estados.estado = ESTADO_JOGANDO
 
 
@@ -86,6 +104,7 @@ def principal():
     argumentos = argparse.ArgumentParser()
     argumentos.add_argument('--fase', type=int, choices=range(1, 7), default=3)
     argumentos.add_argument('--campus', action='store_true')
+    argumentos.add_argument('--duelo', action='store_true', help='Experimentar RomerBug diretamente, sem poderes futuros')
     argumentos.add_argument('--capturas')
     opcoes = argumentos.parse_args()
     jogo = Jogo()
@@ -93,7 +112,10 @@ def principal():
         capturar(jogo, opcoes.capturas)
         pygame.quit()
         return
-    preparar(jogo, opcoes.fase-1)
+    if opcoes.duelo:
+        preparar_duelo(jogo)
+    else:
+        preparar(jogo, opcoes.fase-1)
     if opcoes.campus:
         jogo._load_campus('convivencia', 'biblioteca')
         jogo.maquina_estados.estado = ESTADO_JOGANDO

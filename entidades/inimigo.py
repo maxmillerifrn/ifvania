@@ -11,7 +11,7 @@ from entidades.personagem import Personagem
 
 
 class Inimigo(Personagem):
-    ESCALA_VISUAL = 1.0
+    ESCALA_VISUAL = configuracoes.ESCALA_VISUAL_PERSONAGEM
     _FIGURAS = None
     _VELOCIDADE_ANIMACAO = 10  # quadros de jogo entre cada troca de perna/antena
 
@@ -19,7 +19,7 @@ class Inimigo(Personagem):
     def _load_sprites(cls):
         if cls._FIGURAS is None:
             quadros = recursos.load_character_frames(
-                [f"inimigos/bug_{i}.png" for i in range(2)], configuracoes.COR_INIMIGO)
+                [f"inimigos/bug_humanoide/pose_{i}.png" for i in range(4)], configuracoes.COR_INIMIGO)
             cls._FIGURAS = {
                 1: quadros,
                 -1: [pygame.transform.flip(quadro, True, False) for quadro in quadros],
@@ -41,8 +41,10 @@ class Inimigo(Personagem):
         self.temporizador_recuo = 0
         self.direcao_patrulha = 1 if velocidade >= 0 else -1
         self.quadro_animacao = 0
+        self.deslocamento_atual = 0
 
     def update(self, solidos):
+        anterior = self.rect.x
         self.brilho_dano = max(0, self.brilho_dano-1)
         self.tempo_barra_vida = max(0, self.tempo_barra_vida-1)
         if self.temporizador_recuo > 0:
@@ -53,6 +55,7 @@ class Inimigo(Personagem):
             self.move_and_collide_y(solidos)
             if self.temporizador_recuo == 0:
                 self.velocidade.x = self.direcao_patrulha*self.rapidez
+            self.deslocamento_atual = abs(self.rect.x-anterior)
             return
         self._tempo += 1
         if self._tempo % self._VELOCIDADE_ANIMACAO == 0:
@@ -73,9 +76,12 @@ class Inimigo(Personagem):
 
         self.apply_gravity()
         self.move_and_collide_y(solidos)
+        self.deslocamento_atual = abs(self.rect.x-anterior)
 
     def take_damage(self, quantidade, recuo=(0, 0)):
         if not self.vivo or quantidade <= 0:
+            return
+        if quantidade >= self.vida and getattr(self, 'ao_golpe_final', None) and self.ao_golpe_final(self):
             return
         super().take_damage(quantidade)
         self.brilho_dano = 9
@@ -86,8 +92,10 @@ class Inimigo(Personagem):
             self.kill()
 
     def _redraw(self):
-        direcao_olhar = 1 if self.velocidade.x >= 0 else -1
-        self.image = self.figuras[direcao_olhar][self.quadro_animacao]
+        estado = getattr(getattr(self,'estados',None),'estado','patrulhar')
+        direcao = getattr(self,'direcao_ataque',self.direcao_patrulha) if estado != 'patrulhar' else self.direcao_patrulha
+        indice = 3 if self.brilho_dano else 1+self.quadro_animacao if self.deslocamento_atual else 0
+        self.image = self.figuras[direcao][indice]
 
     def reagir_bloqueio(self, area):
         if area is self.rect:

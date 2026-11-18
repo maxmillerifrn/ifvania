@@ -4,12 +4,14 @@ from sistema import recursos
 from sistema import configuracoes
 from mundo.terminal import TelaTerminal
 from mundo.turma_laboratorio import TurmaLaboratorio
+from mundo.vegetacao_vento import VegetacaoAoVento
 
 
 class ArteEscolar:
     def __init__(self, ambiente, largura, mostrar_turma=False):
         nome = 'patio_ifrn.png' if ambiente == 'corridor' else 'laboratorio_detalhado.png'
         self.fundo = recursos.load_image('cenarios/'+nome)
+        self.vento = VegetacaoAoVento(self.fundo,[(45,112,300,242),(389,112,250,242),(700,112,208,242)],[(132,280,150,78),(490,280,150,78)]) if ambiente == 'corridor' else None
         self.ambiente = ambiente
         self.largura = largura
         self.terminais = TelaTerminal()
@@ -100,6 +102,8 @@ class ArteEscolar:
         for x in range(0, self.largura, self.fundo.get_width()):
             recuo = 32 if self.ambiente in ('classroom', 'lab') and self.largura == 960 else 0
             superficie.blit(self.fundo, (x-deslocamento, -round(camera.deslocamento.y)-recuo))
+            if self.vento is not None:
+                self.vento.draw(superficie,instante,(deslocamento-x,round(camera.deslocamento.y)))
             if recuo:
                 # Abre chão atrás da passagem lateral, para apoiar a fileira distante.
                 superficie.blit(self.fundo, (x-deslocamento, 540-recuo-round(camera.deslocamento.y)),

@@ -58,7 +58,10 @@ class TransicaoChefe:
             combinado = pygame.Surface(configuracoes.TAMANHO_PERSONAGEM, pygame.SRCALPHA)
             combinado.blit(anterior, (0, 0))
             combinado.blit(novo, (0, 0))
+            sombrio = self.chefe.figuras_formas['speedbug'][self.direcao_olhar][0].copy()
+            sombrio.set_alpha(round(255*fracao))
             self.chefe.image = pygame.transform.flip(combinado, self.direcao_olhar < 0, False)
+            self.chefe.image.blit(sombrio,(0,0))
             if fracao >= 0.5:
                 self.chefe.nome = 'SpeedBug'
         elif self.etapa == 'rise':
@@ -69,10 +72,10 @@ class TransicaoChefe:
             seguinte = self.quadros[4+trecho].copy()
             seguinte.set_alpha(round(255*mistura))
             combinado.blit(seguinte, (0, 0))
-            self.chefe.image = pygame.transform.flip(combinado, self.direcao_olhar < 0, False)
+            self.chefe.image = self.chefe.figuras_formas['speedbug'][self.direcao_olhar][0]
         else:
             # Pequena oscilação na liberação, sem deslocar corpo ou colisões.
-            self._pose(5)
+            self.chefe.image = self.chefe.figuras_formas['speedbug'][self.direcao_olhar][0]
             imagem = self.chefe.image.copy()
             self.chefe.image = pygame.transform.rotozoom(imagem, math.sin(fracao*math.pi)*2, 1)
         if self.instante >= self.DURACOES[self.etapa]:
@@ -90,7 +93,7 @@ class TransicaoChefe:
     def draw(self, superficie):
         # Zoom somente visual: posições, câmera e caixas de colisão não mudam.
         self.fase.draw(self.camada)
-        self.jogador.draw(self.camada, self.fase.camera)
+        self.jogador.draw(self.camada, self.fase.camera, mostrar_sempre=True)
         corpo = self.fase.camera.apply(self.chefe.rect)
         entidade_visivel = self.etapa != 'kneel'
         if entidade_visivel:
@@ -107,8 +110,8 @@ class TransicaoChefe:
             self.camada.blit(imagem, imagem.get_rect(midbottom=(x, y+40)))
             if self.etapa == 'morph':
                 brilho = pygame.Surface(self.camada.get_size(), pygame.SRCALPHA)
-                pygame.draw.line(brilho, (*tema.CIANO, 100), (x, y+28), corpo.center, 2)
-                pygame.draw.ellipse(brilho, (*tema.CIANO, 110), corpo.inflate(22, 12), 2)
+                pygame.draw.line(brilho, (165, 85, 235, 150), (x, y+28), corpo.center, 2)
+                pygame.draw.ellipse(brilho, (165, 85, 235, 150), corpo.inflate(22, 12), 2)
                 self.camada.blit(brilho, (0, 0))
         quantidade = 1.0
         if self.etapa == 'kneel':

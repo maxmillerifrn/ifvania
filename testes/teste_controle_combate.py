@@ -142,28 +142,20 @@ class TestesControleCombate(unittest.TestCase):
         self.assertEqual(tela.get_at((330,288))[:3],(235,213,156))
         self.assertNotEqual(tela.get_at((330,320))[:3],(235,213,156))
 
-    def teste_jogador_evade_aviao_e_salta_investida_sem_invulnerabilidade_artificial(self):
-        chefe=RomerBug(450,312,arena=pygame.Rect(0,0,1600,500));chefe.activate()
-        self.jogador.posicao.x=300;self.jogador.rect.x=300
-        chefe.preparar_disparo(self.jogador)
-        self.teclas[pygame.K_a]=True
-        for _ in range(65):
-            self.quadro();chefe.update(self.jogador,self.piso)
-            for area,dano in chefe.get_all_hit_rects():
-                if area.colliderect(self.jogador.rect):self.jogador.take_damage(dano)
-        self.assertEqual(self.jogador.vida,6)
-        chefe.take_damage(8);chefe.temporizador_transformacao=0
-        chefe.posicao.x=450;chefe.rect.x=450
-        self.jogador.posicao.update(320,312);self.jogador.rect.topleft=(320,312)
-        self.jogador.velocidade.update(0,0);self.jogador.no_chao=True;self.teclas.clear()
-        chefe.preparar_ataque(self.jogador,self.piso)
-        for instante in range(63):
-            eventos=[self.evento(pygame.KEYDOWN,pygame.K_SPACE)] if instante==30 else []
-            self.quadro(eventos);chefe.update(self.jogador,self.piso)
-            for area,dano in chefe.get_all_hit_rects():
-                if area.colliderect(self.jogador.rect):self.jogador.take_damage(dano)
-        self.assertEqual(self.jogador.vida,6)
-        self.assertEqual(chefe.estado_ataque,'recuperar')
+    def teste_jogador_recua_do_golpe_corporal_sem_invulnerabilidade(self):
+        chefe = RomerBug(450, 312, arena=pygame.Rect(0, 0, 1600, 500))
+        chefe.activate()
+        self.jogador.posicao.x = 370
+        self.jogador.rect.x = 370
+        chefe.preparar_ataque(self.jogador)
+        self.teclas[pygame.K_a] = True
+        for _ in range(40):
+            self.quadro()
+            chefe.update(self.jogador, self.piso)
+            for area, dano in chefe.get_all_hit_rects():
+                if area.colliderect(self.jogador.rect): self.jogador.take_damage(dano)
+        self.assertEqual(self.jogador.vida, 6)
+        self.assertEqual(chefe.estado_ataque, 'recuperar')
 
     def teste_memoria_ataque_aceita_toque_na_recarga_sem_carga_automatica(self):
         self.jogador.espera_ataque=4
@@ -195,3 +187,25 @@ class TestesControleCombate(unittest.TestCase):
             self.evento(pygame.KEYDOWN,pygame.K_ESCAPE),self.evento(pygame.KEYDOWN,pygame.K_ESCAPE)])
         self.assertEqual(jogo.estado,ESTADO_JOGANDO)
         self.assertEqual(eventos,[])
+
+    def teste_toque_no_recolhimento_encadeia_sem_apagar_golpe_atual(self):
+        self.quadro([self.evento(pygame.KEYDOWN, pygame.K_x), self.evento(pygame.KEYUP, pygame.K_x)])
+        for _ in range(22): self.quadro()
+        self.assertLessEqual(self.jogador.temporizador_golpe, 8)
+        self.assertGreater(self.jogador.temporizador_golpe, 0)
+        self.quadro([self.evento(pygame.KEYDOWN, pygame.K_x), self.evento(pygame.KEYUP, pygame.K_x)])
+        self.assertEqual(self.jogador.etapa_combo, 1)
+        self.assertTrue(self.jogador.ataque_pendente)
+        for _ in range(8): self.quadro()
+        self.assertEqual(self.jogador.etapa_combo, 2)
+        self.assertGreater(self.jogador.temporizador_golpe, 20)
+        self.assertFalse(self.jogador.ataque_pendente)
+
+    def teste_pausa_cancela_toque_antecipado_do_combo(self):
+        self.quadro([self.evento(pygame.KEYDOWN, pygame.K_x), self.evento(pygame.KEYUP, pygame.K_x)])
+        for _ in range(22): self.quadro()
+        self.quadro([self.evento(pygame.KEYDOWN, pygame.K_x), self.evento(pygame.KEYUP, pygame.K_x)])
+        self.jogador.cancelar_combate()
+        for _ in range(35): self.quadro()
+        self.assertEqual(self.jogador.temporizador_golpe, 0)
+        self.assertEqual(self.jogador.etapa_combo, 0)

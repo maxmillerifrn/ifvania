@@ -44,7 +44,9 @@ class Fase:
                 tipo = 'arquivo'
             if dados_fase.get('identificador') == 'copias' and tipo == 'combate':
                 tipo = 'repetidor'
-            self.inimigos.add(criar_inimigo(tipo, *self._grounded_spawn(ex, ey)))
+            inimigo = criar_inimigo(tipo, *self._grounded_spawn(ex, ey))
+            inimigo.identificador_checkpoint = indice
+            self.inimigos.add(inimigo)
 
         definicao_chefe = dados_fase["boss"]
         bx, by = self.mapa_blocos.surgimento_chefe
@@ -78,10 +80,15 @@ class Fase:
         self.professor_liberto = False
         self.infectado = not self.exige_infeccao
         self.encontro_pendente = False
+        self.fusao_pendente = False
+        self.libertacao_concluida = False
         self.professor_humano = Professor(bx, by, 'romerito') if self.exige_infeccao else None
         self.bug_infeccao = recursos.load_character_frames(['inimigos/bug_0.png'])[0] if self.exige_infeccao else None
         self.fonte_encontro = pygame.font.Font(None, 20)
         self.fonte_infeccao = pygame.font.Font(None, 24)
+        if self.exige_infeccao:
+            for inimigo in self.inimigos:
+                inimigo.ao_golpe_final = self.tentar_fusao
         self.objetivos = [pygame.Rect(x, y, 32, 40) for x, y in dados_fase.get('objetivos', ())]
         self.desafios = DesafiosCampus(self.identificador) if self.objetivos else None
         self.conectores = [pygame.Vector2(820, 310), pygame.Vector2(1190, 260), pygame.Vector2(1660, 310), pygame.Vector2(2200, 330), pygame.Vector2(2720, 320)] if dados_fase.get('identificador') in ('rede', 'continuidade') else [pygame.Vector2(2800, 330)] if dados_fase.get('identificador') == 'copias' else []
@@ -108,11 +115,13 @@ class Fase:
         self.imagem_chao = recursos.load_image("blocos/chao.png", (TB, TB), configuracoes.COR_CHAO)
         self.imagem_espinho = recursos.load_image("blocos/espinho.png", (TB, TB), configuracoes.COR_ESPINHO)
         self.imagem_painel_fundo = recursos.load_image("cenarios/painel.png", (90, 220), configuracoes.COR_FUNDO_2)
-        if progresso and self.identificador in progresso.fases_concluidas:
+        if progresso and self.identificador in (progresso.fases_concluidas | progresso.chefes_derrotados):
             self.chefe.vida = 0
             self.chefe.vivo = False
             self.chefe.derrotado = True
             self.dialogo_exibido = self.dialogo_derrota_exibido = True
+            self.libertacao_concluida = True
+            self.professor_liberto = self.exige_infeccao
             self.inimigos.empty()
             if self.objetivos:
                 self.consultados = {f'terminal_{indice}' for indice in range(len(self.objetivos))}
@@ -145,12 +154,22 @@ class Fase:
         raise ValueError(f"Sem piso livre para personagem em {(x, y)}")
 
     # ------------------------------------------------------------------
+    def tentar_fusao(self, inimigo):
+        if self.infectado or self.fusao_pendente or len(self.inimigos) != 1:
+            return False
+        self.origem_fusao = inimigo.rect.midbottom
+        self.fusao_pendente = True
+        inimigo.kill()
+        return True
+
     def update_visuals(self):
         if self.cenario_escolar:
             self.cenario_escolar.update()
 
     def update(self, jogador, eventos_quadro):
         self.efeitos_combate.update()
+        if self.fusao_pendente:
+            return 'fusao', None
         if self.concluido or self.encontro_pendente:
             return None, None
         if self.biblioteca:
@@ -201,6 +220,8 @@ class Fase:
         # inclusive quando o jogador chega pulando ou além do primeiro bloco.
         if not self.dialogo_exibido and self.mapa_blocos.gatilho_dialogo:
             if jogador.rect.colliderect(self.mapa_blocos.gatilho_dialogo):
+                if self.exige_infeccao and not self.infectado:
+                    return None, None
                 self.dialogo_exibido = True
                 if self.exige_infeccao:
                     self.encontro_pendente = True
@@ -240,6 +261,9 @@ class Fase:
                 if jogador.try_melee_hit(self.chefe, self.mapa_blocos.solidos):
                     self.efeitos_combate.adicionar(self.chefe.rect.center, not self.chefe.vivo)
 
+        if self.fusao_pendente:
+            return 'fusao', None
+
         # projéteis do jogador contra inimigos/chefe
         for projetil in list(jogador.projeteis):
             for inimigo in list(self.inimigos):
@@ -253,6 +277,8 @@ class Fase:
                     self.chefe.take_damage(1)
                     projetil.kill()
 
+        if self.fusao_pendente:
+            return 'fusao', None
         if getattr(self.chefe, 'cinematica_pendente', False):
             return 'boss_transform', None
         if self.chefe.derrotado:
@@ -275,8 +301,9 @@ class Fase:
         if self.chefe.ativo and self.chefe.vivo:
             for retangulo, dano in self.chefe.get_all_hit_rects():
                 if retangulo.colliderect(jogador.rect):
-                    impulso = -1 if jogador.rect.centerx < retangulo.centerx else 1
-                    resposta = jogador.take_damage(dano, recuo=(impulso * 6, -7), origem=retangulo.center)
+                    origem = self.chefe.origem_ataque(retangulo)
+                    impulso = -1 if jogador.rect.centerx < origem[0] else 1
+                    resposta = jogador.take_damage(dano, recuo=(impulso * 6, -7), origem=origem)
                     if resposta == 'bloqueado':
                         self.chefe.reagir_bloqueio(retangulo)
                         for projetil in list(self.chefe.projeteis):
@@ -296,6 +323,8 @@ class Fase:
             self.chefe.activate()
 
     def _after_defeat(self, jogador):
+        if self.exige_infeccao and not self.libertacao_concluida:
+            return 'libertacao', None
         self.camera.update(jogador.rect)
         if self.chefe.derrotado and not self.dialogo_derrota_exibido:
             self.dialogo_derrota_exibido = True

@@ -24,7 +24,7 @@ class TestesVisualEscolar(unittest.TestCase):
     def tearDown(self):
         pygame.quit()
 
-    def test_larger_cast_preserves_body_size_feet_and_distinction_from_bugs(self):
+    def test_elenco_e_bug_humanoide_preservam_corpo_pes_e_altura_visual(self):
         self.jogo._load_level(0, novo_jogador=True)
         elenco = [Jogador(120, 312, 'boy'), Jogador(120, 312, 'menina'),
                 Professor(700, 312, 'max'), Professor(700, 312, 'romerito'), self.jogo.fase.chefe]
@@ -33,7 +33,8 @@ class TestesVisualEscolar(unittest.TestCase):
             self.assertEqual(ator.rect.size, (40, 40))
             visual = ator.get_draw_image().get_rect(midbottom=ator.rect.midbottom)
             self.assertEqual(visual.bottom, ator.rect.bottom)
-        self.assertEqual(Inimigo(0, 0).get_draw_image().get_size(), (40, 40))
+        self.assertEqual(Inimigo(0, 0).get_draw_image().get_size(), (80, 80))
+        self.assertEqual(Inimigo(0, 0).rect.size, (40, 40))
 
     def test_terminal_changes_information_only_inside_monitor_and_restores_clipping(self):
         terminal = TelaTerminal()

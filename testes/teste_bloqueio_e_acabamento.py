@@ -100,22 +100,19 @@ class TestesBloqueioAcabamento(unittest.TestCase):
         self.assertEqual(self.jogador.vida, 6)
         self.assertLess(self.jogador.defesa.resistencia, 100)
 
-    def test_speedbug_retorna_do_limite_quando_jogador_muda_de_lado(self):
+    def test_speedbug_retorna_ao_jogador_sem_limite_artificial(self):
         chefe = RomerBug(400, 408, arena=pygame.Rect(0, 0, 1500, 448))
         chefe.activate()
         chefe.take_damage(8)
         chefe.temporizador_transformacao = 0
         chefe.temporizador_ataque = 400
         self.jogador.rect.x = 900
-        for _ in range(100):
-            chefe.update(self.jogador, self.piso)
-        self.assertEqual(chefe.rect.x, 424)
-        self.assertEqual(chefe.velocidade.x, 0)
+        for _ in range(60): chefe.update(self.jogador, self.piso)
+        self.assertGreater(chefe.rect.x, 550)
+        origem = chefe.rect.x
         self.jogador.rect.x = 100
-        for _ in range(60):
-            chefe.update(self.jogador, self.piso)
-        self.assertLess(chefe.rect.x, 424)
-        self.assertGreaterEqual(chefe.rect.x, 376)
+        for _ in range(60): chefe.update(self.jogador, self.piso)
+        self.assertLess(chefe.rect.x, origem-100)
 
     def test_speedbug_na_parede_nao_oscila_subpixel_nem_atravessa_colisao(self):
         chefe = RomerBug(400, 408, arena=pygame.Rect(0, 0, 1500, 448))
@@ -132,20 +129,19 @@ class TestesBloqueioAcabamento(unittest.TestCase):
         self.assertEqual(chefe.distancia_passada, 0)
         self.assertEqual(chefe.deslocamento_real, 0)
 
-    def test_speedbug_corre_para_reposicionar_depois_da_recuperacao(self):
+    def test_speedbug_reaproxima_depois_da_recuperacao(self):
         chefe = RomerBug(400, 408, arena=pygame.Rect(0, 0, 1500, 448))
         chefe.activate()
         chefe.take_damage(8)
         chefe.temporizador_transformacao = 0
         chefe.estado_ataque = 'recuperar'
         chefe.temporizador_ataque = 1
-        self.jogador.rect.x = 1000
+        self.jogador.rect.x = 570
         chefe.update(self.jogador, self.piso)
-        self.assertEqual(chefe.estado_ataque, 'reposicionar')
+        self.assertEqual(chefe.estado_ataque, 'aproximar')
         origem = chefe.rect.x
-        for _ in range(65):
-            chefe.update(self.jogador, self.piso)
-        self.assertGreater(chefe.rect.x-origem, 100)
+        for _ in range(20): chefe.update(self.jogador, self.piso)
+        self.assertGreater(chefe.rect.x, origem+40)
         self.assertFalse(chefe.get_all_hit_rects())
 
     def test_revisita_nao_recria_chefe_nem_cura(self):
