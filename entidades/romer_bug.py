@@ -1,5 +1,4 @@
 """Primeiro professor-chefe: RomerBug se transforma em SpeedBug a 50% de vida."""
-import math
 import pygame
 
 from sistema import recursos
@@ -57,28 +56,14 @@ class RomerBug(Chefe):
         self.interrupcoes = 0
         self.duracao_preparacao = 28
         self.temporizador_ataque = 24
-        caminhos = [f"chefes/{forma}_{i}.png"
-                 for forma in ("romerbug", "speedbug") for i in range(2)]
-        caminhos += [f"chefes/{forma}_{acao}_{i}.png"
-                  for forma, acao in (("romerbug", "caminhada"), ("speedbug", "corrida"))
-                  for i in range(6)]
-        quadros = dict(zip(caminhos, recursos.load_character_frames(caminhos)))
         self.figuras_formas = {}
-        for forma in ("romerbug", "speedbug"):
-            self.figuras_formas[forma] = {
-                1: [quadros[f"chefes/{forma}_{i}.png"] for i in range(2)],
-                -1: [recursos.espelhar_quadro(quadros[f"chefes/{forma}_{i}.png"]) for i in range(2)],
-            }
         self.figuras_movimento = {}
-        for forma, acao in (("romerbug", "caminhada"), ("speedbug", "corrida")):
-            self.figuras_movimento[forma] = {
-                1: [quadros[f"chefes/{forma}_{acao}_{i}.png"] for i in range(6)],
-                -1: [recursos.espelhar_quadro(quadros[f"chefes/{forma}_{acao}_{i}.png"]) for i in range(6)],
-            }
-        self.fonte_transformacao = pygame.font.Font(None, 22)
-        sombras = recursos.load_character_frames([f'inimigos/speedbug_sombrio/pose_{i}.png' for i in range(4)])
-        self.figuras_formas['speedbug'] = {1: [sombras[0], sombras[3]], -1: [recursos.espelhar_quadro(sombras[0]), recursos.espelhar_quadro(sombras[3])]}
-        self.figuras_movimento['speedbug'] = {1: [sombras[1],sombras[2]]*3, -1: [recursos.espelhar_quadro(sombras[1]),recursos.espelhar_quadro(sombras[2])]*3}
+        self.poses_corpo = {}
+        for forma,pasta in (('romerbug','romerbug_sombrio'),('speedbug','speedbug_corredor')):
+            poses = recursos.load_character_frames([f'chefes/{pasta}/pose_{i}.png' for i in range(6)])
+            self.poses_corpo[forma] = {1: poses, -1: [recursos.espelhar_quadro(p) for p in poses]}
+            self.figuras_formas[forma] = {direcao:[quadros[0],quadros[3]] for direcao,quadros in self.poses_corpo[forma].items()}
+            self.figuras_movimento[forma] = {direcao:[quadros[1],quadros[2]]*3 for direcao,quadros in self.poses_corpo[forma].items()}
         self._animate_form()
 
     def take_damage(self, quantidade, recuo=(0, 0)):
@@ -124,9 +109,16 @@ class RomerBug(Chefe):
 
     def choose_attack(self, jogador):
         distancia = abs(jogador.rect.centerx-self.rect.centerx)
+        if self.ciclo_combate % 4 == 3:
+            return 'especial'
         if distancia > 130:
             return 'avanco'
-        return 'varrida' if self.ciclo_combate % 2 else 'cruzado'
+        return 'chute' if self.ciclo_combate % 2 else 'cruzado'
+
+    def lancar_especial(self, jogador):
+        from entidades.poderes_chefes import PulsoSombrio
+        origem = (self.rect.centerx+self.direcao_investida*24,self.rect.bottom-36)
+        self.projeteis.add(PulsoSombrio(origem,(self.direcao_investida,0)))
 
     def preparar_ataque(self, jogador, solidos=(), permitir_reposicionar=True):
         self.golpe_atual = self.choose_attack(jogador)
@@ -201,17 +193,19 @@ class RomerBug(Chefe):
             self.velocidade.x = 0
             if self.temporizador_ataque == 0:
                 self.estado_ataque = 'executar'
-                self.temporizador_ataque = 16 if self.golpe_atual == 'avanco' else 9
+                self.temporizador_ataque = 18 if self.golpe_atual in ('especial','raio') else 16 if self.golpe_atual in ('avanco','barrigada') else 9
+                if self.golpe_atual in ('especial','raio'):
+                    self.lancar_especial(jogador)
                 from sistema.sons import tocar
                 tocar('golpe_corporal')
         elif self.estado_ataque == 'executar':
-            rapidez = (6 if self.transformado else 4.5) if self.golpe_atual == 'avanco' else 1.8
+            rapidez = (6 if self.transformado else 4.5) if self.golpe_atual in ('avanco','barrigada') else 0 if self.golpe_atual in ('especial','raio') else 1.8
             self.velocidade.x = self.direcao_investida*rapidez
             if self.temporizador_ataque == 0:
                 self.etapa_sequencia += 1
                 limite = 3 if self.transformado else 2
-                if self.etapa_sequencia < limite and abs(distancia) < 145:
-                    self.golpe_atual = ('varrida' if self.etapa_sequencia == limite-1 else 'cruzado')
+                if self.golpe_atual not in ('especial','raio') and self.etapa_sequencia < limite and abs(distancia) < 145:
+                    self.golpe_atual = ('chute' if self.etapa_sequencia == limite-1 else 'cruzado')
                     self._preparar_golpe(jogador)
                 else:
                     self._recuperar()
@@ -234,8 +228,11 @@ class RomerBug(Chefe):
         forma = 'speedbug' if self.transformado else 'romerbug'
         if self.temporizador_transformacao > 0:
             self.image = self.figuras_formas[forma][self.direcao_olhar][0]
-        elif self.estado_ataque in ('preparar', 'executar'):
-            self.image = self.figuras_formas[forma][self.direcao_olhar][1]
+        elif self.estado_ataque == 'executar':
+            indice = 5 if self.golpe_atual in ('especial','raio','barrigada') else 4 if self.golpe_atual in ('chute','varrida') else 3
+            self.image = self.poses_corpo[forma][self.direcao_olhar][indice]
+        elif self.estado_ataque == 'preparar':
+            self.image = self.poses_corpo[forma][self.direcao_olhar][0]
         elif abs(self.deslocamento_real) > 0.01:
             passo = 11 if self.transformado else 7
             self.quadro_movimento = int(self.distancia_passada/passo) % 6
@@ -244,7 +241,7 @@ class RomerBug(Chefe):
             self.image = self.figuras_formas[forma][self.direcao_olhar][0]
 
     def area_golpe(self):
-        largura = 78 if self.golpe_atual == 'varrida' else 62
+        largura = 86 if self.golpe_atual in ('chute','varrida') else 74 if self.golpe_atual == 'barrigada' else 62
         altura = 22 if self.golpe_atual == 'varrida' else 40
         area = pygame.Rect(0, 0, largura, altura)
         area.bottom = self.rect.bottom-2 if self.golpe_atual == 'varrida' else self.rect.bottom-16
@@ -269,7 +266,7 @@ class RomerBug(Chefe):
                 or not self.ativo or not self.vivo):
             return []
         ataques = [(p.rect, p.dano) for p in self.projeteis]
-        if self.estado_ataque == 'executar':
+        if self.estado_ataque == 'executar' and self.golpe_atual not in ('especial','raio'):
             ataques.append((self.area_golpe(), 1))
         return ataques
 
@@ -286,28 +283,6 @@ class RomerBug(Chefe):
             clarao = imagem.copy()
             clarao.fill((255, 255, 255, 100), special_flags=pygame.BLEND_RGBA_MULT)
             superficie.blit(clarao, destino, special_flags=pygame.BLEND_RGBA_ADD)
-        if self.ativo and self.vivo and not self.cinematica_pendente and not self.temporizador_transformacao:
-            corpo = camera.apply(self.rect)
-            if self.estado_ataque == 'preparar':
-                # Punho recolhido e cor quente comunicam preparação; não há dano.
-                altura = corpo.bottom-10 if self.golpe_atual == 'varrida' else corpo.centery-18
-                ponto = (corpo.centerx+self.direcao_olhar*13, altura)
-                cor = (255, 160, 78) if self.interrupcoes >= 2 else (240, 215, 135)
-                pygame.draw.circle(superficie, (24, 32, 43), ponto, 9)
-                pygame.draw.circle(superficie, cor, ponto, 6, 2)
-                if self.golpe_atual == 'avanco':
-                    pygame.draw.line(superficie, cor, (ponto[0]-self.direcao_olhar*15, ponto[1]), ponto, 3)
-            elif self.estado_ataque == 'executar':
-                area = camera.apply(self.area_golpe())
-                if area.width == 0:
-                    return
-                # O rastro coincide com a altura e alcance da área de dano.
-                rastro = pygame.Surface(area.size, pygame.SRCALPHA)
-                inicio = -math.pi/2 if self.direcao_investida > 0 else math.pi/2
-                pygame.draw.arc(rastro, (255, 219, 155, 220), rastro.get_rect(), inicio, inicio+math.pi, 3)
-                superficie.blit(rastro, area)
-            elif self.estado_ataque == 'recuperar':
-                pygame.draw.circle(superficie, (111, 205, 205), (corpo.centerx, corpo.top-22), 4, 1)
         for projetil in self.projeteis:
             projetil.draw(superficie, camera)
         if self.temporizador_transformacao > 0 and not self.cinematica_pendente:

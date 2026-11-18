@@ -77,12 +77,6 @@ class BugCombate(Inimigo):
 
     def draw(self, superficie, camera):
         super().draw(superficie, camera)
-        destino = camera.apply(self.rect)
-        if self.estados.estado == 'preparar':
-            pygame.draw.line(superficie, (255, 197, 98), destino.midtop,
-                             (destino.centerx+self.direcao_ataque*14, destino.top-6), 3)
-        if self.lancador:
-            pygame.draw.circle(superficie, (117, 204, 226), destino.center, 5, 2)
         for projetil in self.projeteis:
             projetil.draw(superficie, camera)
 
@@ -120,10 +114,6 @@ class BugRetransmissor(BugCombate):
     def __init__(self, x, y):
         super().__init__(x, y, lancador=True)
 
-    def draw(self, superficie, camera):
-        super().draw(superficie, camera)
-        destino = camera.apply(self.rect)
-        pygame.draw.circle(superficie, (198, 157, 241), destino.midtop, 9, 2)
 
 
 class BugArquivo(BugCombate):
@@ -146,8 +136,3 @@ class BugRepetidor(BugCombate):
         if self.estados.estado == 'patrulhar' and abs(self.rect.x-self.origem_repeticao) > 48:
             self.velocidade.x = -self.rapidez if self.rect.x > self.origem_repeticao else self.rapidez
             self.direcao_patrulha = 1 if self.velocidade.x > 0 else -1
-
-    def draw(self, superficie, camera):
-        super().draw(superficie, camera)
-        destino = camera.apply(self.rect)
-        pygame.draw.circle(superficie, (139, 217, 216), destino.center, 15, 1)

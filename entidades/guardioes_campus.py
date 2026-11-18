@@ -133,20 +133,9 @@ class GuardiaoCampus(Chefe):
         imagem = pygame.transform.rotozoom(imagem, inclinacao+math.sin(self._tempo*0.1), 1)
         destino = imagem.get_rect(midbottom=camera.apply(self.rect).midbottom)
         superficie.blit(imagem, destino)
-        centro = camera.apply(self.rect).center
-        cor = (255, 201, 108) if estado == 'preparar' else self.cor
         if self.brilho_dano:
             clarao = pygame.mask.from_surface(imagem).to_surface(setcolor=(255, 252, 220, 170), unsetcolor=(0, 0, 0, 0))
             superficie.blit(clarao, destino)
-        # A arma aparece recolhida na preparação; o arco ativo tem área própria.
-        pygame.draw.line(superficie, cor, centro, (centro[0]+self.direcao_olhar*(22 if estado == 'preparar' else 38), centro[1]-16), 4)
-        if estado == 'atacar' and self.acao in ('arco', 'varredura', 'sequencia'):
-            for area, _ in self.get_all_hit_rects():
-                if area.width > 80:
-                    pygame.draw.ellipse(superficie, cor, camera.apply(area), 3)
-        if self.acao == 'barreira' and estado == 'preparar':
-            inicio = -1.4 if self.direcao_olhar > 0 else math.pi-1.4
-            pygame.draw.arc(superficie, (119, 223, 244), destino.inflate(15, 0), inicio, inicio+2.8, 4)
         for projetil in self.projeteis:
             projetil.draw(superficie, camera)
 

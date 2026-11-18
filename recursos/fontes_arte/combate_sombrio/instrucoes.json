@@ -1,0 +1,22 @@
+{
+  "data": "2026-11-18",
+  "ferramenta": "image_gen",
+  "arquivo": "atlas.png",
+  "transparencia": true,
+  "prompt": "Use case: stylized-concept. Production transparent sprite atlas for IFVania 2D side-scrolling action platform game. Exact regular grid SIX columns by THREE rows, eighteen isolated full body sprites, equal roomy cells, consistent baseline and scale, all face RIGHT. Clean crisp hand-drawn dark cartoon game art, strong contours and small readable details, no blur, no motion blur, no glow clouds, no text, no backgrounds, no weapons or graphic indicators. Image1 is costume/identity reference for RomerBug and SpeedBug; Image2 is facial reference ONLY for the bald fictional third-row teacher avatar. ROW1 ROMERBUG: preserve the Brazilian teacher's face, short dark hair, navy business SUIT, white shirt, red tie and brown formal shoes from Image1. Darker navy suit with subtly torn hems, shadowed face and unnatural violet eyes, sinister possessed atmosphere, clearly still wearing a suit, NO armor. ROW2 SPEEDBUG: same teacher face, preserve ORANGE sleeveless RUNNING VEST, black running SHORTS, blue medal ribbon and white RUNNING SHOES from Image1. Shadowy possessed face, black/violet corruption veins and torn orange fabric, clearly athletic running outfit, NO trousers or armor. ROW3 MENTE BRILHANTE: respectful fictional caricature inspired by bald adult man in Image2: bald head, rounded face, stocky build, light pink long sleeve button shirt, blue jeans, dark shoes and green academic lanyard; no microphone. Each row's SIX poses in order: 1 idle fighting stance; 2 walking left leg forward; 3 walking right leg forward; 4 straight forward PUNCH; 5 forward high KICK with fully visible extended leg; 6 special: RomerBug and SpeedBug both hands projecting violet energy WITHOUT energy drawn; bald teacher leaning forward in a belly-bump pose with belly ahead and clenched fists. Same person and clothes consistently in all six poses, feet aligned at same height in each cell, no adjacent sprites touching.",
+  "referencias": [
+    {
+      "arquivo": "../romerbug_speedbug.png",
+      "uso": "Identidade e roupas originais de RomerBug e SpeedBug"
+    },
+    {
+      "arquivo": "ricardo_referencia_sebrae.jpg",
+      "uso": "Referência pública do avatar ficcional Mente Brilhante",
+      "fonte": "https://rn.agenciasebrae.com.br/cultura-empreendedora/exposicao-e-desfile-como-experiencias-imersivas-marcaram-a-4a-mostra-serido-de-moda-cultura-e-design/",
+      "foto": "https://rn.agenciasebrae.com.br/wp-content/uploads/sites/20/2025/02/Ricardo-diretor-IFRN-CAICO-scaled.jpg",
+      "credito": "Isaac Lima / Agência Sebrae de Notícias RN",
+      "identificacao": "Ricardo Rodrigues, professor e diretor do IFRN Campus Caicó conforme matéria de 25/02/2025"
+    }
+  ],
+  "exportador": "python -m ferramentas.preparar_combate_sombrio"
+}

@@ -1,5 +1,16 @@
 # Arquitetura da evolução hack and slash
 
+## Revisão vigente — nitidez, golpes e Mente Brilhante (18/11/2026)
+
+O estado anterior foi registrado no commit `fe13741`, antes destas melhorias. O bug agora conserva a apresentação HD ao se virar para a esquerda, corrigindo a ampliação indevida do quadro lógico de 40 px. RomerBug usa novo atlas sombrio mantendo terno, gravata e sapatos; SpeedBug mantém regata laranja, shorts, medalha e tênis de corrida. Ambos têm poses próprias de soco e chute e lançam um pulso de energia como especial.
+
+Por solicitação do responsável, foram retirados os marcadores gráficos de preparação/recuperação e desenhos de áreas dos ataques de bugs e chefes. As etapas de preparação continuam existindo; poses corporais, sons, ataques efetivamente executados, projéteis e feedback de dano permanecem. Indicações de objetivos e perigos ambientais são sistemas distintos e continuam disponíveis.
+
+Na fase 2, **Mente Brilhante** substitui o Indexador. É um avatar ficcional inspirado no professor Ricardo Rodrigues, identificado como diretor do IFRN Campus Caicó na [matéria da Agência Sebrae de 25/02/2025](https://rn.agenciasebrae.com.br/cultura-empreendedora/exposicao-e-desfile-como-experiencias-imersivas-marcaram-a-4a-mostra-serido-de-moda-cultura-e-design/). O personagem usa camisa rosa, jeans e crachá, luta com socos, chutes e barrigada e dispara raios pela cabeça. Os poderes e o aprisionamento pela IFVania são invenções do jogo. Módulo de salto duplo, consultas, mapa, checkpoints e saída da biblioteca foram preservados.
+
+Evidências e decisões em [RELATORIO.md](../avaliacao/mente_brilhante/RELATORIO.md). Experimentação direta: `.venv/bin/python -m ferramentas.experimentar_mente_brilhante` (atalho de desenvolvimento, sem alterar o save real).
+
+
 ## Atualização vigente — parasita humanoide, cenas e save (17/11/2026)
 
 Bloqueio com Q permite caminhada animada na velocidade normal, salto e troca de direção, mantendo resistência e proteção frontal. Os bugs agora têm corpo humanoide, com poses próprias de repouso, corrida e dano. O golpe que eliminaria o último bug do A28 inicia uma cena: ele corre até Romerito e se funde ao professor. Entrar na arena sozinho não dispara mais a transformação. A metamorfose aos 50% permanece protegida e agora revela SpeedBug com armadura escura e corrupção violeta. Após a vitória, o parasita sai do corpo e se desintegra antes do diálogo de libertação.

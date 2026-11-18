@@ -62,7 +62,7 @@ class TestesBiblioteca(unittest.TestCase):
         self.assertFalse(self.jogo.fase.chefe.ativo)
         self.assertNotIn(self.jogo.fase.biblioteca.portao, self.jogo.fase.mapa_blocos.solidos)
 
-    def test_dialogo_e_pausa_congelam_indexador_e_consultas(self):
+    def test_dialogo_e_pausa_congelam_mente_e_consultas(self):
         chefe = self.jogo.fase.chefe
         chefe.activate()
         self.posicionar(self.jogo.fase.biblioteca.modulo)
@@ -80,25 +80,23 @@ class TestesBiblioteca(unittest.TestCase):
         self.assertEqual(self.jogo.fase.biblioteca.instantes_visuais, visual)
         self.assertEqual((chefe.temporizador_ataque, chefe.relogio_ataque), antes)
 
-    def test_indexador_anuncia_faixa_mira_fixa_e_tem_recuperacao_sem_contato(self):
+    def test_mente_prepara_sem_dano_fixa_direcao_e_oferece_recuperacao(self):
         chefe = self.jogo.fase.chefe
         jogador = self.jogo.jogador
         chefe.activate()
-        chefe.temporizador_ataque = 0
-        chefe.update(jogador, [])
-        self.assertFalse(chefe.get_all_hit_rects())
-        faixas = [faixa.copy() for faixa in chefe.faixas]
-        jogador.rect.x += 120
-        for _ in range(47):
-            chefe.update(jogador, [])
-        self.assertEqual(chefe.faixas, faixas)
+        jogador.rect.x = chefe.rect.x-260
+        chefe.preparar_ataque(jogador)
+        direcao = chefe.direcao_investida
+        jogador.rect.x = chefe.rect.x+280
+        for _ in range(28):
+            self.assertFalse(chefe.get_all_hit_rects())
+            chefe.update(jogador,self.jogo.fase.mapa_blocos.solidos)
+        self.assertEqual(chefe.estado_ataque,'executar')
+        self.assertEqual(chefe.direcao_investida,direcao)
         self.assertTrue(chefe.get_all_hit_rects())
-        for _ in range(12):
-            chefe.update(jogador, [])
+        for _ in range(17): chefe.update(jogador,self.jogo.fase.mapa_blocos.solidos)
+        self.assertEqual(chefe.estado_ataque,'recuperar')
         self.assertFalse(chefe.get_all_hit_rects())
-        chefe.take_damage(18)
-        self.assertTrue(chefe.derrotado)
-        self.assertFalse(chefe.projeteis)
 
     def test_identidade_e_limpeza_na_transicao_e_nova_partida(self):
         jogador = self.jogo.jogador
@@ -137,7 +135,7 @@ class TestesBiblioteca(unittest.TestCase):
                     break
             self.assertTrue(chegou, personagem)
 
-    def test_combater_indexador_pelo_chicote_e_encerrar_conteudo(self):
+    def test_combater_mente_pelo_chicote_e_encerrar_conteudo(self):
         from sistema.jogo import ESTADO_FIM_CONTEUDO
         for personagem in ('boy', 'menina'):
             self.jogo._iniciar_sessao_campanha()

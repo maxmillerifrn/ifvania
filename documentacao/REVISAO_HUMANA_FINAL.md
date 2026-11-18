@@ -1,5 +1,9 @@
 # Revisão humana final — IFVania
 
+## Revisão adicional — 18/11/2026
+
+Verificar nitidez do bug nas duas direções, reconhecimento do terno/roupa de corrida nas artes sombrias, leitura dos golpes sem marcadores gráficos e diversão do novo Mente Brilhante. Confirmar caricatura respeitosa do avatar; identificação histórica e fonte estão no [relatório](../avaliacao/mente_brilhante/RELATORIO.md). A retirada dos indicadores foi uma decisão explícita do responsável, substituindo o critério anterior que os exigia.
+
 ## Atualização vigente — parasita humanoide, cenas e save (17/11/2026)
 
 Bloqueio com Q permite caminhada animada na velocidade normal, salto e troca de direção, mantendo resistência e proteção frontal. Os bugs agora têm corpo humanoide, com poses próprias de repouso, corrida e dano. O golpe que eliminaria o último bug do A28 inicia uma cena: ele corre até Romerito e se funde ao professor. Entrar na arena sozinho não dispara mais a transformação. A metamorfose aos 50% permanece protegida e agora revela SpeedBug com armadura escura e corrupção violeta. Após a vitória, o parasita sai do corpo e se desintegra antes do diálogo de libertação.

@@ -22,7 +22,7 @@ class Inimigo(Personagem):
                 [f"inimigos/bug_humanoide/pose_{i}.png" for i in range(4)], configuracoes.COR_INIMIGO)
             cls._FIGURAS = {
                 1: quadros,
-                -1: [pygame.transform.flip(quadro, True, False) for quadro in quadros],
+                -1: [recursos.espelhar_quadro(quadro) for quadro in quadros],
             }
         return cls._FIGURAS
 

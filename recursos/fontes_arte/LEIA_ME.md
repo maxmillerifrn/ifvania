@@ -310,3 +310,7 @@ Panorama em `corredor_biblioteca/panorama.png`, prompt em `corredor_biblioteca/i
 ## Parasita humanoide e SpeedBug sombrio — 17/11/2026
 
 Fonte original transparente: `bug_humanoide/atlas.png`; prompt integral em `bug_humanoide/instrucoes.json`. Exportar com `python -m ferramentas.preparar_bug_humanoide --destino /tmp/ifvania-bug-humanoide`. O atlas contém duas linhas de quatro poses; exporta quadros de 40 e apresentações de 80 px. Nova pasta, sem substituir os bugs e SpeedBug antigos. Verificador: 16 exportadores, 219 PNGs em cópia temporária.
+
+## Combate sombrio e Mente Brilhante — 18/11/2026
+
+Fonte em `combate_sombrio/atlas.png`, prompt e referências em `combate_sombrio/instrucoes.json`. A fotografia `ricardo_referencia_sebrae.jpg` vem da matéria indicada pelo responsável, com crédito de Isaac Lima/Agência Sebrae RN; não é utilizada diretamente no jogo. O avatar é ficcional. Exportar com `python -m ferramentas.preparar_combate_sombrio --destino /tmp/ifvania-combate-sombrio`; três linhas de seis poses, apresentações em 80 px e retrato da biblioteca. Fontes antigas preservadas. Verificador: 18 exportadores, 257 PNGs em temporário.

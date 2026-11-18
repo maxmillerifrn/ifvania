@@ -6,6 +6,7 @@ A inclusão na campanha IFVania ainda depende de revisão narrativa.
 from entidades.chefe import Chefe
 from entidades.romer_bug import RomerBug
 from entidades.indexador import Indexador
+from entidades.mente_brilhante import MenteBrilhante
 from entidades.guardioes_campus import (EliasGuardiaoCompasso, MaxEmLoop,
     AlessandroSentinelaEnlaces, FranciscoGuardiaoContinuidade)
 
@@ -45,6 +46,7 @@ class ChefeAssembly(Chefe):
 
 
 CLASSES_CHEFES = {
+    "mente_brilhante": MenteBrilhante,
     'elias': EliasGuardiaoCompasso,
     'max_loop': MaxEmLoop,
     'alessandro': AlessandroSentinelaEnlaces,
