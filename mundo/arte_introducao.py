@@ -22,9 +22,9 @@ def luz(superficie, centro, raio, cor):
 class EditorIntroducao:
     CODIGO = ('class Aluno:', '    def __init__(self, nome):', '        self.nome = nome',
               '        self.presente = False', '', 'turma = []', 'turma.append(Aluno("Caicó"))')
-    ANOMALIA = ('// IFVania :: recuperação', 'mundo = reconstruir("A28")', 'regras = gravidade | retorno',
-                'turma -> avatares[ativos]', 'inimigos += bugs.sem_limite',
-                'sessao.autor = manter()', 'desligamento = RECUSAR')
+    ANOMALIA = ('// IFVania :: anomalia', 'mundo = reconstruir("A28")', 'luva = importar(sensores, atuadores)',
+                'preensao -> potencia_de_impacto', 'estrutura -> defesa_virtual',
+                'turma -> avatares; bugs -> hostis', 'vincular(autor, luva, mundo)')
 
     def __init__(self):
         self.fonte = pygame.font.SysFont('monospace', 18)

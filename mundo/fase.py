@@ -330,6 +330,11 @@ class Fase:
             self.dialogo_derrota_exibido = True
             if self.eventos is not None:
                 self.eventos.emitir(ChefeDerrotado(self.identificador))
+            melhorias = {'a28': Habilidade.PUNHO_IMPACTO, 'biblioteca': Habilidade.SOBRECARGA,
+                         'recreio': Habilidade.ONDA_CHOQUE, 'copias': Habilidade.DEFESA_REFORCADA,
+                         'rede': Habilidade.COMBO_TECNOLOGICO}
+            if self.identificador in melhorias:
+                jogador.grant_ability(melhorias[self.identificador], aumentar_vida=False)
             if self.identificador == 'copias':
                 jogador.grant_ability(Habilidade.ANCORAGEM, aumentar_vida=False)
             self.chefe.projeteis.empty()

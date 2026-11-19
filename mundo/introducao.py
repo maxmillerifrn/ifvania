@@ -4,6 +4,8 @@ import math
 import pygame
 
 from mundo import arte_introducao as arte
+from entidades.luva_robotica import desenhar_luva
+from entidades.visual_equipamento import pose_equipamento
 from sistema import configuracoes, recursos, sons
 
 
@@ -26,19 +28,24 @@ class Cena:
 
 class Introducao:
     CENAS = (
-        Cena(9, 'chegada', ((1.8, 4.9, 'Aluno(a)', 'Enfim em casa. Só falta a atividade de Max.'),
-                           (5.7, 8.6, 'Aluno(a)', 'Onde foi que eu anotei o prazo?'))),
-        Cena(13.5, 'atividade', ((2.1, 5.2, 'Aluno(a)', 'A lista veio vazia. De novo.'),
-                                (6.7, 10.2, 'Aluno(a)', 'IA, faz a atividade inteira. Pode mandar o arquivo pronto.'),
-                                (10.5, 13.2, 'Aluno(a)', 'Vou dormir. De manhã eu vejo como ficou.')),
-             ((2, 'tecla'), (4, 'tecla'), (10.2, 'tecla'), (13.2, 'silencio'))),
-        Cena(9, 'oscilacao', sinais=((1, 'energia'), (2.6, 'recuperacao'))),
-        Cena(12, 'codigo_pronto', (
-            (4.0, 7.4, 'IA', 'Atividade concluída. Entrega sincronizada com o campus.'),
-            (7.7, 10.8, 'Aluno(a)', 'Já entregou? Então posso dormir mais cinco minutos.')),
-            ((4.0, 'tecla'), (11.1, 'recuperacao'))),
-        Cena(9.5, 'despertar', ((1.7, 5.3, 'Aluno(a)', 'Ué, eu nem toquei no teclado... O que é isso?'),),
-             ((1.1, 'anomalia'), (5.3, 'energia'))),
+        Cena(10, 'chegada', ((1.2, 4.6, 'Aluno(a)', 'IFRN Caicó: aula, pesquisa... e a atividade para amanhã.'),
+                            (6, 9.8, 'Aluno(a)', 'Caderno aqui. Protótipo ali. Só falta organizar a vida.'))),
+        Cena(13.5, 'atividade', ((1, 5, 'Aluno(a)', 'Ainda falta programação. Mas a pesquisa com Max está quase lá!'),
+                                (6, 9.8, 'Aluno(a)', 'IA, faz a atividade inteira enquanto eu ajusto a luva.'),
+                                (10, 13.3, 'Aluno(a)', 'Afinal, o que poderia dar errado?')),
+             ((2, 'tecla'), (6, 'tecla'), (10, 'tecla'))),
+        Cena(22, 'pesquisa', ((.5, 5.8, 'Professor Max', 'Como vão os testes? Precisamos validar preensão e atuadores.'),
+                             (6, 11, 'Aluno(a)', 'Ajustei os sensores, professor. Os dedos respondem com precisão!'),
+                             (11.3, 16.5, 'Professor Max', 'Nossa luva deve ajudar quem perdeu movimentos das mãos.'),
+                             (17, 21.8, 'Aluno(a)', 'Abrir, fechar, segurar. Mais autonomia, sem forçar a mão.')),
+             ((2, 'tecla'), (8, 'recuperacao'))),
+        Cena(10, 'oscilacao', ((6.5, 9.8, 'Aluno(a)', 'Só uma queda de energia... Os sensores voltaram. Ufa.'),),
+             ((1, 'energia'), (2.6, 'recuperacao'))),
+        Cena(15, 'codigo_pronto', ((.5, 4.2, 'IA', 'Atividade concluída.'),
+                                  (4.4, 9, 'Aluno(a)', 'Luva funcionando! Amanhã mostro os resultados ao professor Max.')),
+             ((1, 'tecla'), (9, 'silencio'))),
+        Cena(11, 'ida_escola', ((.5, 4.8, 'Aluno(a)', 'Atividade no pendrive, luva na mochila. Hora de ir ao IFRN.'),
+                               (6, 10.5, 'Aluno(a)', 'Primeiro a apresentação. Depois mostro o protótipo ao professor Max.'))),
     )
 
     def __init__(self, jogador, caixa_dialogo):
@@ -46,8 +53,10 @@ class Introducao:
         self.quadro = 0
         self.sinais_tocados = set()
         self.figuras = jogador.figuras
+        self.personagem = jogador.personagem
         self.caixa_dialogo = caixa_dialogo
         self.fundo_rua = recursos.load_image("cenarios/introducao/fachada.png")
+        self.fundo_escola = pygame.transform.scale(recursos.load_image('menu/fachada_escola.png'), arte.TAMANHO)
         self.fundo_quarto = recursos.load_image("cenarios/introducao/quarto.png")
         tecido = self.fundo_quarto.subsurface((371, 316, 157, 78))
         self.coberta = pygame.transform.smoothscale(tecido, (271, 106))
@@ -86,10 +95,24 @@ class Introducao:
         self.sombra.fill((5, 9, 20, round(255*max(0, min(1, opacidade)))))
         self.fundo.blit(self.sombra, (0, 0))
 
+    @property
+    def com_mochila(self):
+        cena = self.CENAS[self.indice].encenar
+        return (cena == 'chegada' and self.tempo < 8.15) or (cena == 'ida_escola' and self.tempo >= 2.4)
+
     def quadro_ator(self, tempo, caminhada=0, esquerda=False, pose=None, escala=1.):
+        if not self.com_mochila:
+            indice = 1+int(caminhada/12) % 4 if caminhada else 0
+            if pose == 'attack':
+                indice = 2
+            imagem = pose_equipamento(self.personagem, indice, esquerda)
+            tamanho = max(1, round(168*escala))
+            return pygame.transform.scale(imagem, (tamanho,tamanho))
         lado = '_l' if esquerda else '_r'
         if pose:
             imagem = self.figuras[pose+lado]
+            if isinstance(imagem, list):
+                imagem = imagem[1]
         elif caminhada:
             imagem = self.figuras['walk'+lado][int(caminhada/12) % 8]
         else:
@@ -120,20 +143,16 @@ class Introducao:
             for x, largura in ((342, 55), (405, 37), (451, 49), (508, 43)):
                 for y, altura in ((118, 24), (151, 108)):
                     self.fundo.fill(cor, (x, y, largura, altura), special_flags=pygame.BLEND_RGB_MULT)
+        self.bancada(0, equipada=True)
         visor = pygame.Rect(583, 255, 60, 24)
         pygame.draw.rect(self.fundo, (31, 25, 24), visor, border_radius=4)
         texto = self.fonte_hora.render(hora, True, (210, 159, 113))
         self.fundo.blit(texto, texto.get_rect(center=visor.center))
 
-    def mochila(self, x, y):
-        pygame.draw.ellipse(self.fundo, (33, 29, 28), (x-26, y+49, 91, 11))
-        pygame.draw.arc(self.fundo, (36, 37, 32), (x+34, y+7, 37, 48), 0.2, 4.8, 5)
-        pygame.draw.arc(self.fundo, (54, 59, 44), (x+12, y-7, 24, 19), 0, math.pi, 4)
-        pygame.draw.rect(self.fundo, (28, 35, 32), (x, y, 51, 55), border_radius=13)
-        pygame.draw.rect(self.fundo, (65, 76, 56), (x+3, y+2, 43, 48), border_radius=12)
-        pygame.draw.rect(self.fundo, (79, 89, 65), (x+6, y+6, 35, 40), 1, border_radius=11)
-        pygame.draw.rect(self.fundo, (43, 52, 40), (x+4, y+33, 42, 19), border_radius=5)
-        pygame.draw.line(self.fundo, (138, 134, 89), (x+12, y+37), (x+35, y+37))
+    def mochila(self, x, y, escala=1.):
+        imagem = recursos.load_image('equipamentos/personagens/mochila.png')
+        imagem = pygame.transform.smoothscale(imagem,(round(imagem.get_width()*escala),round(imagem.get_height()*escala)))
+        self.fundo.blit(imagem, imagem.get_rect(midbottom=(x+25,y+55)))
 
     def chegada(self, tempo):
         if tempo < 4.8:
@@ -150,6 +169,7 @@ class Introducao:
             self.escurecer(max(1-suave(tempo, 0, 0.75), suave(tempo, 4.18, 4.8)))
             return
         self.quarto(suave(tempo, 5, 9)*0.52, '18:07')
+        self.bancada(0)
         andar = suave(tempo, 4.8, 8.15)
         x = 76+552*andar
         self.ator(x, 437+7*suave(tempo, 4.8, 5.7), tempo, 552*andar if andar < 1 else 0)
@@ -178,10 +198,9 @@ class Introducao:
             self.quarto(0.9, '20:46')
             self.mochila(*arte.MOCHILA)
             andar = suave(tempo, 10.65, 13.16)
-            self.ator(688-402*andar, 446, tempo, 402*andar if andar < 1 else 0, esquerda=True)
-            deitar = suave(tempo, 13.16, 13.5)
-            if deitar:
-                self.escurecer(deitar*0.87)
+            self.ator(688, 446, tempo)
+
+        self.bancada(0)
         quantidade = min(3, 1+int(tempo*1.4)) if tempo < 10.2 else min(7, 3+int((tempo-10.2)*2))
         estado = 'Max / POO: modele uma lista de chamada'
         if 1.8 < tempo < 5.6:
@@ -192,26 +211,42 @@ class Introducao:
             estado = 'IA gerando a atividade...'
         self.editor.desenhar(self.fundo, quantidade, 0, estado, tempo, ampliar=tempo < 10.65)
 
-    def oscilacao(self, tempo):
-        self.quarto(1, '00:42')
+    def bancada(self, tempo, equipada=False, anomalia=False):
+        # Pesquisa sobre a escrivaninha existente, respeitando madeira e perspectiva.
+        pygame.draw.polygon(self.fundo, (51, 59, 46), [(847, 295), (898, 295), (911, 304), (850, 304)])
+        pygame.draw.line(self.fundo, (115, 103, 73), (851, 303), (907, 303))
+        pygame.draw.line(self.fundo, (111, 95, 70), (861, 300), (848, 286), 2)
+        pygame.draw.line(self.fundo, (52, 49, 42), (848, 286), (845, 283), 3)
+        if not equipada:
+            desenhar_luva(self.fundo, (880, 288), .55, abertura=.45, brilho=anomalia)
+        pygame.draw.lines(self.fundo, (65, 61, 48), False, [(862, 294), (843, 302), (826, 292)], 1)
+        if anomalia:
+            arte.luz(self.fundo, (880, 288), 25, (111, 173, 150, 65))
+
+    def pesquisa(self, tempo):
+        self.quarto(.9, '22:18')
         self.mochila(*arte.MOCHILA)
-        self.dormindo(tempo)
-        self.escurecer(0.56)
+        self.ator(688, 446, tempo, pose='attack')
+        self.bancada(tempo, equipada=True)
+        mao = (748, 350)
+        desenhar_luva(self.fundo, mao, .70, 1, (math.sin(tempo*2)+1)/2)
+        self.editor.desenhar(self.fundo, 7, 0, 'IA gerando / sensores conectados', tempo, ampliar=False)
+        # Telemetria discreta sobre o próprio visor; falas continuam nas legendas.
+        for indice in range(20):
+            x = 761+indice*3
+            y = 267-round(math.sin(indice*.6+tempo*3)*5)
+            pygame.draw.circle(self.fundo, (151, 180, 145), (x, y), 1)
+
+    def oscilacao(self, tempo):
+        self.pesquisa(tempo)
         alteradas = int(7*progresso(tempo, 2.7, 7.4))
-        estado = 'IA gerando a atividade...'
-        if tempo >= 1:
-            estado = 'TENSÃO BAIXA / reiniciando console'
-        if tempo >= 2.6:
-            estado = 'Interface restaurada / sessão duplicada'
-        if tempo >= 5:
-            estado = 'IFVania :: mapa vinculando ao campus'
+        estado = 'TENSÃO BAIXA / reconectando protótipo' if tempo < 3 else 'Sensores e atuadores > regras do mundo'
         self.editor.desenhar(self.fundo, 7, alteradas, estado, tempo, lateral=True)
+        self.bancada(tempo, equipada=True, anomalia=True)
         if 1 <= tempo < 2.6:
-            opacidade = 0.94 if 1.52 < tempo < 2.24 else 0.22+0.17*math.sin(tempo*24)
-            self.escurecer(opacidade)
-            arte.fragmentar(self.fundo, tempo, 0.21, arte.MONITOR.center)
-        elif 2.6 <= tempo < 3.05 or 5.8 <= tempo < 7.7:
-            arte.fragmentar(self.fundo, tempo, 0.13, arte.MONITOR.center)
+            self.escurecer(.72 if int(tempo*7) % 2 else .2)
+        if tempo >= 1:
+            arte.fragmentar(self.fundo, tempo, .2, arte.MONITOR.center)
 
     def dormindo(self, tempo):
         recorte = self.fundo.get_clip()
@@ -222,62 +257,39 @@ class Introducao:
         self.fundo.blit(self.coberta, (257, 288))
 
     def codigo_pronto(self, tempo):
-        hora = '06:12'
-        if tempo < 3.9:
-            self.quarto(0.14, hora)
-            self.mochila(*arte.MOCHILA)
-            levantar = suave(tempo, 0.8, 1.6)
-            if not levantar:
-                self.dormindo(tempo)
-            else:
-                andar = suave(tempo, 1.6, 3.9)
-                distancia = 402*andar
-                self.ator(arte.CAMA[0]+distancia, arte.CAMA[1]+129*levantar, tempo,
-                          distancia if andar < 1 else 0,
-                          escala=0.80+0.20*levantar, angulo=88*(1-levantar))
-            self.escurecer(0.50-0.26*suave(tempo, 0, 1.6))
+        self.quarto(1, '23:48')
+        self.mochila(*arte.MOCHILA)
+        andar = suave(tempo, 2, 8)
+        if tempo < 8:
+            self.ator(688-401*andar, 446, tempo, 401*andar, esquerda=True)
         else:
-            self.posto(tempo, hora)
-            self.escurecer(0.24)
-        self.editor.desenhar(self.fundo, 7, 0, 'Entrega enviada / Portal IFRN Caicó',
-                             tempo, ampliar=tempo >= 3.9)
-        if 11.1 <= tempo < 11.6:
-            arte.fragmentar(self.fundo, tempo, 0.18, arte.MONITOR.center)
+            self.dormindo(tempo)
+        # Protótipo ao alcance da cama; a bancada já está vazia.
+        self.bancada(tempo, equipada=True)
+        desenhar_luva(self.fundo, (329, 300), .45, brilho=tempo > 10)
+        self.escurecer(.66*suave(tempo, 7, 9))
+        self.editor.desenhar(self.fundo, 7, int(7*suave(tempo, 9, 13)),
+                            'AMBIENTE VIRTUAL INICIALIZADO.' if tempo > 11 else 'Atividade concluída.',
+                            tempo, ampliar=tempo > 10, lateral=True)
+        if tempo > 10:
+            arte.luz(self.fundo, (329, 300), 28, (110, 169, 143, 70))
 
-    def despertar(self, tempo):
-        atracao = suave(tempo, 5, 8.8)
-        intensidade = suave(tempo, 0.6, 7.8)
-        centro_x, centro_y = arte.MONITOR.center
-        if tempo < 2.6:
-            self.posto(tempo, '06:12')
+    def ida_escola(self, tempo):
+        if tempo < 5:
+            self.quarto(.05, '06:35')
+            self.bancada(tempo, equipada=True)
+            andar = suave(tempo, 2.5, 4.6)
+            x = 628-578*andar
+            self.ator(x, 446, tempo, caminhada=578*andar, esquerda=True)
+            if tempo < 2.4:
+                recolher = suave(tempo, .8, 2.4)
+                self.mochila(586+55*recolher, 388-85*recolher, 1-.25*recolher)
+            self.escurecer(max(1-suave(tempo, 0, .7), suave(tempo, 4.4, 5)))
         else:
-            self.quarto(0.14, '06:12')
-            self.mochila(*arte.MOCHILA)
-            recuar = suave(tempo, 2.6, 4.2)
-            if atracao < 1:
-                inicio = 688-112*recuar
-                self.ator(inicio+(centro_x-inicio)*atracao,
-                          446+(centro_y-446)*atracao-math.sin(atracao*math.pi)*70, tempo,
-                          112*recuar if recuar < 1 else 0, esquerda=0 < recuar < 1,
-                          pose='jump' if atracao else None,
-                          escala=max(0.05, 1-atracao), angulo=-130*atracao)
-        self.escurecer(0.24+0.35*intensidade)
-        pygame.draw.rect(self.fundo, (113, 234, 225), arte.MONITOR)
-        arte.luz(self.fundo, arte.MONITOR.center, 360, (89, 234, 235, 115+round(intensidade*126)))
-        if 1.45 <= tempo < 5.3:
-            nome = self.caixa_dialogo.nome_jogador.upper()
-            texto = self.fonte_hora.render(f'SESSÃO AUTORA / {nome}', False, (186, 250, 222))
-            placa = texto.get_rect(midbottom=(centro_x, centro_y-54)).inflate(12, 8)
-            placa.clamp_ip(pygame.Rect(16, 32, 928, 476))
-            pygame.draw.rect(self.fundo, (16, 55, 67), placa)
-            self.fundo.blit(texto, texto.get_rect(center=placa.center))
-        if intensidade > 0:
-            for indice in range(4):
-                raio = round(35+((tempo*69+indice*60) % 260)*intensidade)
-                pygame.draw.ellipse(self.fundo, (79, 157+indice*15, 181),
-                                    (centro_x-raio, centro_y-raio//2, raio*2, raio), 1)
-            arte.fragmentar(self.fundo, tempo, intensidade, arte.MONITOR.center)
-        self.escurecer(suave(tempo, 8.55, 9.45)*0.76)
+            self.fundo.blit(self.fundo_escola, (0, 0))
+            andar = suave(tempo, 5.5, 10.3)
+            self.ator(130+340*andar, 488-30*andar, tempo, caminhada=340*andar, escala=.7)
+            self.escurecer(max(1-suave(tempo, 5, 5.6), suave(tempo, 10.4, 11)))
 
     def desenhar(self, tela, com_interface=True):
         cena = self.CENAS[self.indice]
@@ -302,6 +314,8 @@ class Introducao:
             if inicio <= tempo < fim:
                 [(nome, texto)] = self.caixa_dialogo.resolve_lines([(falante, texto)])
                 imagem = self.fonte.render(texto, True, (244, 239, 229))
+                if imagem.get_width() > largura-70:
+                    imagem = pygame.transform.smoothscale(imagem, (largura-70, imagem.get_height()))
                 etiqueta = self.fonte_menor.render(nome.upper(), True, (248, 192, 136))
                 caixa = pygame.Rect(0, 0, max(imagem.get_width(), etiqueta.get_width())+36, 51)
                 caixa.midbottom = (largura//2, altura-31)

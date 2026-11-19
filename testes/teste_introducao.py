@@ -37,19 +37,46 @@ class TestesIntroducao(unittest.TestCase):
         for _ in range(round(duracao*QUADROS_POR_SEGUNDO)):
             cenas_exibidas.add(self.jogo.introducao.indice)
             self.jogo._update(self.teclas, [])
-        self.assertEqual(cenas_exibidas, set(range(5)))
+        self.assertEqual(cenas_exibidas, set(range(6)))
         self.assertEqual(self.jogo.estado, ESTADO_DIALOGO)
         self.assertFalse(self.jogo.jogador.chicote_desbloqueado)
         self.jogo._draw()
-        self.assertEqual(self.jogo.fase.identificador, 'a28')
-        self.assertEqual(self.jogo.jogador.rect.topleft, self.jogo.fase.surgimento_jogador)
+        self.assertEqual(self.jogo.fase.ambiente, 'classroom')
         self.assertEqual(self.jogo.caixa_dialogo.linhas[0][0], 'Lia')
-        self.tecla(pygame.K_SPACE)
-        self.assertEqual(self.jogo.caixa_dialogo._caracteres_exibidos, 0)
-        while self.jogo.revelacao_a28:
+        self.assertIn('Depois da apresentação', self.jogo.caixa_dialogo.linhas[0][1])
+        identidade = self.jogo.jogador
+        def concluir_dialogo():
+            for _ in range(80):
+                if not self.jogo.caixa_dialogo.ativo:
+                    if self.jogo.descoberta_mouse and self.jogo.descoberta_mouse.aguardando_conclusao:
+                        for _ in range(self.jogo.descoberta_mouse.DURACAO):
+                            self.jogo._update(self.teclas, [])
+                    return
+                self.tecla(pygame.K_e)
+                self.jogo._update(self.teclas, [])
+            self.fail('Diálogo não concluiu')
+        def andar(destino):
+            for _ in range(600):
+                if self.jogo.jogador.rect.x >= destino:
+                    return
+                self.jogo._update(defaultdict(bool, {pygame.K_d: True}), [])
+            self.fail('Não chegou ao destino')
+        concluir_dialogo()
+        self.tecla(pygame.K_RETURN)
+        self.assertEqual(self.jogo.fase.ambiente, 'corridor')
+        andar(self.jogo.fase.porta_a28.x-40)
+        self.jogo._update(self.teclas, self.tecla(pygame.K_e))
+        self.assertEqual(self.jogo.fase.ambiente, 'lab')
+        andar(630)
+        self.jogo._update(self.teclas, self.tecla(pygame.K_e))
+        concluir_dialogo()
+        for _ in range(self.jogo.duracao_abducao):
             self.jogo._update(self.teclas, [])
-        for _ in range(2*len(self.jogo.caixa_dialogo.linhas)):
-            self.assertEqual(self.tecla(pygame.K_SPACE), [])
+        self.assertEqual(self.jogo.fase.identificador, 'a28')
+        self.assertIs(self.jogo.jogador, identidade)
+        self.assertFalse(self.jogo.jogador.chicote_desbloqueado)
+        concluir_dialogo()
+        self.tecla(pygame.K_RETURN)
         self.assertEqual(self.jogo.estado, ESTADO_JOGANDO)
         self.assertTrue(self.jogo.jogador.chicote_desbloqueado)
         origem = self.jogo.jogador.rect.copy()

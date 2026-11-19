@@ -13,6 +13,7 @@ from sistema.maquina_estados import MaquinaEstados
 from mundo.dados_campus import RETORNOS
 from mundo.descoberta_mouse import DescobertaMouse
 from mundo.introducao import Introducao
+from mundo.tutorial_luva import TutorialLuva
 from mundo.encerramento_equipamentos import EncerramentoEquipamentos
 from sistema import recursos, sons
 from mundo.dados_fases import build_levels, INTRODUCAO_HISTORIA, INDICE_CORRUPCAO_HISTORIA, INDICE_EXECUCAO_HISTORIA, INDICE_MEMORIA_HISTORIA
@@ -102,6 +103,7 @@ class Jogo:
         self._iniciar_sessao_campanha()
         self.checkpoints = ControleCheckpoints(self, caminho_salvamento)
         self.cena_parasita = None
+        self.tutorial_luva = None
         self.introducao = None
         self.revelacao_a28 = 0
         self.quarto_em_transicao = None
@@ -157,7 +159,7 @@ class Jogo:
     def _handle_event(self, evento):
         if evento.type == pygame.WINDOWFOCUSLOST and self.jogador:
             self.jogador.cancelar_entrada()
-            if self.estado in (ESTADO_JOGANDO, ESTADO_ABDUCAO, ESTADO_INFECCAO, ESTADO_TRANSFORMACAO_CHEFE, ESTADO_DESLIGAMENTO, ESTADO_INTRODUCAO):
+            if self.estado in (ESTADO_DIALOGO, ESTADO_JOGANDO, ESTADO_ABDUCAO, ESTADO_INFECCAO, ESTADO_TRANSFORMACAO_CHEFE, ESTADO_DESLIGAMENTO, ESTADO_INTRODUCAO):
                 self.estado_retorno_pausa = self.estado
                 self.estado = ESTADO_PAUSA
             return
@@ -299,6 +301,7 @@ class Jogo:
 
     # ------------------------------------------------------------------
     def _preparar_nova_historia(self):
+        self.tutorial_luva = None
         self._iniciar_sessao_campanha()
         self.checkpoints.checkpoint = None
         self.checkpoints.marcos.clear()
@@ -322,21 +325,20 @@ class Jogo:
         self.estado = ESTADO_INTRODUCAO
 
     def _concluir_introducao(self, pular=False):
-        if not pular:
-            self.quarto_em_transicao = pygame.Surface(self.tela.get_size())
-            self.introducao.desenhar(self.quarto_em_transicao, com_interface=False)
+        self.tutorial_luva = None
         self.introducao = None
         if pular:
             self._load_level(0)
             self.jogador.temporizador_invulnerabilidade = 0
             self.estado = ESTADO_JOGANDO
             return
-        self.revelacao_a28 = 45
-        self._enter_virtual(abertura_domestica=True)
-        self.jogador.temporizador_invulnerabilidade = 0
+        self._load_school('classroom')
+        self.na_introducao = True
+        self.estado = ESTADO_DIALOGO
+        self.caixa_dialogo.start(INTRODUCAO_HISTORIA, ao_concluir=self._begin_corridor)
 
     def _iniciar_prologo_escolar(self):
-        # Entrada para as ferramentas que registram o prólogo escolar histórico.
+        # Entrada direta para ferramentas; a campanha chega aqui após a ida à escola.
         self._preparar_nova_historia()
         self._load_school('classroom', novo_jogador=True)
         self.na_introducao = True
@@ -366,22 +368,21 @@ class Jogo:
         self.jogador.velocidade.update(0, 0)
         self.fase.begin_abduction(self.jogador)
 
-    def _enter_virtual(self, abertura_domestica=False):
+    def _enter_virtual(self):
+        self.na_introducao = False
         self._load_level(0)
         self.descoberta_mouse = DescobertaMouse()
         self.jogador.chicote_desbloqueado = False
         self.estado = ESTADO_DIALOGO
-        if abertura_domestica:
-            falas = [
-                ('Aluno(a)', 'Meu quarto... virou o A28? Eu estava na cama.'),
-                ('Aluno(a)', 'Será que a turma também veio parar aqui? Vou procurar Romerito.'),
-                *DESCOBERTA_MOUSE[2:],
-            ]
-            self.caixa_dialogo.start(falas, ao_concluir=lambda: self._grant_mouse(mostrar_cartao=False))
-        else:
-            self.caixa_dialogo.start(DESCOBERTA_MOUSE, ao_concluir=self._grant_mouse)
+        self.caixa_dialogo.start(DESCOBERTA_MOUSE, ao_concluir=self._grant_mouse)
 
     def _grant_mouse(self, mostrar_cartao=True):
+        if self.descoberta_mouse and not self.descoberta_mouse.concluida:
+            self.descoberta_mouse.aguardando_conclusao = True
+            self.descoberta_mouse.mostrar_cartao = mostrar_cartao
+            self.jogador.cancelar_combate()
+            return
+        self.tutorial_luva = TutorialLuva(self.jogador, self.fase)
         self.descoberta_mouse = None
         self.jogador.chicote_desbloqueado = True
         self.checkpoints.registrar()
@@ -509,6 +510,8 @@ class Jogo:
             self.jogador.update(self.fase.mapa_blocos.solidos, self.fase.mapa_blocos.perigos)
 
             tipo_evento, conteudo = self.fase.update(self.jogador, eventos)
+            if self.tutorial_luva and getattr(self.fase, 'identificador', None) == 'a28':
+                self.tutorial_luva.atualizar(self.jogador)
             if tipo_evento == "dialogue":
                 self.checkpoints.salvar()
                 self.estado = ESTADO_DIALOGO
@@ -551,6 +554,8 @@ class Jogo:
             self.caixa_dialogo.update()
             if getattr(self, 'descoberta_mouse', None) is not None:
                 self.descoberta_mouse.update(self.caixa_dialogo.indice)
+                if self.descoberta_mouse.concluida and self.descoberta_mouse.aguardando_conclusao:
+                    self._grant_mouse(self.descoberta_mouse.mostrar_cartao)
             if self.na_introducao:
                 self.fase.sincronizar_aula(self.caixa_dialogo.indice, INDICE_EXECUCAO_HISTORIA,
                                            INDICE_CORRUPCAO_HISTORIA)
@@ -654,7 +659,10 @@ class Jogo:
                 self.fase.draw(self.tela, ocultar_professores=True)
             else:
                 self.fase.draw(self.tela)
-                self.jogador.draw(self.tela, self.fase.camera)
+                if self.descoberta_mouse and self.descoberta_mouse.visivel:
+                    self.descoberta_mouse.draw(self.tela, self.fase.camera, self.jogador)
+                else:
+                    self.jogador.draw(self.tela, self.fase.camera)
             if self.na_introducao:
                 self.fase.draw_apresentacao(self.tela, self.caixa_dialogo.indice,
                                              INDICE_MEMORIA_HISTORIA, INDICE_EXECUCAO_HISTORIA)
@@ -665,6 +673,8 @@ class Jogo:
                 if self.estado not in (ESTADO_ABDUCAO, ESTADO_INFECCAO) and not (
                         self.estado == ESTADO_PAUSA and self.estado_retorno_pausa in (ESTADO_ABDUCAO, ESTADO_INFECCAO)):
                     self.painel_informacoes.draw_controls_hint(self.tela, self.jogador)
+                    if self.tutorial_luva and getattr(self.fase, 'identificador', None) == 'a28' and self.estado == ESTADO_JOGANDO:
+                        self.tutorial_luva.desenhar(self.tela)
                     if self.checkpoints.tempo_mensagem:
                         imagem = self.interface_inicial.fonte_pequena.render(self.checkpoints.mensagem,True,(150,240,210))
                         self.tela.blit(imagem,(28,150))
@@ -677,9 +687,8 @@ class Jogo:
                 if self.cena_parasita is not None:
                     self.cena_parasita.draw(self.tela)
             if self.estado == ESTADO_DIALOGO and not self.revelacao_a28:
-                if getattr(self, 'descoberta_mouse', None) is not None:
-                    self.descoberta_mouse.draw(self.tela, self.fase.camera, self.jogador)
-                self.caixa_dialogo.draw(self.tela)
+                if self.caixa_dialogo.ativo:
+                    self.caixa_dialogo.draw(self.tela)
             if self.estado == ESTADO_PAUSA and not self.revelacao_a28:
                 self._draw_overlay("PAUSADO", "ESC continuar / F5 salvar checkpoint")
         elif self.estado == ESTADO_CARTAO_FASE:

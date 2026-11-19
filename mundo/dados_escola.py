@@ -10,14 +10,10 @@ DIALOGO_ENCONTRO = [
     ('IFVania', 'Vocês dois vão continuar esta conversa dentro do meu mundo.'),
 ]
 
+# Nome legado preservado para ferramentas de captura e partidas antigas.
 DESCOBERTA_MOUSE = [
-    ('Aluno(a)', 'Onde estamos? A IFVania nos trouxe para dentro de um mundo virtual!'),
-    ('Aluno(a)', 'Tem alguma coisa se movendo por ali... Preciso encontrar algo para me defender.'),
-    ('Aluno(a)', 'Deixe eu procurar na bolsa... Achei um mouse com fio!'),
-    ('Aluno(a)', 'Posso segurar pelo fio e usar o mouse como chicote. Vou procurar o professor!'),
-    ('Sistema', 'Mouse com cabo reforçado disponível. Use os golpes para se defender dos bugs.'),
-    ('Sistema', 'Use X, K ou botão esquerdo do mouse. Toque e solte para golpear; segure e solte para causar o dobro de dano.'),
-    ('Sistema', 'Use SHIFT para um passo evasivo. Ele protege por um instante e precisa de tempo para recuperar.'),
-    ('Sistema', 'Segure Q para tensionar o cabo e bloquear pela frente. A resistência amarela cai nos impactos; solte para recuperar. Costas e perigos do cenário exigem esquiva ou salto.'),
-    ('Sistema', 'Encadeie três toques para variar alcance e empurrar os bugs. Cima ao soltar ataca para o alto; baixo no ar finaliza para o chão.'),
+    ('Aluno(a)', 'O laboratório virou um mundo virtual! A luva ainda está na minha mochila.'),
+    ('Aluno(a)', 'Tem um bug vindo. Preciso recuar!'),
+    ('Aluno(a)', 'Vou colocar a luva. Os atuadores estão diferentes... O código mudou nossa pesquisa!'),
+    ('Aluno(a)', 'Max fez isso comigo para ajudar pessoas. Aqui, vou usá-la para nos proteger.'),
 ]

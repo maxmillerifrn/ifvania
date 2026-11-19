@@ -48,6 +48,15 @@ class PainelInformacoes:
             pygame.draw.rect(superficie, (43, 50, 54), (30, 129, 178, 3))
             pygame.draw.rect(superficie, tema.PERIGO if jogador.defesa.quebra else tema.AMBAR,
                              (30, 129, round(178*jogador.defesa.resistencia/100), 3))
+        if jogador.chicote_desbloqueado:
+            forca = 1+int(jogador.has(Habilidade.PUNHO_IMPACTO))
+            resistencia = 1+int(jogador.has(Habilidade.DEFESA_REFORCADA))
+            controle = 1+int(jogador.has(Habilidade.SOBRECARGA))+int(jogador.has(Habilidade.COMBO_TECNOLOGICO))
+            tema.text(superficie, self.fonte_pequena, f'LUVA  F{forca} / R{resistencia} / C{controle}', (30, 140), tema.CIANO)
+            if jogador.has(Habilidade.SOBRECARGA):
+                rotulo = ('SOBRECARGA ATIVA' if jogador.tempo_sobrecarga else
+                          f'RECARGA {jogador.recarga_sobrecarga//60}s' if jogador.recarga_sobrecarga else 'R: SOBRECARGA PRONTA')
+                tema.text(superficie, self.fonte_pequena, rotulo, (30, 160), tema.AMBAR)
         if chefe is not None and chefe.ativo and chefe.vivo:
             self.draw_boss(superficie, chefe)
 
@@ -65,7 +74,7 @@ class PainelInformacoes:
 
     def draw_controls_hint(self, superficie, jogador):
         dicas = ['A/D ou SETAS  mover', 'ESPAÇO  saltar',
-                 'X / K / CLIQUE  combo / segurar  carga' if jogador.chicote_desbloqueado else 'E  interagir']
+                 'X / K / CLIQUE  socos / segurar  impacto' if jogador.chicote_desbloqueado else 'E  interagir']
         if jogador.chicote_desbloqueado and not jogador.has(Habilidade.ARRANCADA):
             dicas.append('SHIFT  esquiva')
         if jogador.chicote_desbloqueado and not jogador.has(Habilidade.ESCUDO):
@@ -76,6 +85,10 @@ class PainelInformacoes:
                               (Habilidade.DISPARO_DISTANCIA, 'F  tiro'), (Habilidade.ESCUDO, 'Q  escudo')):
             if jogador.has(habilidade):
                 dicas.append(dica)
+        if jogador.has(Habilidade.SOBRECARGA):
+            dicas.append('R  sobrecarga')
+        if jogador.has(Habilidade.ONDA_CHOQUE):
+            dicas.append('BAIXO + ataque aéreo  onda')
         dicas.append('ESC  pausa')
         fileiras, linha = [], ''
         for dica in dicas:

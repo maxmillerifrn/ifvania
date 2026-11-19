@@ -8,11 +8,12 @@ from mundo.dados_guardioes import criar_fases_guardioes
 FALA_CORRUPCAO_INTRODUCAO = ('Aluno(a)', 'Espere, professor! A tela diz que ela não vai permitir ser desligada!')
 
 FALA_EXECUCAO_TAREFA = ('Aluno(a)', 'Conectei o pendrive. O arquivo já começou a executar... Professor, isso estava na tarefa?')
-FALA_MEMORIA_TAREFA = ('Aluno(a)', 'Ontem cheguei em casa depois da aula. Minha mãe lembrou da atividade, mas pedi para uma IA fazer enquanto fui jantar.')
-FALA_RETORNO_TAREFA = ('Aluno(a)', 'A energia oscilou durante o jantar. Voltei, vi a tarefa pronta e salvei no pendrive sem conferir.')
+FALA_MEMORIA_TAREFA = ('Aluno(a)', 'Ontem cheguei em casa depois da aula. Pedi para uma IA fazer a atividade enquanto testava nossa luva assistiva.')
+FALA_RETORNO_TAREFA = ('Aluno(a)', 'A energia oscilou durante os testes da luva. Vi a tarefa pronta e salvei no pendrive sem conferir.')
 
 INTRODUCAO_HISTORIA = [
-    ('Aluno(a)', 'Professor Max, minha tarefa ficou pronta... mas apareceu coisa que eu não escrevi.'),
+    ('Aluno(a)', 'Professor Max, trouxe a atividade. Depois da apresentação, quero mostrar como ficou nossa luva!'),
+    ('Professor Max', 'Ótimo, {player}. Depois vemos os testes de preensão. Primeiro, vamos entender seu código.'),
     ('Professor Max', 'Turma, abram a atividade de programação orientada a objetos. Vamos apresentar e explicar o código.'),
     ('Professor Max', 'Como você fez essa parte, {player}? Vamos entender juntos antes de executar.'),
     FALA_MEMORIA_TAREFA,
@@ -44,6 +45,7 @@ DIALOGO_REENCONTRO = [
 ]
 
 DIALOGO_APOS_CHEFE = [
+    ('Aluno(a)', 'Recalibrei os atuadores: Punho de Impacto! Segurar e soltar concentra mais força.'),
     ('Professor Romerito', 'Eu voltei, {player}, mas os outros continuam presos. Não dá para correr sozinho nessa.'),
     ('Aluno(a)', 'Vou procurar um caminho. O senhor ajuda quem chegar ao A28?'),
     ('Professor Romerito', 'Combinado. Busque o mapa de saída e os registros da rede na biblioteca.'),

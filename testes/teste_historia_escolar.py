@@ -32,6 +32,9 @@ class TestesHistoriaEscolar(unittest.TestCase):
     def finish_dialogue(self):
         for _ in range(80):
             if not self.jogo.caixa_dialogo.ativo:
+                if self.jogo.descoberta_mouse and self.jogo.descoberta_mouse.aguardando_conclusao:
+                    for _ in range(self.jogo.descoberta_mouse.DURACAO):
+                        self.jogo._update(self.teclas, [])
                 return
             self.key(pygame.K_e)
             self.jogo._update(self.teclas, [])

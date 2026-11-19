@@ -13,7 +13,7 @@ class RetratosDialogo:
             return self.cache[identidade]
         nomes_hd = {'Professor Max': 'max', 'Professor Romerito': 'romerito',
                     'Mente Brilhante': 'mente_brilhante', 'Professor Ricardo': 'mente_brilhante',
-                    'Max em Loop': 'max',
+                    'Max em Loop': 'max', 'Eco de Max': 'max',
                     'Elias · Guardião do Compasso': 'guardiao_elias',
                     'Alessandro · Sentinela dos Enlaces': 'guardiao_alessandro',
                     'Francisco · Guardião da Continuidade': 'guardiao_francisco',

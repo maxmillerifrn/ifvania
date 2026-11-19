@@ -1,3 +1,4 @@
+from sistema.habilidades import Habilidade
 """Aceite da etapa 4: percurso básico, infecção, combate e fim do conteúdo."""
 import os
 os.environ.setdefault('SDL_VIDEODRIVER', 'dummy')
@@ -189,7 +190,7 @@ class TestesCampanhaVirtual(unittest.TestCase):
             self.jogo._update(self.teclas, [])
         self.assertEqual(self.jogo.estado, ESTADO_JOGANDO)
         self.assertFalse(fase.itens_habilidades)
-        self.assertEqual(jogador.habilidades, set())
+        self.assertEqual(jogador.habilidades, {Habilidade.PUNHO_IMPACTO})
         self.assertEqual(jogador.vida_maxima, 6)
         self.assertEqual(jogador.vida, 6)
 
@@ -268,7 +269,7 @@ class TestesCampanhaVirtual(unittest.TestCase):
                 self.assertTrue(chefe.derrotado)
                 self.assertEqual(self.jogo.estado, ESTADO_DIALOGO)
                 self.assertEqual(jogador.personagem, personagem)
-                self.assertFalse(jogador.habilidades)
+                self.assertEqual(jogador.habilidades, {Habilidade.PUNHO_IMPACTO})
                 self.assertEqual(jogador.vida_maxima, 6)
                 self.assertFalse(fase.itens_habilidades)
                 self.assertFalse(chefe.projeteis)

@@ -1,5 +1,28 @@
 # Roteiro da história — IFVania
 
+## Revisão vigente — mochila, traje com luva e acesso ao A28 (19/11/2026)
+
+Os dois protagonistas agora usam arte sem mochila após deixá-la no chão em casa e retornam à arte com mochila ao recolhê-la pela manhã. A mochila avulsa tem sprite próprio. No A28, uma animação de seis poses mostra o personagem abrindo a mochila, retirando a luva, vestindo-a e ajustando a cinta; o combate só é liberado ao concluir a sequência. As artes equipadas incluem a luva no próprio personagem em repouso, caminhada, golpes, salto e esquiva. Pausa e perda de foco congelam a cena, mesmo se as falas já terminaram.
+
+O acesso escolar ao A28 reutiliza o panorama do corredor pós-chefe 1, espelhado para preservar o percurso e a porta existentes. A fachada geométrica anterior foi removida. Controles, colisões e progressão foram preservados. [Relatório e capturas](../avaliacao/equipamento_personagens/RELATORIO.md): 216 testes aprovados; avaliação humana do acabamento em movimento ainda pendente.
+
+
+## Ajuste vigente — arte integrada e retorno à escola
+
+A abertura em casa agora termina na manhã seguinte, com a atividade no pendrive e a luva na mochila, seguida da chegada ao IFRN. Na sala, o aluno diz a Max: “Professor Max, trouxe a atividade. Depois da apresentação, quero mostrar como ficou nossa luva!”. A execução do arquivo dispara a crise; seguem a conversa com Max, o corredor jogável, o encontro com Romerito e a sucção no laboratório. Não há mais transporte a partir da cama. As falas de lembrança foram alinhadas aos testes da luva durante a oscilação.
+
+A luva recebeu três sprites texturizados de perfil, em metal envelhecido e tecido escuro, substituindo as formas geométricas e o núcleo brilhante. O desenho acompanha a mão da pose sem alterar colisões ou alcance. A bancada sobreposta e o painel grande de pesquisa foram removidos: os materiais ficam na escrivaninha existente e a telemetria no monitor. Fontes e prompt estão em `recursos/fontes_arte/luva_robotica/`; a geração usou a ferramenta integrada de imagens. Evidências atualizadas: [revisão escolar](../avaliacao/luva_robotica/revisao_escola/RELATORIO.md).
+
+
+## Histórico — primeira implementação da luva robótica (18/11/2026)
+
+Esta revisão substitui as descrições anteriores da abertura doméstica e da arma do protagonista. A IA gera a atividade enquanto o aluno desenvolve com Max uma luva assistiva no IFRN Campus Caicó. A oscilação acontece durante os testes; o código incorpora o protótipo ao mundo virtual. Após dormir sem conferir a atividade, o aluno desperta, equipa a luva e é transportado ao A28. São seis cenas animadas e um sétimo momento jogável, com tutorial integrado ao primeiro bug. F pula e ESC pausa sem perder o equipamento básico.
+
+A luva substitui o mouse como arma: socos de alcance curto, combo, carga, ascendente, mergulho, guarda e contra-ataque. X/K/clique continuam atacando na soltura; Q bloqueia; Shift esquiva. As vitórias em A28, biblioteca, recreio, cópias e rede desbloqueiam, respectivamente, Punho de Impacto, Sobrecarga Mecânica (R), Onda de Choque, Defesa Reforçada e Combo Tecnológico. Os módulos são persistidos no save existente. O HUD apresenta força, resistência e controle. Max permanece orientador; “Eco de Max” é uma cópia explicitamente criada pela anomalia.
+
+Arquitetura, roteiro, parâmetros, capturas e limitações em [relatório da luva](../avaliacao/luva_robotica/RELATORIO.md). Verificação automatizada e renderização offscreen não substituem a avaliação humana de ritmo, áudio e diversão.
+
+
 ## Revisão vigente — nitidez, golpes e Mente Brilhante (18/11/2026)
 
 O estado anterior foi registrado no commit `fe13741`, antes destas melhorias. O bug agora conserva a apresentação HD ao se virar para a esquerda, corrigindo a ampliação indevida do quadro lógico de 40 px. RomerBug usa novo atlas sombrio mantendo terno, gravata e sapatos; SpeedBug mantém regata laranja, shorts, medalha e tênis de corrida. Ambos têm poses próprias de soco e chute e lançam um pulso de energia como especial.

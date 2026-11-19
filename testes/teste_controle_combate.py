@@ -55,7 +55,7 @@ class TestesControleCombate(unittest.TestCase):
                 with self.subTest(personagem=personagem, carga=carga):
                     self.jogador = Jogador(200,312,personagem)
                     self.jogador.no_chao = True
-                    alvo = Inimigo(295,312,vida=10)
+                    alvo = Inimigo(255,312,vida=10)
                     self.jogador.handle_input(self.teclas,[self.evento(pygame.KEYDOWN,pygame.K_x)])
                     self.assertEqual(self.jogador.temporizador_golpe,0)
                     for _ in range(carga):self.quadro()
@@ -120,7 +120,7 @@ class TestesControleCombate(unittest.TestCase):
 
     def teste_filtragem_final_tolerante_sem_acertar_atras_de_parede(self):
         self.jogador._try_melee(2)
-        alvo=Inimigo(310,296,vida=8)
+        alvo=Inimigo(270,296,vida=8)
         for idade in range(30):
             self.jogador.temporizador_golpe=30-idade
             area=self.jogador.get_melee_rect()
@@ -128,7 +128,7 @@ class TestesControleCombate(unittest.TestCase):
                 self.jogador.try_melee_hit(alvo,self.piso)
         self.assertEqual(alvo.vida,6)
         self.jogador.espera_ataque=0;self.jogador._try_melee(2)
-        parede=pygame.Rect(280,200,12,152)
+        parede=pygame.Rect(250,200,12,152)
         for idade in range(30):
             self.jogador.temporizador_golpe=30-idade
             self.jogador.try_melee_hit(alvo,[parede])
@@ -190,7 +190,7 @@ class TestesControleCombate(unittest.TestCase):
 
     def teste_toque_no_recolhimento_encadeia_sem_apagar_golpe_atual(self):
         self.quadro([self.evento(pygame.KEYDOWN, pygame.K_x), self.evento(pygame.KEYUP, pygame.K_x)])
-        for _ in range(22): self.quadro()
+        for _ in range(self.jogador.chicote.DURACAO-8): self.quadro()
         self.assertLessEqual(self.jogador.temporizador_golpe, 8)
         self.assertGreater(self.jogador.temporizador_golpe, 0)
         self.quadro([self.evento(pygame.KEYDOWN, pygame.K_x), self.evento(pygame.KEYUP, pygame.K_x)])
@@ -198,12 +198,12 @@ class TestesControleCombate(unittest.TestCase):
         self.assertTrue(self.jogador.ataque_pendente)
         for _ in range(8): self.quadro()
         self.assertEqual(self.jogador.etapa_combo, 2)
-        self.assertGreater(self.jogador.temporizador_golpe, 20)
+        self.assertGreater(self.jogador.temporizador_golpe, self.jogador.chicote.DURACAO-4)
         self.assertFalse(self.jogador.ataque_pendente)
 
     def teste_pausa_cancela_toque_antecipado_do_combo(self):
         self.quadro([self.evento(pygame.KEYDOWN, pygame.K_x), self.evento(pygame.KEYUP, pygame.K_x)])
-        for _ in range(22): self.quadro()
+        for _ in range(self.jogador.chicote.DURACAO-8): self.quadro()
         self.quadro([self.evento(pygame.KEYDOWN, pygame.K_x), self.evento(pygame.KEYUP, pygame.K_x)])
         self.jogador.cancelar_combate()
         for _ in range(35): self.quadro()

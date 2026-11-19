@@ -39,7 +39,7 @@ def criar_biblioteca():
             ('Mente Brilhante', 'A IFVania trancou o catálogo na minha cabeça. Não consigo liberar o mapa!'),
             ('Aluno(a)', 'Professor Ricardo? Vou romper esse vínculo. A turma precisa da saída.'),
         ],
-        'victory_dialogue': [
+        'victory_dialogue': [('Aluno(a)', 'Otimizei o controle: R ativa Sobrecarga por cinco segundos. Depois, os atuadores precisam esfriar.'),
             ('Professor Ricardo', 'Minha cabeça voltou a ser minha. O mapa está liberado; vamos tirar todos daqui.'),
             ('Aluno(a)', 'Achei o mapa e o inventário. O servidor tem uma alimentação de reserva.'),
             ('Professor Romerito', 'E há colegas presos perto da quadra, {player}. Precisamos abrir o pátio.'),

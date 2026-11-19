@@ -12,7 +12,7 @@ from sistema import recursos
 from entidades.personagem import Personagem
 from sistema.habilidades import Habilidade
 from entidades.projetil import Projetil
-from entidades.chicote_mouse import ChicoteMouse
+from entidades.luva_robotica import LuvaRobotica, desenhar_luva
 from sistema.comandos import interpretar
 from sistema.maquina_estados import MaquinaEstados
 from entidades.defesa_mouse import DefesaMouse
@@ -85,7 +85,11 @@ class Jogador(Personagem):
         self.temporizador_invulnerabilidade = 0
         self.espera_ataque = 0
         self.temporizador_golpe = 0
-        self.chicote = ChicoteMouse()
+        self.chicote = LuvaRobotica()
+        self.tempo_sobrecarga = self.recarga_sobrecarga = 0
+        self.janela_contra_ataque = 0
+        self.protecao_inicial = False
+        self.acoes_luva = set()
         self.chicote_desbloqueado = True  # Fases de combate antigas; o prólogo bloqueia a arma.
         self._solidos = ()
         self.pausa_impacto = 0
@@ -210,6 +214,9 @@ class Jogador(Personagem):
                     self.comando_carga = None
                 continue
             if evento.type == pygame.KEYDOWN:
+                if evento.key == pygame.K_r and not getattr(evento, 'repeat', False):
+                    if self.has(Habilidade.SOBRECARGA) and not self.recarga_sobrecarga and self.chicote_desbloqueado:
+                        self.tempo_sobrecarga, self.recarga_sobrecarga = 300, 900
                 if intencao is not None and intencao.acao == 'salto':
                     self.memoria_salto = configuracoes.TOLERANCIA_SALTO
                     self._try_jump()
@@ -225,6 +232,7 @@ class Jogador(Personagem):
 
     def cancelar_entrada(self):
         self.defesa.cancelar()
+        self.janela_contra_ataque = 0
         self.etapa_combo = self.janela_combo = 0
         self.instante_carga = 0
         self.carregando = False
@@ -253,6 +261,7 @@ class Jogador(Personagem):
                 or (self.temporizador_golpe > 0 and self.chicote.age(self) < self.chicote.FIM_GOLPE)):
             return
         self.cancelar_combate()
+        self.acoes_luva.add('esquiva')
         self.direcao_esquiva = self.direcao_olhar
         self.temporizador_esquiva = configuracoes.DURACAO_ESQUIVA
         self.estados_combate.mudar('esquiva')
@@ -266,6 +275,7 @@ class Jogador(Personagem):
             return False
         self.cancelar_combate()
         if self.defesa.iniciar():
+            self.acoes_luva.add('guarda')
             self.estados_combate.mudar('bloqueio')
             return True
         return False
@@ -324,9 +334,18 @@ class Jogador(Personagem):
                 and self.temporizador_golpe == 0 and self.temporizador_esquiva == 0):
             self.etapa_combo = (self.etapa_combo % 3)+1 if dano == 1 and self.janela_combo else 1
             self.janela_combo = 50 if dano == 1 else 0
-            self.espera_ataque = configuracoes.ESPERA_ATAQUE
+            bonus = int(self.tempo_sobrecarga > 0) + int(self.janela_contra_ataque > 0)
+            if dano > 1 and self.has(Habilidade.PUNHO_IMPACTO):
+                bonus += 1
+            if self.etapa_combo == 3 and self.has(Habilidade.COMBO_TECNOLOGICO):
+                bonus += 2
+            self.janela_contra_ataque = 0
+            self.espera_ataque = 18 if self.tempo_sobrecarga else 24
             self.temporizador_golpe = self.chicote.DURACAO
-            self.chicote.start(self.direcao_olhar, dano)
+            self.chicote.start(self.direcao_olhar, dano+bonus)
+            self.acoes_luva.add('ataque')
+            if self.etapa_combo == 3:
+                self.acoes_luva.add('combo')
             self.estados_combate.mudar('golpe')
             self.chicote.tipo_golpe = self.tipo_golpe
             if self.tipo_golpe == 'descendente' and not self.no_chao:
@@ -342,6 +361,10 @@ class Jogador(Personagem):
         return self.chicote.try_hit(self, alvo, solidos)
 
     def update(self, solidos, perigos):
+        self.tempo_sobrecarga = max(0, self.tempo_sobrecarga-1)
+        self.recarga_sobrecarga = max(0, self.recarga_sobrecarga-1)
+        self.janela_contra_ataque = max(0, self.janela_contra_ataque-1)
+        self.defesa.CUSTO_ACERTO = 17 if self.has(Habilidade.DEFESA_REFORCADA) else 26
         self.defesa.update()
         self.janela_combo = max(0, self.janela_combo-1)
         if not (self.defesa.ativa or self.carregando or self.temporizador_golpe or self.temporizador_esquiva or self.temporizador_recuo or self.temporizador_ancoragem):
@@ -388,7 +411,7 @@ class Jogador(Personagem):
         if self.espera_ataque > 0:
             self.espera_ataque -= 1
         if self.temporizador_golpe > 0:
-            self.temporizador_golpe -= 1
+            self.temporizador_golpe = max(0, self.temporizador_golpe-(2 if self.tempo_sobrecarga else 1))
         if self.temporizador_invulnerabilidade > 0:
             self.temporizador_invulnerabilidade -= 1
         if self.ataque_pendente:
@@ -436,11 +459,16 @@ class Jogador(Personagem):
             return
         frontal = ((origem[0]-self.rect.centerx)*self.direcao_olhar >= 0 if origem is not None
                    else recuo[0]*self.direcao_olhar < 0)
+        if self.protecao_inicial and bloqueavel and frontal:
+            self.protecao_inicial = False
+            self.tentar_bloqueio()
         janela_anterior = self.defesa.janela_acerto
         if bloqueavel and frontal and self.defesa.receber(quantidade):
             from sistema.sons import tocar
             if not janela_anterior:
                 tocar('bloqueio')
+            self.janela_contra_ataque = 45
+            self.acoes_luva.add('defesa')
             return 'bloqueado'
         if self.escudo_ativo:
             self.escudo_ativo = False
@@ -459,6 +487,8 @@ class Jogador(Personagem):
     def respawn(self, x, y):
         self.cancelar_combate()
         self.defesa = DefesaMouse()
+        self.tempo_sobrecarga = self.recarga_sobrecarga = 0
+        self.protecao_inicial = False
         self.temporizador_recuo = self.espera_esquiva = self.tolerancia_borda = 0
         self.posicao = pygame.Vector2(x, y)
         self.ultimo_apoio_seguro = (x, y)
@@ -552,6 +582,9 @@ class Jogador(Personagem):
             self.image = figura
 
     def get_draw_image(self):
+        if self.chicote_desbloqueado:
+            from entidades.visual_equipamento import figura_com_luva
+            return figura_com_luva(self)
         imagem = super().get_draw_image()
         if self.estado_animacao == 'walk' and self.deslocamento_x > 0.01:
             sufixo = '_r' if self.direcao_olhar > 0 else '_l'
@@ -584,7 +617,7 @@ class Jogador(Personagem):
         if self.temporizador_esquiva > 0:
             pygame.draw.line(superficie, (136, 159, 163),
                              (destino.centerx-self.direcao_esquiva*34, destino.centery), destino.center, 2)
-        if self.temporizador_golpe > 0:
+        if self.temporizador_golpe > 0 and not piscando:
             self.chicote.draw(superficie, camera, self, self._solidos)
         if self.escudo_ativo:
             pygame.draw.circle(superficie, (120, 220, 255), destino.center, self.largura, 2)

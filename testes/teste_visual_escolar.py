@@ -100,7 +100,7 @@ class TestesVisualEscolar(unittest.TestCase):
         for _ in range(70): self.jogo._update(self.teclas, [])
         self.assertEqual(fase.cenario_escolar.instantes_visuais, 70)
 
-    def test_whip_follows_scaled_hand_without_extending_tip_trajectory(self):
+    def test_luva_preserva_trajetoria_logica_ao_mudar_escala_visual(self):
         jogador = Jogador(200, 312)
         jogador._try_melee()
         jogador.temporizador_golpe = jogador.chicote.DURACAO-10
@@ -108,7 +108,7 @@ class TestesVisualEscolar(unittest.TestCase):
         normal = jogador.chicote.points(jogador)
         jogador.ESCALA_VISUAL = 2.0
         ampliado = jogador.chicote.points(jogador)
-        self.assertNotEqual(normal[0], ampliado[0])
+        self.assertEqual(normal[0], ampliado[0])
         self.assertEqual(normal[-1], ampliado[-1])
         self.assertEqual(jogador.rect.size, (40, 40))
         parede = pygame.Rect(jogador.rect.right, 250, 32, 150)

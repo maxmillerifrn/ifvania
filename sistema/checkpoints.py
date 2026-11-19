@@ -143,6 +143,7 @@ class ControleCheckpoints:
             jogo.fase.camera.update(jogador.rect)
             jogo.caixa_dialogo.ativo = False
             jogo.na_introducao = False
+            jogo.tutorial_luva = None
             jogo.transicao_chefe = None
             jogo.cena_parasita = None
             jogo.estado = 'playing'

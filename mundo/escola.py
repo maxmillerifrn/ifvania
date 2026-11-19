@@ -12,6 +12,7 @@ from mundo.camera import Camera
 from mundo.arte_escolar import ArteEscolar
 from interface import tema
 from mundo.succao_computador import SuccaoComputador
+from mundo.vegetacao_vento import VegetacaoAoVento
 
 
 class FaseEscolar:
@@ -44,6 +45,10 @@ class FaseEscolar:
         self.instantes = 0
         self.instantes_visuais = 0
         self.arte = ArteEscolar(ambiente, largura, mostrar_turma=ambiente == 'classroom')
+        self.corredor_a28 = (pygame.transform.flip(recursos.load_image('cenarios/corredor_biblioteca.png'), True, False)
+                             if ambiente == 'corridor' else None)
+        self.vento_corredor = (VegetacaoAoVento(self.corredor_a28, [(280,200,230,150),(1350,200,300,150)])
+                               if self.corredor_a28 else None)
         self.hipnose = 0.0
         self.succao = None
         self.indice_historia = 0
@@ -105,54 +110,14 @@ class FaseEscolar:
         if self.corrompido:
             self.hipnose = min(1, self.hipnose+1/90)
 
-    def _door(self, superficie, x, rotulo, ativo=False, deslocamento_y=0):
-        def desenhar(cor, retangulo, largura=0):
-            destino = pygame.Rect(retangulo).move(0, deslocamento_y)
-            self._rect(superficie, cor, destino, largura)
-
-        # Porta metálica: caixilho, visor, dobradiças, puxador e chapa inferior.
-        desenhar((21, 29, 34), (x-7, 210, 94, 142))
-        desenhar((89, 100, 101), (x-4, 213, 88, 139), 2)
-        desenhar((43, 57, 63), (x, 218, 80, 134))
-        desenhar((71, 85, 89), (x+3, 221, 74, 128), 1)
-        desenhar((14, 28, 35), (x+12, 230, 56, 42))
-        desenhar((96, 123, 128), (x+12, 230, 56, 42), 2)
-        desenhar((26, 47, 56), (x+16, 234, 48, 34))
-        desenhar((65, 91, 99), (x+20, 237, 2, 27))
-        desenhar((101, 113, 110), (x+61, 290, 10, 21))
-        desenhar((164, 173, 163), (x+58, 295, 11, 3))
-        desenhar((56, 69, 73), (x+8, 328, 64, 19))
-        for hy in (239, 289, 327):
-            desenhar((100, 107, 103), (x+2, hy, 4, 9))
-        for sy in (334, 339, 344):
-            desenhar((83, 93, 91), (x+15, sy, 46, 1))
-        desenhar((13, 27, 33), (x-5, 180, 90, 25))
-        desenhar((95, 117, 118), (x-5, 180, 90, 25), 1)
-        self._text(superficie, rotulo, x+20, 185+deslocamento_y)
-        if ativo:
-            desenhar((110, 182, 179), (x+91, 288, 7, 4))
-
-    def _desenhar_fachada_a28(self, superficie):
-        """Bloco de chegada: porta pertence à parede e soleira ao piso."""
-        self._rect(superficie, (30, 38, 41), (1600, 112, 320, 328))
-        self._rect(superficie, (118, 108, 81), (1608, 120, 304, 312))
-        for y in range(128, 420, 24):
-            self._rect(superficie, (106, 98, 76), (1608, y, 304, 1))
-        self._rect(superficie, (59, 67, 66), (1608, 354, 304, 78))
-        self._rect(superficie, (123, 66, 56), (1608, 350, 304, 7))
-        self._rect(superficie, (27, 39, 44), (1592, 100, 328, 14))
-        self._rect(superficie, (151, 148, 119), (1592, 100, 328, 3))
-        self._rect(superficie, (27, 35, 39), (1600, 432, 320, 8))
-        self._rect(superficie, (149, 155, 139), (1718, 438, 100, 2))
-
     def draw(self, superficie, ocultar_professores=False):
-        self.arte.draw(superficie, self.camera, self.instantes_visuais, self.corrompido, self.hipnose)
-        if self.ambiente == 'corridor':
-            self._desenhar_fachada_a28(superficie)
-            self._door(superficie, self.porta_a28.x, 'A28', True, self.Y_PISO-352)
-            self._rect(superficie, (17, 34, 40), (1280, 95, 250, 30))
-            self._text(superficie, 'LABORATÓRIO A28  >', 1295, 102)
+        if self.corredor_a28 is not None:
+            superficie.blit(self.corredor_a28, (-round(self.camera.deslocamento.x), -round(self.camera.deslocamento.y)))
+            self.vento_corredor.draw(superficie, self.instantes_visuais, self.camera.deslocamento)
+            self._text(superficie, 'LABORATÓRIO A28', 1701, 201, (52, 46, 35), pequeno=True)
+            self._text(superficie, 'A28  >', 1295, 198, (52, 46, 35), pequeno=True)
         else:
+            self.arte.draw(superficie, self.camera, self.instantes_visuais, self.corrompido, self.hipnose)
             titulo = ('IFVania — inteligência artificial' if self.arte.etapa_aula in ('execucao', 'revolta')
                       else 'Apresentação da atividade / POO') if self.ambiente == 'classroom' else 'LABORATÓRIO A28'
             self._text(superficie, titulo, 454, 170)

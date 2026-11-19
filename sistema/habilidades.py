@@ -10,9 +10,19 @@ class Habilidade(Enum):
     DISPARO_DISTANCIA = auto()
     ESCUDO = auto()
     ANCORAGEM = auto()
+    PUNHO_IMPACTO = auto()
+    SOBRECARGA = auto()
+    ONDA_CHOQUE = auto()
+    DEFESA_REFORCADA = auto()
+    COMBO_TECNOLOGICO = auto()
 
 
 NOMES_HABILIDADES = {
+    Habilidade.PUNHO_IMPACTO: 'Punho de Impacto',
+    Habilidade.SOBRECARGA: 'Sobrecarga Mecânica',
+    Habilidade.ONDA_CHOQUE: 'Onda de Choque',
+    Habilidade.DEFESA_REFORCADA: 'Defesa Reforçada',
+    Habilidade.COMBO_TECNOLOGICO: 'Combo Tecnológico',
     Habilidade.ANCORAGEM: 'Cabo de ancoragem',
     Habilidade.SALTO_DUPLO: "Salto duplo",
     Habilidade.ARRANCADA: "Dash Veloz (Python)",
@@ -22,6 +32,11 @@ NOMES_HABILIDADES = {
 }
 
 TECLAS_HABILIDADES = {
+    Habilidade.PUNHO_IMPACTO: 'Segurar e soltar X / K / clique',
+    Habilidade.SOBRECARGA: 'R (5 segundos / recarga 15 segundos)',
+    Habilidade.ONDA_CHOQUE: 'Baixo + ataque no ar',
+    Habilidade.DEFESA_REFORCADA: 'Q',
+    Habilidade.COMBO_TECNOLOGICO: 'Terceiro golpe do combo',
     Habilidade.ANCORAGEM: 'E junto a conector',
     Habilidade.SALTO_DUPLO: "Espaço (2x no ar)",
     Habilidade.ARRANCADA: "SHIFT",

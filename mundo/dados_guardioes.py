@@ -3,7 +3,7 @@ def criar_fases_guardioes():
     descricoes = (
         ('recreio', 'Recreio em repetição', 'Elias · Guardião do Compasso', 'elias', 'guardioes/elias.png', (97, 187, 134),
          'Rompa as três travas para abrir a rota dos estudantes.', 'O recreio terminou. A turma pode seguir até o A28. Max está no M1.'),
-        ('copias', 'Laboratório das cópias', 'Max em Loop', 'max_loop', 'guardioes/max.png', (108, 208, 221),
+        ('copias', 'Laboratório das cópias', 'Eco de Max', 'max_loop', 'guardioes/max.png', (108, 208, 221),
          'Compare os três registros. Só a cópia conectada executa o ataque.', 'A entidade é a autopreservação da IFVania. Sua sessão de autoria preserva suas escolhas. Vamos corrigir juntos.'),
         ('rede', 'Rede sem saída', 'Alessandro · Sentinela dos Enlaces', 'alessandro', 'guardioes/alessandro.png', (207, 158, 100),
          'Isole três ramais para impedir a migração da IFVania.', 'O último enlace caiu. Os computadores estão isolados; o nobreak ainda alimenta o servidor.'),
@@ -19,7 +19,7 @@ def criar_fases_guardioes():
     }
     registros = {
         'recreio': ('O primeiro portão parou de repetir. Há alunos recuperando a orientação.', 'A segunda trava caiu. Romerito pode conduzir a turma até o A28.', 'A IFVania ofereceu terminar minhas tarefas se eu desistir. Mas ninguém poderia sair.'),
-        'copias': ('É o arquivo que a IA entregou no portal. Eu nem cheguei a abrir a versão final.', 'A oscilação ativou a recuperação. A entidade é a própria autopreservação da IFVania.', 'Minha sessão de autoria explica por que ainda escolho. Max continua preso na aula copiada.'),
+        'copias': ('É o arquivo que a IA concluiu no meu quarto. Eu nem cheguei a abrir a versão final.', 'A oscilação ativou a recuperação. A entidade é a própria autopreservação da IFVania.', 'Minha sessão de autoria explica por que ainda escolho. A IA copiou as mensagens de Max para simular um orientador. O original não controla este avatar.'),
         'rede': ('Primeiro ramal isolado. Os monitores daquele bloco apagaram.', 'Segundo ramal isolado. Max mantém o caminho aberto.', 'Último ramal pronto. Não vou aceitar sair sozinho e deixar os outros presos.'),
         'continuidade': ('As sessões da turma estão prontas para encerrar.', 'A rede está isolada, mas a reserva ainda alimenta o núcleo.', 'A autopreservação usa o guardião de Francisco. Vamos romper esse último vínculo.'),
     }
@@ -60,10 +60,16 @@ def criar_fases_guardioes():
                      'continuidade': 'Combine o que aprendeu. O último guardião tem uma única reserva de integridade.'}[identificador],
             'boss_dialogue': [(chefe, 'A IFVania mantém este vínculo. Não consigo interromper a rotina.'), ('Aluno(a)', 'Vou romper esse controle. Ninguém precisa continuar preso.')],
             'victory_dialogue': [(chefe, vitoria)]})
+        melhorias = {'recreio': 'O amortecimento virou Onda de Choque: baixo + ataque no ar, perto do chão.',
+                     'copias': 'Defesa Reforçada: a estrutura absorve impactos gastando menos resistência.',
+                     'rede': 'Controle sincronizado! O terceiro golpe agora executa o Combo Tecnológico.'}
+        if identificador in melhorias:
+            fases[-1]['victory_dialogue'].append(('Aluno(a)', melhorias[identificador]))
         if identificador == 'copias':
+            fases[-1]['boss_dialogue'] = [('Aluno(a)', 'Essa voz é das mensagens da pesquisa. Você não é o professor Max!'), ('Eco de Max', 'Modelo de orientação duplicado. A IFVania assumiu os atuadores.')]
             fases[-1]['victory_dialogue'] += [
                 ('Aluno(a)', 'Pedi que a IA fizesse tudo. Nem abri o arquivo que ela entregou.'),
-                ('Professor Max', 'Você devia ter conferido. Agora vamos entender e corrigir juntos. O cabo está estabilizado: use E perto dos anéis luminosos para se puxar até eles.')]
+                ('Professor Max', 'Registro de Max: segurança e precisão vêm primeiro. A luva estabilizou a ancoragem: use E perto dos anéis luminosos para se puxar até eles.')]
         elif identificador == 'continuidade':
             fases[-1]['victory_dialogue'] = [
                 ('IFVania', 'Se a aula acabar, o que sobra de mim?'),

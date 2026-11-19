@@ -36,7 +36,7 @@ class TestesChicoteMouse(unittest.TestCase):
     def test_windup_and_recovery_do_not_damage(self):
         alvo = Inimigo(228, 210, vida=10)
         self.jogador._try_melee()
-        for idade in (0, 3, 4, 19, 25, 29):
+        for idade in (0, self.jogador.chicote.PREPARACAO-1, self.jogador.chicote.FIM_GOLPE, self.jogador.chicote.DURACAO-1):
             self.jogador.temporizador_golpe = self.jogador.chicote.DURACAO - idade
             self.assertIsNone(self.jogador.get_melee_rect())
             self.assertFalse(self.jogador.try_melee_hit(alvo, []))
